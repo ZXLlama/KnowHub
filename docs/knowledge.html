@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KnowHub · 強制灌入知識</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <a href="index.html" class="btn-outline">← 回首頁</a>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="search" class="input" id="search" placeholder="搜尋標題（輸入即搜）" />
+        <button id="random" class="btn">隨機知識</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div id="card" class="card">
+      <div class="skeleton"></div>
+    </div>
+
+    <div style="opacity:.7;margin-top:12px;font-size:13px">最後更新：<span id="last"></span></div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/knowledge.js" type="module"></script>
+</body>
+</html>

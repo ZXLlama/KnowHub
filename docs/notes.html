@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KnowHub · 各種筆記</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <a href="index.html" class="btn-outline">← 回首頁</a>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="search" class="input" id="search" placeholder="搜尋標題（輸入即搜）" />
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="card">
+      <div id="list"></div>
+    </div>
+
+    <div class="modal" id="modal">
+      <div class="panel card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 id="m-title">Title</h2>
+          <button id="m-close" class="btn-outline">關閉</button>
+        </div>
+        <div id="m-tags" style="margin:6px 0"></div>
+        <hr>
+        <div id="m-body" class="prose"></div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/notes.js" type="module"></script>
+</body>
+</html>
