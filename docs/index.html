@@ -6,7 +6,7 @@
   <title>KnowHub - 首頁</title>
   <link rel="stylesheet" href="assets/css/style.css">
 
-  <!-- KaTeX 支援 -->
+  <!-- KaTeX -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -25,41 +25,53 @@
       flex: 1;
       text-align: center;
       padding: 2rem 1rem;
+      background: #1f2937;
+      border-radius: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .menu .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 16px rgba(59,130,246,0.3);
     }
     .menu .card h2 {
       margin: 0.5rem 0;
       font-size: 1.4rem;
+      color: #f9fafb;
     }
     .menu .card p {
       font-size: 0.9rem;
-      color: #94a3b8;
+      color: #9ca3af;
+    }
+    img.logo {
+      height: 120px;   /* Logo 放大 */
+      margin-bottom: 1rem;
+      border-radius: 12px; /* 圓角 */
     }
   </style>
 </head>
 <body>
   <div class="container" style="text-align:center; padding-top:6vh;">
-    <!-- Logo / Title -->
-    <img src="Know-hub.png" alt="KnowHub Logo" style="height:80px; margin-bottom:1rem;">
-    <h1 style="font-size:2.5rem; margin-bottom:0.5rem;">KnowHub</h1>
-    <p style="color:#94a3b8; font-size:1.2rem; margin-bottom:2rem;">
+    <!-- Logo / Tagline -->
+    <img src="Know-hub.png" alt="KnowHub Logo" class="logo">
+    <p style="color:#9ca3af; font-size:1.2rem; margin-bottom:2rem;">
       你的專屬知識中樞
     </p>
 
     <!-- 三個入口 -->
     <div class="menu">
-      <a href="knowledge.html" class="card btn-link">
+      <a href="knowledge.html">
         <div class="card">
           <h2>📚 強制灌入知識</h2>
           <p>快速重點、定義、詳細說明，一次看透</p>
         </div>
       </a>
-      <a href="vocab.html" class="card btn-link">
+      <a href="vocab.html">
         <div class="card">
           <h2>📝 英文單字</h2>
           <p>單字卡形式，隨機抽取與搜尋</p>
         </div>
       </a>
-      <a href="notes.html" class="card btn-link">
+      <a href="notes.html">
         <div class="card">
           <h2>🧠 各種筆記</h2>
           <p>整理過的筆記清單，支援標籤與搜尋</p>
@@ -68,21 +80,9 @@
     </div>
 
     <!-- Footer -->
-    <footer style="margin-top:4rem; font-size:0.85rem; color:#64748b;">
-      <p>Made with ❤️ by KnowHub</p>
+    <footer style="margin-top:4rem; font-size:0.85rem; color:#6b7280;">
+      <p>Made with ❤️ by ZXSNOW</p>
     </footer>
   </div>
-
-  <script src="assets/js/common.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      window.renderMathInElement(document.body, {
-        delimiters: [
-          {left:"$$", right:"$$", display:true},
-          {left:"$", right:"$", display:false}
-        ]
-      });
-    });
-  </script>
 </body>
 </html>
