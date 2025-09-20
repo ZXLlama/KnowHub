@@ -1,18 +1,16 @@
 {
-  "name": "knowhub-api",
+  "name": "knowhub",
   "version": "1.0.0",
-  "type": "module",
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "build": "tsc -p .",
-    "start": "node api/knowledge.ts"
+    "build": "tsc -p ."
   },
   "dependencies": {
-  "@notionhq/client": "^2.2.15",
-  "@vercel/node": "^2.15.10"
-},
+    "@notionhq/client": "^2.3.0"
+  },
   "devDependencies": {
+    "@types/node": "^20.11.30",
     "typescript": "^5.5.4"
   }
 }

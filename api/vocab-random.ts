@@ -1,5 +1,5 @@
-import { randomVocab } from "../lib/notion.js";
-import { handleOptions, sendJSON, serverError } from "./utils.js";
+import { randomVocab } from "../lib/notion";
+import { handleOptions, sendJSON, serverError } from "./utils";
 
 export default async function handler(req: any, res: any) {
   if (handleOptions(req, res)) return;
@@ -10,4 +10,3 @@ export default async function handler(req: any, res: any) {
     serverError(res, e);
   }
 }
-export const config = { api: { bodyParser: false } };
