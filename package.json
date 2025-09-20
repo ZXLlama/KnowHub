@@ -10,7 +10,7 @@
     "@notionhq/client": "^2.3.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.19.17",
     "typescript": "^5.5.4"
   }
 }

@@ -7,23 +7,28 @@ window.KNOWHUB = {
   SUBJECTS: ["國文","英文","數學","物理","化學","生物","地科","其他"],
 
   subjectColor(tag){
-    const map = {
-      "國文":["#fde68a","#352600"],
-      "英文":["#c7d2fe","#1e1b4b"],
-      "數學":["#a7f3d0","#064e3b"],
-      "物理":["#bae6fd","#0c4a6e"],
-      "化學":["#fecaca","#7f1d1d"],
-      "生物":["#bbf7d0","#14532d"],
-      "地科":["#e9d5ff","#4c1d95"],
-      "其他":["#e5e7eb","#111827"]
-    };
-    return map[tag] || map["其他"];
-  },
+  const map = {
+    "國文":["#fef3c7","#92400e"],
+    "英文":["#e0e7ff","#3730a3"],
+    "數學":["#d1fae5","#065f46"],
+    "物理":["#bae6fd","#0c4a6e"],
+    "化學":["#fecdd3","#881337"],
+    "生物":["#dcfce7","#166534"],
+    "地科":["#ede9fe","#5b21b6"],
+    "其他":["#f3f4f6","#374151"]
+  };
+  return map[tag] || map["其他"];
+},
 
-  tagChip(tag){
-    const [bg,fg] = KNOWHUB.subjectColor(tag);
-    return `<span class="badge" style="background:${bg}22;color:${fg};border-color:${bg}55">${tag}</span>`;
-  },
+tagChip(tag){
+  const [bg,fg] = KNOWHUB.subjectColor(tag);
+  return `
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+          style="background:${bg}; color:${fg}; border:1px solid ${fg}22;">
+      ${tag}
+    </span>`;
+},
+
 
   renderMath(scope=document.body){
     if (!window.renderMathInElement) return;

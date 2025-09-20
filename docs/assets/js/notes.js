@@ -1,76 +1,86 @@
-const API = KNOWHUB.API_BASE;
-const chipsEl = document.querySelector('#chips');
-const listEl = document.querySelector('#list');
+import { api, tagChip, renderMath } from './common.js';
+
+const chipsEl = document.querySelector('#subject-chips');
 const searchEl = document.querySelector('#search');
-
+const listEl = document.querySelector('#notes-list');
 const modal = document.querySelector('#modal');
-const mTitle = document.querySelector('#m-title');
-const mTags = document.querySelector('#m-tags');
-const mBody = document.querySelector('#m-body');
-document.querySelector('#m-close').onclick = ()=> modal.style.display = "none";
-modal.addEventListener('click',(e)=>{ if(e.target===modal) modal.style.display="none"; });
+const modalContent = document.querySelector('#modal-content');
+const closeModal = document.querySelector('#closeModal');
 
-let selected = new Set();
-let cache = [];
+let selectedSubjects = new Set();
 
-function renderChips(){
-  chipsEl.innerHTML = KNOWHUB.SUBJECTS.map(s => 
-    `<button class="chip ${selected.has(s)?'active':''}" data-s="${s}">${s}</button>`
+function renderChips() {
+  chipsEl.innerHTML = KNOWHUB.SUBJECTS.map(s =>
+    `<button data-s="${s}" class="${selectedSubjects.has(s) ? 'active' : ''}">${s}</button>`
   ).join('');
-  chipsEl.querySelectorAll('.chip').forEach(b=>{
-    b.onclick = ()=>{
+
+  chipsEl.querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
       const s = b.dataset.s;
-      selected.has(s) ? selected.delete(s) : selected.add(s);
-      fetchList();
+      selectedSubjects.has(s) ? selectedSubjects.delete(s) : selectedSubjects.add(s);
+      fetchNotes();
       renderChips();
-    }
-  });
-}
-
-function itemRow(x){
-  const tags = (x.subject||[]).map(KNOWHUB.tagChip).join(' ');
-  const summary = (x.content||"").replace(/<[^>]+>/g,"").slice(0,120);
-  return `
-  <div style="padding:10px 0;border-bottom:1px solid #233041">
-    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
-      <a href="javascript:void 0" class="link" data-id="${x.id}">${x.title}</a>
-      <div>${tags}</div>
-    </div>
-    <div style="color:#9aa8bf;margin-top:4px">${summary}...</div>
-  </div>`;
-}
-
-function openModal(x){
-  mTitle.textContent = x.title;
-  mTags.innerHTML = (x.subject||[]).map(KNOWHUB.tagChip).join(' ');
-  mBody.innerHTML = x.content || "";
-  KNOWHUB.renderMath(mBody);
-  modal.style.display = "flex";
-}
-
-function renderList(items){
-  listEl.innerHTML = items.map(itemRow).join('') || `<div style="opacity:.7">查無結果</div>`;
-  listEl.querySelectorAll('a.link').forEach(a=>{
-    a.onclick = ()=>{
-      const id = a.getAttribute('data-id');
-      const found = cache.find(x=>x.id===id);
-      if(found) openModal(found);
     };
   });
 }
 
-async function fetchList(){
-  const subjects = [...selected];
-  const q = new URL(location.href).searchParams.get('q') || searchEl.value.trim();
-  const url = new URL(API + "/api/notes");
-  subjects.forEach(s => url.searchParams.append('subject', s));
-  if (q) url.searchParams.set('q', q);
-  const r = await fetch(url);
-  const data = await r.json();
-  cache = data.items || [];
-  renderList(cache);
+async function fetchNotes() {
+  listEl.innerHTML = `<div class="skeleton" style="height:200px;"></div>`;
+  try {
+    const subject = [...selectedSubjects];
+    const q = searchEl.value.trim();
+    const data = await api('/api/notes', { subject, q, limit: 20 });
+
+    if (!data.items?.length) {
+      listEl.innerHTML = `<p style="text-align:center; color:#94a3b8;">沒有找到符合的筆記 😢</p>`;
+      return;
+    }
+
+    listEl.innerHTML = data.items.map(renderListItem).join('');
+    listEl.querySelectorAll('.note-item').forEach(el => {
+      el.onclick = () => {
+        const id = el.dataset.id;
+        const note = data.items.find(x => x.id === id);
+        showModal(note);
+      };
+    });
+  } catch (e) {
+    listEl.innerHTML = `<p style="color:#f87171;">讀取失敗 🚨 ${e.message}</p>`;
+  }
 }
 
-searchEl.addEventListener('input', ()=> fetchList());
+function renderListItem(note) {
+  return `
+    <div class="card note-item" data-id="${note.id}" style="cursor:pointer; margin-bottom:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
+        <h3 style="font-size:1.2rem; margin:0;">${note.title}</h3>
+        <div>${note.subject.map(tagChip).join('')}</div>
+      </div>
+      <p style="color:#94a3b8; margin-top:0.5rem; font-size:0.9rem;">
+        ${note.content.slice(0, 100)}...
+      </p>
+    </div>
+  `;
+}
+
+function showModal(note) {
+  modal.style.display = "flex";
+  modalContent.innerHTML = `
+    <h2 style="font-size:1.5rem; margin-bottom:1rem;">${note.title}</h2>
+    <div>${note.subject.map(tagChip).join('')}</div>
+    <hr style="margin:1rem 0; border-color:#475569;">
+    <div class="prose">${note.content}</div>
+    <p style="margin-top:1rem; font-size:0.85rem; color:#94a3b8;">
+      最後更新：${KNOWHUB.fmtDate(note.last_edited_time)}
+    </p>
+  `;
+  renderMath(modalContent);
+}
+
+closeModal.onclick = () => { modal.style.display = "none"; };
+modal.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+searchEl.oninput = () => fetchNotes();
+
 renderChips();
-fetchList();
+fetchNotes();

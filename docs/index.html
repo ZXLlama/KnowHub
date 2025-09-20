@@ -1,56 +1,87 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KnowHub</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowHub - 首頁</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- KaTeX 支援 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    @media (min-width: 768px) {
+      .menu { flex-direction: row; justify-content: center; }
+    }
+    .menu .card {
+      flex: 1;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .menu .card h2 {
+      margin: 0.5rem 0;
+      font-size: 1.4rem;
+    }
+    .menu .card p {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="nav">
-      <div class="brand">KnowHub</div>
-      <div class="badge">Your Personal Knowledge Hub</div>
+  <div class="container" style="text-align:center; padding-top:6vh;">
+    <!-- Logo / Title -->
+    <img src="Know-hub.png" alt="KnowHub Logo" style="height:80px; margin-bottom:1rem;">
+    <h1 style="font-size:2.5rem; margin-bottom:0.5rem;">KnowHub</h1>
+    <p style="color:#94a3b8; font-size:1.2rem; margin-bottom:2rem;">
+      你的專屬知識中樞
+    </p>
+
+    <!-- 三個入口 -->
+    <div class="menu">
+      <a href="knowledge.html" class="card btn-link">
+        <div class="card">
+          <h2>📚 強制灌入知識</h2>
+          <p>快速重點、定義、詳細說明，一次看透</p>
+        </div>
+      </a>
+      <a href="vocab.html" class="card btn-link">
+        <div class="card">
+          <h2>📝 英文單字</h2>
+          <p>單字卡形式，隨機抽取與搜尋</p>
+        </div>
+      </a>
+      <a href="notes.html" class="card btn-link">
+        <div class="card">
+          <h2>🧠 各種筆記</h2>
+          <p>整理過的筆記清單，支援標籤與搜尋</p>
+        </div>
+      </a>
     </div>
 
-    <div class="card" style="padding:24px">
-      <h1 style="font-size:28px">學習，但要優雅。</h1>
-      <p style="color:#9aa8bf">按 <kbd>/</kbd> 即可快速搜尋；或直接選一個入口開始。</p>
-      <div style="margin-top:12px"><input type="search" class="input" id="q" placeholder="全站快速搜尋（標題為主）"/></div>
-      <div class="grid grid-3" style="margin-top:18px">
-        <a class="card" href="knowledge.html" style="text-decoration:none">
-          <h2>強制灌入知識</h2>
-          <p class="prose" style="color:#9aa8bf">六區塊結構：快速重點、定義、詳細、易錯、例子。</p>
-        </a>
-        <a class="card" href="vocab.html" style="text-decoration:none">
-          <h2>英文單字</h2>
-          <p class="prose" style="color:#9aa8bf">抽卡 & 搜尋，H1 顯示單字，下面是內容。</p>
-        </a>
-        <a class="card" href="notes.html" style="text-decoration:none">
-          <h2>各種筆記</h2>
-          <p class="prose" style="color:#9aa8bf">標題 + 內容，支援科目篩選與查詢。</p>
-        </a>
-      </div>
-    </div>
-
-    <div style="opacity:.7;margin-top:12px;font-size:13px">LaTeX 支援範例：$\\mathrm{H_{2}SO_{4} \\rightarrow H^{+} + HSO_{4}^{-}}$</div>
+    <!-- Footer -->
+    <footer style="margin-top:4rem; font-size:0.85rem; color:#64748b;">
+      <p>Made with ❤️ by KnowHub</p>
+    </footer>
   </div>
 
-  <!-- 共用腳本（KaTeX + helpers） -->
-  <!-- 注意：common.js 在這裡以內嵌型式放 CDN 版本，index 不需要其他 JS -->
-  <?!-- 實務上你也可把 common.js 外連，這裡最少依賴 -->
   <script src="assets/js/common.js"></script>
   <script>
-    KNOWHUB.renderMath();
-    // 這裡做簡單的全站搜尋跳轉（直接帶到各分頁讓它們處理）
-    document.querySelector("#q").addEventListener("keydown",(e)=>{
-      if (e.key==="Enter"){
-        const v = e.currentTarget.value.trim();
-        if(!v) return;
-        // 先導向到「各種筆記」作聚合搜尋；你也可以做一個 search.html
-        location.href = "notes.html?q="+encodeURIComponent(v);
-      }
+    document.addEventListener("DOMContentLoaded", () => {
+      window.renderMathInElement(document.body, {
+        delimiters: [
+          {left:"$$", right:"$$", display:true},
+          {left:"$", right:"$", display:false}
+        ]
+      });
     });
   </script>
 </body>

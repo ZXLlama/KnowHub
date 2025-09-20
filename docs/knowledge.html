@@ -1,34 +1,42 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KnowHub · 強制灌入知識</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowHub - 強制灌入知識</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- KaTeX -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <div class="nav">
-      <a href="index.html" class="btn-outline">← 回首頁</a>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="search" class="input" id="search" placeholder="搜尋標題（輸入即搜）" />
-        <button id="random" class="btn">隨機知識</button>
-      </div>
+    <!-- Header -->
+    <h1 style="font-size:2rem; margin-bottom:1rem;">📚 強制灌入知識</h1>
+
+    <!-- 工具列 -->
+    <div class="toolbar" id="subject-chips"></div>
+    <input type="search" id="search" placeholder="🔍 搜尋標題..." style="margin-bottom:1.5rem;">
+
+    <!-- 顯示卡片 -->
+    <div id="knowledge-card" class="card skeleton" style="min-height:200px;"></div>
+
+    <!-- 動作按鈕 -->
+    <div style="margin-top:1.5rem; display:flex; gap:1rem;">
+      <button id="random" class="btn">🎲 隨機知識</button>
+      <button id="prev" class="btn" style="background:#475569;">⬅️ 上一則</button>
+      <button id="next" class="btn" style="background:#475569;">➡️ 下一則</button>
     </div>
 
-    <div class="card" style="margin-bottom:12px">
-      <div class="chips" id="chips"></div>
-    </div>
-
-    <div id="card" class="card">
-      <div class="skeleton"></div>
-    </div>
-
-    <div style="opacity:.7;margin-top:12px;font-size:13px">最後更新：<span id="last"></span></div>
+    <!-- Footer -->
+    <footer style="margin-top:3rem; font-size:0.85rem; color:#94a3b8;">
+      <a href="index.html" style="color:#38bdf8;">← 回首頁</a>
+    </footer>
   </div>
 
   <script src="assets/js/common.js"></script>
-  <script src="assets/js/knowledge.js" type="module"></script>
+  <script src="assets/js/knowledge.js"></script>
 </body>
 </html>

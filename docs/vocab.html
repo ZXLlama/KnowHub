@@ -1,32 +1,44 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KnowHub · 英文單字</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowHub - 英文單字</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- KaTeX -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="nav">
-      <a href="index.html" class="btn-outline">← 回首頁</a>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="search" class="input" id="search" placeholder="搜尋單字（輸入即搜）" />
-        <button id="random" class="btn">隨機單字</button>
-      </div>
+  <div class="container" style="text-align:center;">
+    <!-- Header -->
+    <header style="margin-bottom:2rem;">
+      <img src="Know-hub.png" alt="KnowHub Logo" style="height:60px; margin-bottom:0.5rem;">
+      <h1 style="font-size:2rem;">📝 英文單字</h1>
+    </header>
+
+    <!-- 搜尋框 -->
+    <input type="search" id="search" placeholder="🔍 搜尋單字..." style="margin-bottom:1.5rem;">
+
+    <!-- 單字卡 -->
+    <div id="vocab-card" class="card skeleton" style="min-height:200px;"></div>
+
+    <!-- 動作按鈕 -->
+    <div style="margin-top:1.5rem; display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+      <button id="random" class="btn">🎲 隨機單字</button>
+      <button id="prev" class="btn" style="background:#475569;">⬅️ 上一個</button>
+      <button id="next" class="btn" style="background:#475569;">➡️ 下一個</button>
     </div>
 
-    <div class="grid grid-2">
-      <div class="card" id="main" style="min-height:180px">
-        <div class="skeleton"></div>
-      </div>
-      <div class="card">
-        <div id="list" class="prose" style="max-height:60vh;overflow:auto"></div>
-      </div>
-    </div>
+    <!-- Footer -->
+    <footer style="margin-top:3rem; font-size:0.85rem; color:#94a3b8;">
+      <a href="index.html" style="color:#38bdf8;">← 回首頁</a>
+    </footer>
   </div>
+
   <script src="assets/js/common.js"></script>
-  <script src="assets/js/vocab.js" type="module"></script>
+  <script src="assets/js/vocab.js"></script>
 </body>
 </html>
