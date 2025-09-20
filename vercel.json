@@ -1,7 +1,10 @@
 {
   "functions": {
-    "api/*.{ts,js}": {
-      "runtime": "nodejs18.x"
+    "api/**/*.{ts,js}": {
+      "runtime": "vercel-node@2.0.0"
     }
-  }
+  },
+  "builds": [
+    { "src": "api/**/*.ts", "use": "@vercel/node" }
+  ]
 }
