@@ -19,13 +19,12 @@ async function loadSheet() {
     const res = await fetch(SHEET_URL);
     const text = await res.text();
     const rows = text.split("\n").map(r => r.split(",").map(x => x.trim()));
-    const [header, ...data] = rows;
 
-    allWords = data.map((r, i) => ({
+    allWords = rows.map((r, i) => ({
       word: r[0] || "",
       pos: r[1] || "",
       definition: r[2] || "",
-      index: i + 2 // 因為第一列是標題
+      index: i + 1 // ✅ 從第1行開始編號
     })).filter(x => x.word);
 
     setupSuggestions();
@@ -33,6 +32,7 @@ async function loadSheet() {
     cardEl.innerHTML = `<div class="card"><p>載入失敗 🚨 ${e.message}</p></div>`;
   }
 }
+
 
 function renderItem(x) {
   const html = `
