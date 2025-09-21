@@ -1,4 +1,4 @@
-import { renderMath } from './common.js';
+const { renderMath } = KNOWHUB;
 
 const cardEl = document.querySelector('#vocab-card');
 const searchEl = document.querySelector('#search');
