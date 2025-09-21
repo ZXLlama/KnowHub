@@ -10,9 +10,8 @@ const nextBtn = document.querySelector('#next');
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
 let allWords = [];
-let history = [];
-let pointer = -1;
 let suggestionsEl;
+let currentIndex = -1; // 🔥 新增：追蹤目前位置
 
 // 讀取 Google Sheet CSV
 async function loadSheet() {
@@ -26,7 +25,7 @@ async function loadSheet() {
       word: r[0] || "",
       pos: r[1] || "",
       definition: r[2] || "",
-      index: i + 2 // 因為第一列是標題，實際資料從第2列開始
+      index: i + 2 // 因為第一列是標題
     })).filter(x => x.word);
 
     setupSuggestions();
@@ -38,20 +37,13 @@ async function loadSheet() {
 function renderItem(x) {
   const html = `
     <div class="card" style="text-align:center; position:relative;">
-      <!-- 編號角落 -->
       <span style="position:absolute; top:0.5rem; right:0.8rem; font-size:0.9rem; color:#94a3b8;">
         #${x.index}
       </span>
-
-      <!-- 單字 -->
       <h2 style="font-size:2.2rem; margin-bottom:0.5rem;">${x.word}</h2>
-
-      <!-- 詞性 -->
       <p style="font-size:1.1rem; color:#94a3b8; margin-bottom:1rem;">
         ${x.pos ? `<span style="color:#38bdf8;">(${x.pos})</span>` : ""}
       </p>
-
-      <!-- 中文翻譯 -->
       <div style="margin-top:1rem; text-align:center;">
         <p style="font-size:1.5rem; font-weight:bold;">${x.definition}</p>
       </div>
@@ -61,15 +53,10 @@ function renderItem(x) {
   renderMath(cardEl);
 }
 
-function showWord(word) {
-  if (!word) {
-    cardEl.innerHTML = `<div class="card"><p>找不到符合的單字 😢</p></div>`;
-    return;
-  }
-  renderItem(word);
-  history = history.slice(0, pointer + 1);
-  history.push(word);
-  pointer++;
+function showWordByIndex(i) {
+  if (i < 0 || i >= allWords.length) return;
+  currentIndex = i;
+  renderItem(allWords[i]);
 }
 
 // 🔍 搜尋
@@ -95,15 +82,17 @@ function searchWord(q) {
     .slice(0, 10)
     .map(x => `
       <li class="suggestion-item" style="padding:0.5rem; cursor:pointer; border-bottom:1px solid #374151;">
-        ${x.word} ${x.pos ? `(${x.pos})` : ""} - ${x.definition}
+        #${x.index} ${x.word} ${x.pos ? `(${x.pos})` : ""} - ${x.definition}
       </li>
     `).join("");
 
   suggestionsEl.querySelectorAll(".suggestion-item").forEach((li, i) => {
     li.onclick = () => {
-      showWord(results[i]);
+      const chosen = results[i];
+      const idx = allWords.findIndex(w => w.index === chosen.index);
+      showWordByIndex(idx);
       suggestionsEl.innerHTML = "";
-      searchEl.value = results[i].word;
+      searchEl.value = chosen.word;
     };
   });
 }
@@ -111,24 +100,14 @@ function searchWord(q) {
 // 🎲 隨機
 function randomWord() {
   if (allWords.length === 0) return;
-  const word = allWords[Math.floor(Math.random() * allWords.length)];
-  showWord(word);
+  const i = Math.floor(Math.random() * allWords.length);
+  showWordByIndex(i);
 }
 
 // 綁定事件
 randomBtn.onclick = () => randomWord();
-prevBtn.onclick = () => {
-  if (pointer > 0) {
-    pointer--;
-    renderItem(history[pointer]);
-  }
-};
-nextBtn.onclick = () => {
-  if (pointer < history.length - 1) {
-    pointer++;
-    renderItem(history[pointer]);
-  }
-};
+prevBtn.onclick = () => showWordByIndex(currentIndex - 1);
+nextBtn.onclick = () => showWordByIndex(currentIndex + 1);
 searchEl.oninput = () => searchWord(searchEl.value.trim());
 
 // 建立建議列表容器
@@ -145,10 +124,10 @@ function setupSuggestions() {
   searchEl.insertAdjacentElement("afterend", suggestionsEl);
 }
 
-// 初始化：預設顯示第一個單字
+// 初始化：預設第一個單字
 (async () => {
   await loadSheet();
   if (allWords.length > 0) {
-    showWord(allWords[0]); // 預設第一個
+    showWordByIndex(0);
   }
 })();

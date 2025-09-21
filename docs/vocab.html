@@ -26,10 +26,15 @@
     <div id="vocab-card" class="card skeleton" style="min-height:200px;"></div>
 
     <!-- 動作按鈕 -->
-    <div style="margin-top:1.5rem; display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
-      <button id="random" class="btn">🎲 隨機單字</button>
-      <button id="prev" class="btn" style="background:#475569;">⬅️ 上一個</button>
-      <button id="next" class="btn" style="background:#475569;">➡️ 下一個</button>
+    <div class="btn-group">
+      <!-- 上排：隨機 -->
+      <button id="random" class="btn btn-wide">🎲 隨機單字</button>
+
+      <!-- 下排：上一個 + 下一個 -->
+      <div class="nav-btns">
+        <button id="prev" class="btn btn-nav">⬅️ 上一個</button>
+        <button id="next" class="btn btn-nav">➡️ 下一個</button>
+      </div>
     </div>
 
     <!-- Footer -->

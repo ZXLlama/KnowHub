@@ -131,3 +131,44 @@ input[type="search"]:focus, input[type="text"]:focus {
   0% { background-position: -468px 0; }
   100% { background-position: 468px 0; }
 }
+
+/* === 單字卡控制按鈕區 === */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* 🎲 隨機按鈕 → 寬版 */
+.btn-wide {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* 上/下一個按鈕 → 並排 */
+.nav-btns {
+  display: flex;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.nav-btns .btn-nav {
+  flex: 1;
+  background: #475569;
+}
+
+/* 手機友善（小於 480px） */
+@media (max-width: 480px) {
+  .btn-group {
+    gap: 0.8rem;
+  }
+  .btn-wide {
+    max-width: 100%;
+  }
+  .nav-btns {
+    max-width: 100%;
+  }
+}
