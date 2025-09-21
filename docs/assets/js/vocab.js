@@ -22,10 +22,11 @@ async function loadSheet() {
     const rows = text.split("\n").map(r => r.split(",").map(x => x.trim()));
     const [header, ...data] = rows;
 
-    allWords = data.map(r => ({
+    allWords = data.map((r, i) => ({
       word: r[0] || "",
       pos: r[1] || "",
-      definition: r[2] || ""
+      definition: r[2] || "",
+      index: i + 2 // 因為第一列是標題，實際資料從第2列開始
     })).filter(x => x.word);
 
     setupSuggestions();
@@ -36,25 +37,28 @@ async function loadSheet() {
 
 function renderItem(x) {
   const html = `
-    <div class="card" style="text-align:center;">
+    <div class="card" style="text-align:center; position:relative;">
+      <!-- 編號角落 -->
+      <span style="position:absolute; top:0.5rem; right:0.8rem; font-size:0.9rem; color:#94a3b8;">
+        #${x.index}
+      </span>
+
+      <!-- 單字 -->
       <h2 style="font-size:2.2rem; margin-bottom:0.5rem;">${x.word}</h2>
-      <p style="font-size:1.1rem; color:#94a3b8; margin-bottom:0.8rem;">
+
+      <!-- 詞性 -->
+      <p style="font-size:1.1rem; color:#94a3b8; margin-bottom:1rem;">
         ${x.pos ? `<span style="color:#38bdf8;">(${x.pos})</span>` : ""}
       </p>
-      <div style="text-align:left; margin-top:1rem;">
-        ${section("中文", x.definition)}
+
+      <!-- 中文翻譯 -->
+      <div style="margin-top:1rem; text-align:center;">
+        <p style="font-size:1.5rem; font-weight:bold;">${x.definition}</p>
       </div>
     </div>
   `;
   cardEl.innerHTML = html;
   renderMath(cardEl);
-}
-
-function section(title, content) {
-  if (!content) return "";
-  return `<hr style="margin:1rem 0; border-color:#475569;">
-          <h3 style="margin-bottom:0.5rem;">${title}</h3>
-          <div class="prose">${content}</div>`;
 }
 
 function showWord(word) {
@@ -68,7 +72,7 @@ function showWord(word) {
   pointer++;
 }
 
-// 🔍 模糊搜尋 + 中文支援
+// 🔍 搜尋
 function searchWord(q) {
   q = q.toLowerCase();
   if (!q) {
@@ -141,8 +145,10 @@ function setupSuggestions() {
   searchEl.insertAdjacentElement("afterend", suggestionsEl);
 }
 
-// 初始化
+// 初始化：預設顯示第一個單字
 (async () => {
   await loadSheet();
-  randomWord();
+  if (allWords.length > 0) {
+    showWord(allWords[0]); // 預設第一個
+  }
 })();
