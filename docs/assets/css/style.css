@@ -43,21 +43,50 @@ a {
   width: 100%;
   max-width: 360px;
   height: 280px;               /* ✅ 固定高度 */
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  overflow: hidden;
 }
 
-/* 正反面文字置中 */
+/* === Flip Card === */
+.flip-card {
+  perspective: 1000px;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
 .flip-front, .flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 1rem;
   box-sizing: border-box;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+  text-align: center;
 }
 
 /* === Text === */
@@ -134,39 +163,6 @@ a {
   background: #475569;
 }
 
-/* === Flip card === */
-.flip-card {
-  perspective: 1000px;
-  cursor: pointer;
-}
-
-.flip-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.flip-card.flipped .flip-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-front, .flip-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 1rem;
-}
-
-.flip-back {
-  transform: rotateY(180deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* === TTS Button === */
 .btn-tts {
   margin-top: 0.5rem;
@@ -183,17 +179,43 @@ a {
   background: #0ea5e9;
 }
 
+/* === 搜尋框強化 === */
+#search {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.6rem 1rem 0.6rem 2.2rem; /* 左邊空間給 icon */
+  border: 1px solid #374151;
+  border-radius: 0.6rem;
+  background: #1f2937 url('https://img.icons8.com/ios-filled/20/9ca3af/search.png') no-repeat 0.7rem center;
+  background-size: 1rem;
+  color: #f9fafb;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+#search::placeholder {
+  color: #9ca3af;
+}
+
+#search:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
+  background-color: #111827;
+}
+
 /* === 手機優化 === */
 @media (max-width: 480px) {
   .word-text {
-    font-size: 1.6rem;     /* ✅ 手機字稍微縮小 */
+    font-size: 1.6rem;
   }
   .definition-text {
     font-size: 1.3rem;
   }
   #vocab-card .card {
     max-width: 90%;
-    height: 240px;         /* ✅ 手機卡片稍微矮一點 */
+    height: 240px;         /* ✅ 手機卡片稍矮 */
   }
   .btn-wide {
     max-width: 100%;
@@ -205,7 +227,7 @@ a {
 
 /* === 手機滑動體驗 === */
 #vocab-card {
-  touch-action: pan-y; /* ✅ 僅允許上下捲動，左右交給 JS */
+  touch-action: pan-y;
 }
 
 /* === 翻頁淡入淡出動畫 === */
@@ -229,4 +251,40 @@ a {
 @keyframes fadeOut {
   from { opacity: 1; transform: scale(1); }
   to   { opacity: 0; transform: scale(0.98); }
+}
+
+/* === 搜尋建議列表 === */
+.suggestion-item {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #374151;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: #374151;
+  transform: translateX(3px);
+  color: #ffffff;
+}
+
+.suggestion-item:active {
+  background: #2563eb;
+  color: #fff;
+  transform: scale(0.98);
+}
+
+/* 建議列表容器 */
+#search + ul {
+  margin-top: 0.4rem;
+  border: 1px solid #374151;
+  border-radius: 0.5rem;
+  background: #1f2937;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
 }
