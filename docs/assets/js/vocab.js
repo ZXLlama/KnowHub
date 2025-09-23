@@ -1,6 +1,5 @@
 // ====== DOM ======
 const cardEl = document.querySelector('#vocab-card');
-const flipInner = document.querySelector('#flip-inner');
 
 const front = document.querySelector('#face-front');
 const back = document.querySelector('#face-back');
@@ -22,8 +21,7 @@ const ttsBtn    = document.querySelector('#tts-btn');
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
-const FLIP_DURATION = 600; // ms；CSS 也會用到對應值
-let isFlipped = false;     // 目前是否看到背面
+let isFlipped = false;     // 是否顯示中文面
 let allWords = [];
 let pointer = 0;
 
@@ -32,7 +30,6 @@ async function loadSheet() {
   const res = await fetch(SHEET_URL);
   const text = await res.text();
 
-  // 簡單 CSV 解析（你的資料沒有引號包逗號，這樣就夠）
   const rows = text.split("\n").map(r => r.split(",").map(s => s.trim()));
 
   allWords = rows
@@ -50,44 +47,27 @@ function renderItem(item, resetToFront = false) {
   defEl.textContent  = item.definition;
   idxEl.textContent  = `#${item.index}`;
 
-  // 保證切換單字時回到正面，並隱藏背面
   if (resetToFront) {
     isFlipped = false;
-    flipInner.classList.remove('flipped');
     front.classList.remove('face-hidden');
     back.classList.add('face-hidden');
   }
 }
 
-// ====== 翻轉：在 90° 切換顯示面 ======
-function smartFlip() {
-  const goingToBack = !isFlipped;
-
-  // 啟動旋轉
-  flipInner.classList.add('animating');
-  // 先切換旋轉狀態（0→180 或 180→0）
-  flipInner.classList.toggle('flipped', goingToBack);
-
-  // 在動畫一半時切換可見面
-  setTimeout(() => {
-    isFlipped = goingToBack;
-    if (isFlipped) {
-      front.classList.add('face-hidden');
-      back.classList.remove('face-hidden');
-    } else {
-      back.classList.add('face-hidden');
-      front.classList.remove('face-hidden');
-    }
-  }, FLIP_DURATION / 2);
-
-  // 動畫結束收尾
-  setTimeout(() => {
-    flipInner.classList.remove('animating');
-  }, FLIP_DURATION);
+// ====== 點擊切換 ======
+function toggleCard() {
+  isFlipped = !isFlipped;
+  if (isFlipped) {
+    front.classList.add('face-hidden');
+    back.classList.remove('face-hidden');
+  } else {
+    back.classList.add('face-hidden');
+    front.classList.remove('face-hidden');
+  }
 }
 
 // ====== 事件 ======
-cardEl.addEventListener('click', () => smartFlip());
+cardEl.addEventListener('click', () => toggleCard());
 
 ttsBtn.addEventListener('click', (e) => {
   e.stopPropagation();
