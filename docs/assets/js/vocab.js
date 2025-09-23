@@ -42,13 +42,17 @@ async function loadSheet() {
 
 /* === 渲染單字 === */
 function renderItem(item) {
+  // 正面
   wordEl.textContent = item.word;
   posEl.textContent = `(${item.pos}) #${item.index}`;
+
+  // 背面
   defEl.textContent = item.definition;
 
   // 確保翻回正面
   flipInner.classList.remove("flipped");
 }
+
 
 /* === 發音 (TTS) === */
 ttsBtn.addEventListener("click", () => {

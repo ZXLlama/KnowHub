@@ -33,7 +33,10 @@ a {
   width: calc(100% - 2rem);  /* 🔥 滿版但左右留白 */
   max-width: 500px;
   height: 280px;
-  margin: 1.2rem 0;
+  margin: 1.2rem auto;   /* ✅ auto 讓它水平置中 */
+  display: flex;         /* ✅ 卡片本身也要置中內容 */
+  justify-content: center;
+  align-items: center;
 }
 
 .flip-inner {
@@ -49,20 +52,13 @@ a {
   transform: rotateY(180deg);
 }
 
-.flip-front, .flip-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 1rem;
-  border: 1px solid #374151;
-  background: #1f2937;
+.flip-back {
+  transform: rotateY(180deg);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  backface-visibility: hidden;
+  text-align: center;
   padding: 1rem;
-  box-sizing: border-box;
 }
 
 .flip-back {
@@ -86,6 +82,7 @@ a {
   text-align: center;
   word-break: keep-all;
   max-width: 90%;
+  line-height: 1.8rem;
 }
 
 /* === 按鈕 === */
