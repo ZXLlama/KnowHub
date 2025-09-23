@@ -12,13 +12,15 @@ a {
   color: inherit;
 }
 
+/* === Container === */
 .container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;   /* ✅ 頁面可捲動 */
   align-items: center;
   padding: 1.5rem;
+  box-sizing: border-box;
 }
 
 /* === Card === */
@@ -36,14 +38,26 @@ a {
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 
+/* 固定字卡高度，避免翻頁時文字偏移 */
 #vocab-card .card {
   width: 100%;
   max-width: 360px;
-  min-height: 200px;
-  max-height: 300px;
+  height: 280px;               /* ✅ 固定高度 */
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 正反面文字置中 */
+.flip-front, .flip-back {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 /* === Text === */
@@ -172,14 +186,14 @@ a {
 /* === 手機優化 === */
 @media (max-width: 480px) {
   .word-text {
-    font-size: 1.8rem;
+    font-size: 1.6rem;     /* ✅ 手機字稍微縮小 */
   }
   .definition-text {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
   #vocab-card .card {
-    max-width: 95%;
-    max-height: 250px;
+    max-width: 90%;
+    height: 240px;         /* ✅ 手機卡片稍微矮一點 */
   }
   .btn-wide {
     max-width: 100%;
@@ -191,5 +205,28 @@ a {
 
 /* === 手機滑動體驗 === */
 #vocab-card {
-  touch-action: pan-y; /* 允許上下捲動，但左右交給 JS */
+  touch-action: pan-y; /* ✅ 僅允許上下捲動，左右交給 JS */
+}
+
+/* === 翻頁淡入淡出動畫 === */
+.fade {
+  opacity: 0;
+}
+
+.fade-in {
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.25s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.98); }
 }

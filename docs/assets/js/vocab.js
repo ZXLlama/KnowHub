@@ -25,7 +25,7 @@ async function loadSheet() {
       word: r[0] || "",
       pos: r[1] || "",
       definition: r[2] || "",
-      index: i + 1 // ✅ 從第 1 行開始編號
+      index: i + 1
     })).filter(x => x.word);
 
     setupSuggestions();
@@ -37,7 +37,7 @@ async function loadSheet() {
 // === 渲染字卡 ===
 function renderItem(x) {
   const html = `
-    <div class="card flip-card ${flipped ? "flipped" : ""}" id="word-card">
+    <div class="card flip-card ${flipped ? "flipped" : ""} fade" id="word-card">
       <div class="flip-inner">
         <!-- 正面 (英文) -->
         <div class="flip-front" style="text-align:center; position:relative;">
@@ -46,7 +46,6 @@ function renderItem(x) {
           </span>
           <h2 class="word-text">${x.word}</h2>
           <p class="pos-text">${x.pos ? `<span>(${x.pos})</span>` : ""}</p>
-          <!-- 發音按鈕 -->
           <button class="btn-tts" id="tts-btn">🔊 發音</button>
         </div>
 
@@ -74,6 +73,11 @@ function renderItem(x) {
     e.stopPropagation();
     speakWord(x.word);
   };
+
+  // 觸發淡入動畫
+  requestAnimationFrame(() => {
+    wordCard.classList.add("fade-in");
+  });
 }
 
 // === TTS 發音 ===
@@ -83,16 +87,29 @@ function speakWord(text) {
   speechSynthesis.speak(utter);
 }
 
-// === 循環顯示 ===
+// === 翻頁 (含淡出/淡入) ===
 function showWordByIndex(i) {
   if (allWords.length === 0) return;
 
   if (i < 0) i = allWords.length - 1;
   if (i >= allWords.length) i = 0;
 
-  currentIndex = i;
-  flipped = false; // 切換單字時重置翻轉
-  renderItem(allWords[i]);
+  const oldCard = document.querySelector("#word-card");
+  if (oldCard) {
+    oldCard.classList.remove("fade-in");
+    oldCard.classList.add("fade-out");
+
+    // 等動畫結束後再換字卡
+    oldCard.addEventListener("animationend", () => {
+      currentIndex = i;
+      flipped = false;
+      renderItem(allWords[i]);
+    }, { once: true });
+  } else {
+    currentIndex = i;
+    flipped = false;
+    renderItem(allWords[i]);
+  }
 }
 
 // === 搜尋 ===
@@ -188,5 +205,5 @@ function setupSwipe() {
   if (allWords.length > 0) {
     showWordByIndex(0);
   }
-  setupSwipe(); // 啟用手勢滑動
+  setupSwipe();
 })();
