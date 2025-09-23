@@ -21,7 +21,7 @@ const ttsBtn    = document.querySelector('#tts-btn');
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
-let isFlipped = false;     // 是否顯示中文面
+let isFlipped = false;
 let allWords = [];
 let pointer = 0;
 
@@ -37,7 +37,7 @@ async function loadSheet() {
     .filter(x => x.word);
 
   pointer = 0;
-  renderItem(allWords[pointer], /*resetToFront=*/true);
+  renderItem(allWords[pointer], true);
 }
 
 // ====== 渲染 ======
@@ -64,6 +64,9 @@ function toggleCard() {
     back.classList.add('face-hidden');
     front.classList.remove('face-hidden');
   }
+  // 小縮放特效
+  cardEl.style.transform = 'scale(0.97)';
+  setTimeout(() => cardEl.style.transform = 'scale(1)', 150);
 }
 
 // ====== 事件 ======
@@ -80,17 +83,17 @@ ttsBtn.addEventListener('click', (e) => {
 
 prevBtn.addEventListener('click', () => {
   pointer = (pointer - 1 + allWords.length) % allWords.length;
-  renderItem(allWords[pointer], /*resetToFront=*/true);
+  renderItem(allWords[pointer], true);
 });
 
 nextBtn.addEventListener('click', () => {
   pointer = (pointer + 1) % allWords.length;
-  renderItem(allWords[pointer], /*resetToFront=*/true);
+  renderItem(allWords[pointer], true);
 });
 
 randomBtn.addEventListener('click', () => {
   pointer = Math.floor(Math.random() * allWords.length);
-  renderItem(allWords[pointer], /*resetToFront=*/true);
+  renderItem(allWords[pointer], true);
 });
 
 // 搜尋 + 建議
@@ -110,7 +113,7 @@ searchEl.addEventListener('input', () => {
     li.textContent = `#${item.index} ${item.word} ${item.pos ? '(' + item.pos + ')' : ''}`;
     li.onclick = () => {
       pointer = item.index - 1;
-      renderItem(item, /*resetToFront=*/true);
+      renderItem(item, true);
       suggestionsEl.innerHTML = '';
       searchEl.value = '';
     };
@@ -118,7 +121,7 @@ searchEl.addEventListener('input', () => {
   });
 });
 
-// 手機滑動（左→下一個、右→上一個）
+// 手機滑動
 (function setupSwipe() {
   let sx = 0;
   cardEl.addEventListener('touchstart', e => sx = e.touches[0].clientX);
