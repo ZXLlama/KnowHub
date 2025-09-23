@@ -1,60 +1,51 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KnowHub - 英文單字</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-
-  <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
   <div class="container" style="text-align:center;">
-    <!-- Header -->
     <header style="margin-bottom:2rem;">
-      <img src="Know-hub.png" alt="KnowHub Logo" style="height:60px; margin-bottom:0.5rem;">
+      <img src="Know-hub.png" alt="KnowHub Logo" class="logo"/>
       <h1 style="font-size:2rem;">📝 英文單字</h1>
     </header>
 
-    <!-- 搜尋框 -->
-    <input type="search" id="search" placeholder="🔍 搜尋單字...">
+    <!-- 搜尋 -->
+    <input type="search" id="search" placeholder="🔍 搜尋單字..." />
     <ul id="suggestions"></ul>
 
-    <!-- 單字卡（翻轉） -->
+    <!-- 字卡：正反兩面 -->
     <div id="vocab-card" class="flip-card">
-      <div class="flip-inner">
-        <div class="flip-front card">
-          <h2 class="word-text">Loading...</h2>
-          <p class="pos-text"></p>
+      <div class="flip-inner" id="flip-inner">
+        <div class="flip-front card" id="face-front">
+          <span class="corner-index" id="corner-index">#1</span>
+          <h2 class="word-text" id="word">Loading…</h2>
+          <p class="pos-text" id="pos"></p>
           <button id="tts-btn" class="btn-tts">🔊 發音</button>
         </div>
-        <div class="flip-back card">
-          <p class="definition-text">請選擇單字</p>
+        <div class="flip-back card face-hidden" id="face-back">
+          <p class="definition-text" id="def">請選擇單字</p>
         </div>
       </div>
     </div>
 
-    <!-- 動作按鈕 -->
+    <!-- 操作按鈕 -->
     <div class="btn-group">
       <button id="random" class="btn btn-wide">🎲 隨機單字</button>
       <div class="nav-btns">
-        <button id="prev" class="btn btn-nav">⬅️ 上一個</button>
-        <button id="next" class="btn btn-nav">➡️ 下一個</button>
+        <button id="prev" class="btn btn-nav">⬅ 上一個</button>
+        <button id="next" class="btn btn-nav">➡ 下一個</button>
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer style="margin-top:3rem; font-size:0.85rem; color:#94a3b8;">
-      <a href="index.html" style="color:#38bdf8;">← 回首頁</a>
+    <footer style="margin-top:2rem;">
+      <a href="index.html">← 回首頁</a>
     </footer>
   </div>
 
-  <!-- 共用工具 -->
-  <script type="module" src="assets/js/common.js"></script>
-  <!-- 單字邏輯 -->
   <script type="module" src="assets/js/vocab.js"></script>
 </body>
 </html>

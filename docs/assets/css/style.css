@@ -1,208 +1,138 @@
-/* === Reset & Base === */
+/* ===== Base ===== */
+:root { --flip-duration: 600ms; }
+
 body {
   margin: 0;
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
-  background: #111827;
-  color: #f9fafb;
+  background: #0f172a;
+  color: #e5e7eb;
   line-height: 1.6;
 }
 
-a {
-  text-decoration: none;
-  color: #3b82f6;
-}
+a { color: #38bdf8; text-decoration: none; }
 
+/* ===== Logo（避免被拉伸） ===== */
 .logo {
-  max-width: 160px;
-  margin: 1rem 0;
+  display: block;
+  margin: 0.5rem auto 0.25rem;
+  width: auto;               /* 不固定寬高，避免失真 */
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
 }
 
-/* === Container === */
+/* ===== Container ===== */
 .container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 1.25rem;
   box-sizing: border-box;
 }
 
-/* === 卡片 === */
+/* ===== Search ===== */
+#search {
+  width: 100%;
+  max-width: 520px;
+  padding: 0.6rem 1rem 0.6rem 2.2rem;
+  border: 1px solid #334155;
+  border-radius: 0.6rem;
+  background: #0b1220 url('https://img.icons8.com/ios-filled/20/94a3b8/search.png') no-repeat 0.7rem center;
+  background-size: 1rem;
+  color: #e5e7eb;
+  outline: none;
+  transition: box-shadow .2s, border-color .2s, background-color .2s;
+  margin-bottom: .4rem;
+}
+#search::placeholder { color: #94a3b8; }
+#search:focus { border-color:#3b82f6; box-shadow:0 0 8px rgba(59,130,246,.45); background-color:#0a0f1a; }
+
+/* 建議清單 */
+#suggestions { list-style:none; padding:0; margin:.2rem 0 0 0; width:100%; max-width:520px; }
+.suggestion-item {
+  padding:.6rem 1rem; border-bottom:1px solid #334155; background:#0b1220; color:#e5e7eb;
+  cursor:pointer; transition:background .2s, transform .1s;
+}
+.suggestion-item:last-child { border-bottom:none; }
+.suggestion-item:hover { background:#172033; transform:translateX(3px); }
+
+/* ===== Flip Card ===== */
 .flip-card {
   perspective: 1000px;
-  width: calc(100% - 2rem);  /* 🔥 滿版但左右留白 */
-  max-width: 500px;
-  height: 280px;
-  margin: 1.2rem auto;   /* ✅ auto 讓它水平置中 */
-  display: flex;         /* ✅ 卡片本身也要置中內容 */
-  justify-content: center;
-  align-items: center;
+  width: calc(100% - 2rem);       /* 填滿寬度但左右留白 */
+  max-width: 520px;
+  height: 300px;
+  margin: 1.2rem auto;
+  display: flex; justify-content: center; align-items: center;
 }
 
 .flip-inner {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.6s;
+  transition: transform var(--flip-duration) ease;
+}
+.flip-inner.flipped { transform: rotateY(180deg); }
+
+.card {
+  position: absolute;
+  inset: 0;
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1rem; box-sizing: border-box;
 }
 
-.flip-card.flipped .flip-inner,
-.flip-inner.flipped {
-  transform: rotateY(180deg);
+/* 兩面共用 */
+.flip-front, .flip-back {
+  backface-visibility: hidden;   /* 硬體層面先擋一次 */
 }
 
-.flip-back {
-  transform: rotateY(180deg);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 1rem;
+/* 背面朝向 */
+.flip-back { transform: rotateY(180deg); }
+
+/* 90° 切換時再用 visibility 強制隱藏，避免任何瀏覽器出現疊影 */
+.face-hidden { visibility: hidden; }
+
+/* 角落編號 */
+.corner-index {
+  position: absolute; top: .6rem; right: .8rem; font-size:.9rem; color:#94a3b8;
 }
 
-.flip-back {
-  transform: rotateY(180deg);
-}
-
-.word-text {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.pos-text {
-  font-size: 1rem;
-  color: #94a3b8;
-  margin-bottom: 0.8rem;
-}
-
+/* 文字 */
+.word-text { font-size: 2.1rem; margin: .25rem 0 .4rem; word-break: keep-all; }
+.pos-text  { font-size: 1rem; color:#94a3b8; }
 .definition-text {
-  font-size: 1.6rem;
-  font-weight: bold;
-  text-align: center;
-  word-break: keep-all;
-  max-width: 90%;
-  line-height: 1.8rem;
+  font-size: 1.6rem; font-weight: 700; text-align: center; max-width: 90%; word-break: keep-all;
 }
 
-/* === 按鈕 === */
+/* ===== Buttons ===== */
 .btn {
-  background: #3b82f6;
-  color: #fff;
-  font-size: 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.6rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  background:#3b82f6; color:#fff; border:none; border-radius:.6rem;
+  padding:.6rem 1rem; cursor:pointer; transition:background .2s, transform .1s;
+  font-size:1rem; font-weight:500;
 }
+.btn:hover { background:#2563eb; }
+.btn:active { transform:scale(.96); }
 
-.btn:hover {
-  background: #2563eb;
-}
+.btn-group { display:flex; flex-direction:column; align-items:center; gap:1rem; margin-top:1rem; }
+.btn-wide  { width:100%; max-width:520px; }
+.nav-btns  { display:flex; gap:.8rem; width:100%; max-width:520px; }
+.btn-nav   { flex:1; background:#475569; }
 
-.btn:active {
-  transform: scale(0.96);
-}
-
-.btn-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.btn-wide {
-  width: 100%;
-  max-width: 500px;
-}
-
-.nav-btns {
-  display: flex;
-  gap: 0.8rem;
-  width: 100%;
-  max-width: 500px;
-}
-
-.nav-btns .btn-nav {
-  flex: 1;
-  background: #475569;
-}
-
-/* === TTS === */
 .btn-tts {
-  margin-top: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
-  border-radius: 0.4rem;
-  background: #38bdf8;
-  color: #fff;
-  cursor: pointer;
+  margin-top:.6rem; padding:.45rem .9rem; font-size:.95rem; border-radius:.5rem;
+  background:#38bdf8; color:#fff;
 }
-.btn-tts:hover {
-  background: #0ea5e9;
-}
+.btn-tts:hover { background:#0ea5e9; }
 
-/* === 搜尋框 === */
-#search {
-  width: 100%;
-  max-width: 500px;
-  padding: 0.6rem 1rem 0.6rem 2.2rem;
-  border: 1px solid #374151;
-  border-radius: 0.6rem;
-  background: #1f2937 url('https://img.icons8.com/ios-filled/20/9ca3af/search.png') no-repeat 0.7rem center;
-  background-size: 1rem;
-  color: #f9fafb;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  outline: none;
-  margin-bottom: 0.5rem;
-}
-
-#search::placeholder {
-  color: #9ca3af;
-}
-
-#search:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
-  background-color: #111827;
-}
-
-/* === 搜尋建議 === */
-#suggestions {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  max-width: 500px;
-}
-
-.suggestion-item {
-  padding: 0.6rem 1rem;
-  cursor: pointer;
-  border-bottom: 1px solid #374151;
-  background: #1f2937;
-  color: #e5e7eb;
-  transition: background 0.2s ease;
-}
-
-.suggestion-item:hover {
-  background: #374151;
-  color: #fff;
-}
-
-/* === 手機優化 === */
+/* ===== Mobile ===== */
 @media (max-width: 480px) {
-  .flip-card {
-    height: 240px;
-  }
-  .word-text {
-    font-size: 1.6rem;
-  }
-  .definition-text {
-    font-size: 1.3rem;
-  }
+  .flip-card { height: 260px; }
+  .word-text { font-size: 1.8rem; }
+  .definition-text { font-size: 1.35rem; }
 }
-
