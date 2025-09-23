@@ -1,6 +1,5 @@
 // ====== DOM ======
 const cardEl = document.querySelector('#vocab-card');
-
 const front = document.querySelector('#face-front');
 const back = document.querySelector('#face-back');
 
@@ -21,7 +20,7 @@ const ttsBtn    = document.querySelector('#tts-btn');
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
-let isFlipped = false;
+let isFlipped = false; // false=英文，true=中文
 let allWords = [];
 let pointer = 0;
 
@@ -49,8 +48,8 @@ function renderItem(item, resetToFront = false) {
 
   if (resetToFront) {
     isFlipped = false;
-    front.classList.remove('face-hidden');
-    back.classList.add('face-hidden');
+    front.classList.remove('face-hidden'); // 顯示英文
+    back.classList.add('face-hidden');     // 隱藏中文
   }
 }
 
@@ -58,11 +57,11 @@ function renderItem(item, resetToFront = false) {
 function toggleCard() {
   isFlipped = !isFlipped;
   if (isFlipped) {
-    front.classList.add('face-hidden');
-    back.classList.remove('face-hidden');
+    front.classList.add('face-hidden');   // 隱藏英文
+    back.classList.remove('face-hidden'); // 顯示中文
   } else {
-    back.classList.add('face-hidden');
-    front.classList.remove('face-hidden');
+    back.classList.add('face-hidden');    // 隱藏中文
+    front.classList.remove('face-hidden');// 顯示英文
   }
   // 小縮放特效
   cardEl.style.transform = 'scale(0.97)';
