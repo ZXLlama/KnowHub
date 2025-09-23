@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="container" style="text-align:center;">
+    <!-- Header -->
     <header style="margin-bottom:2rem;">
       <img src="Know-hub.png" alt="KnowHub Logo" class="logo"/>
       <h1 style="font-size:2rem;">📝 英文單字</h1>
@@ -19,16 +20,16 @@
 
     <!-- 字卡：正反兩面 -->
     <div id="vocab-card" class="flip-card">
-      <div class="flip-inner" id="flip-inner">
-        <div class="flip-front card" id="face-front">
-          <span class="corner-index" id="corner-index">#1</span>
-          <h2 class="word-text" id="word">Loading…</h2>
-          <p class="pos-text" id="pos"></p>
-          <button id="tts-btn" class="btn-tts">🔊 發音</button>
-        </div>
-        <div class="flip-back card face-hidden" id="face-back">
-          <p class="definition-text" id="def">請選擇單字</p>
-        </div>
+      <!-- 正面：英文 -->
+      <div class="flip-front card" id="face-front">
+        <span class="corner-index" id="corner-index">#1</span>
+        <h2 class="word-text" id="word">Loading…</h2>
+        <p class="pos-text" id="pos"></p>
+        <button id="tts-btn" class="btn-tts">🔊 發音</button>
+      </div>
+      <!-- 背面：中文 -->
+      <div class="flip-back card face-hidden" id="face-back">
+        <p class="definition-text" id="def">請選擇單字</p>
       </div>
     </div>
 
@@ -41,11 +42,13 @@
       </div>
     </div>
 
+    <!-- Footer -->
     <footer style="margin-top:2rem;">
       <a href="index.html">← 回首頁</a>
     </footer>
   </div>
 
+  <!-- JS -->
   <script type="module" src="assets/js/vocab.js"></script>
 </body>
 </html>
