@@ -6,14 +6,15 @@ const randomBtn = document.querySelector('#random');
 const prevBtn = document.querySelector('#prev');
 const nextBtn = document.querySelector('#next');
 
-// 🚨 你的公開 Google Sheet (CSV 匯出)
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
 let allWords = [];
 let suggestionsEl;
-let currentIndex = -1; // 🔥 新增：追蹤目前位置
+let currentIndex = -1;
+let flipped = false; // 翻轉狀態
 
-// 讀取 Google Sheet CSV
+// === 讀取 CSV ===
 async function loadSheet() {
   try {
     const res = await fetch(SHEET_URL);
@@ -24,7 +25,7 @@ async function loadSheet() {
       word: r[0] || "",
       pos: r[1] || "",
       definition: r[2] || "",
-      index: i + 1 // ✅ 從第1行開始編號
+      index: i + 1 // ✅ 從第 1 行開始編號
     })).filter(x => x.word);
 
     setupSuggestions();
@@ -33,33 +34,68 @@ async function loadSheet() {
   }
 }
 
-
+// === 渲染字卡 ===
 function renderItem(x) {
   const html = `
-    <div class="card" style="text-align:center; position:relative;">
-      <span style="position:absolute; top:0.5rem; right:0.8rem; font-size:0.9rem; color:#94a3b8;">
-        #${x.index}
-      </span>
-      <h2 style="font-size:2.2rem; margin-bottom:0.5rem;">${x.word}</h2>
-      <p style="font-size:1.1rem; color:#94a3b8; margin-bottom:1rem;">
-        ${x.pos ? `<span style="color:#38bdf8;">(${x.pos})</span>` : ""}
-      </p>
-      <div style="margin-top:1rem; text-align:center;">
-        <p style="font-size:1.5rem; font-weight:bold;">${x.definition}</p>
+    <div class="card flip-card ${flipped ? "flipped" : ""}" id="word-card">
+      <div class="flip-inner">
+        <!-- 正面 (英文) -->
+        <div class="flip-front" style="text-align:center; position:relative;">
+          <span style="position:absolute; top:0.5rem; right:0.8rem; font-size:0.9rem; color:#94a3b8;">
+            #${x.index}
+          </span>
+          <h2 class="word-text">${x.word}</h2>
+          <p class="pos-text">${x.pos ? `<span>(${x.pos})</span>` : ""}</p>
+          <!-- 發音按鈕 -->
+          <button class="btn-tts" id="tts-btn">🔊 發音</button>
+        </div>
+
+        <!-- 背面 (中文) -->
+        <div class="flip-back">
+          <p class="definition-text">${x.definition}</p>
+        </div>
       </div>
     </div>
   `;
   cardEl.innerHTML = html;
   renderMath(cardEl);
+
+  const wordCard = document.querySelector("#word-card");
+  const ttsBtn = document.querySelector("#tts-btn");
+
+  // 點整張卡片翻轉
+  wordCard.onclick = () => {
+    flipped = !flipped;
+    wordCard.classList.toggle("flipped");
+  };
+
+  // 發音按鈕 → 阻止翻轉
+  ttsBtn.onclick = (e) => {
+    e.stopPropagation();
+    speakWord(x.word);
+  };
 }
 
+// === TTS 發音 ===
+function speakWord(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  speechSynthesis.speak(utter);
+}
+
+// === 循環顯示 ===
 function showWordByIndex(i) {
-  if (i < 0 || i >= allWords.length) return;
+  if (allWords.length === 0) return;
+
+  if (i < 0) i = allWords.length - 1;
+  if (i >= allWords.length) i = 0;
+
   currentIndex = i;
+  flipped = false; // 切換單字時重置翻轉
   renderItem(allWords[i]);
 }
 
-// 🔍 搜尋
+// === 搜尋 ===
 function searchWord(q) {
   q = q.toLowerCase();
   if (!q) {
@@ -97,20 +133,19 @@ function searchWord(q) {
   });
 }
 
-// 🎲 隨機
+// === 隨機 ===
 function randomWord() {
   if (allWords.length === 0) return;
   const i = Math.floor(Math.random() * allWords.length);
   showWordByIndex(i);
 }
 
-// 綁定事件
+// === 綁定 ===
 randomBtn.onclick = () => randomWord();
 prevBtn.onclick = () => showWordByIndex(currentIndex - 1);
 nextBtn.onclick = () => showWordByIndex(currentIndex + 1);
 searchEl.oninput = () => searchWord(searchEl.value.trim());
 
-// 建立建議列表容器
 function setupSuggestions() {
   suggestionsEl = document.createElement("ul");
   suggestionsEl.style.listStyle = "none";
@@ -124,10 +159,34 @@ function setupSuggestions() {
   searchEl.insertAdjacentElement("afterend", suggestionsEl);
 }
 
-// 初始化：預設第一個單字
+// === 手機滑動手勢 ===
+function setupSwipe() {
+  let startX = 0;
+  let endX = 0;
+
+  cardEl.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+  });
+
+  cardEl.addEventListener("touchend", (e) => {
+    endX = e.changedTouches[0].clientX;
+    const diff = endX - startX;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        showWordByIndex(currentIndex - 1); // 右滑
+      } else {
+        showWordByIndex(currentIndex + 1); // 左滑
+      }
+    }
+  });
+}
+
+// === 初始化 ===
 (async () => {
   await loadSheet();
   if (allWords.length > 0) {
     showWordByIndex(0);
   }
+  setupSwipe(); // 啟用手勢滑動
 })();
