@@ -9,7 +9,12 @@ body {
 
 a {
   text-decoration: none;
-  color: inherit;
+  color: #3b82f6;
+}
+
+.logo {
+  max-width: 160px;
+  margin: 1rem 0;
 }
 
 /* === Container === */
@@ -17,56 +22,30 @@ a {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;   /* ✅ 頁面可捲動 */
   align-items: center;
-  padding: 1.5rem;
+  padding: 1rem;
   box-sizing: border-box;
 }
 
-/* === Card === */
-.card {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-
-/* 固定字卡高度，避免翻頁時文字偏移 */
-#vocab-card .card {
-  width: 100%;
-  max-width: 360px;
-  height: 280px;               /* ✅ 固定高度 */
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* === Flip Card === */
+/* === 卡片 === */
 .flip-card {
   perspective: 1000px;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 2rem);  /* 🔥 滿版但左右留白 */
+  max-width: 500px;
+  height: 280px;
+  margin: 1.2rem 0;
 }
 
 .flip-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  transition: transform 0.6s;
   transform-style: preserve-3d;
+  transition: transform 0.6s;
 }
 
-.flip-card.flipped .flip-inner {
+.flip-card.flipped .flip-inner,
+.flip-inner.flipped {
   transform: rotateY(180deg);
 }
 
@@ -74,26 +53,25 @@ a {
   position: absolute;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden;
   border-radius: 1rem;
+  border: 1px solid #374151;
+  background: #1f2937;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  backface-visibility: hidden;
   padding: 1rem;
   box-sizing: border-box;
 }
 
 .flip-back {
   transform: rotateY(180deg);
-  text-align: center;
 }
 
-/* === Text === */
 .word-text {
-  font-size: 2.2rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
-  word-break: keep-all;
 }
 
 .pos-text {
@@ -108,15 +86,13 @@ a {
   text-align: center;
   word-break: keep-all;
   max-width: 90%;
-  margin: auto;
 }
 
-/* === Buttons === */
+/* === 按鈕 === */
 .btn {
   background: #3b82f6;
   color: #fff;
   font-size: 1rem;
-  font-weight: 500;
   border: none;
   border-radius: 0.5rem;
   padding: 0.6rem 1rem;
@@ -132,30 +108,24 @@ a {
   transform: scale(0.96);
 }
 
-.btn:disabled {
-  background: #4b5563;
-  cursor: not-allowed;
-}
-
-/* 隨機 + 前後 */
 .btn-group {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .btn-wide {
   width: 100%;
-  max-width: 320px;
+  max-width: 500px;
 }
 
 .nav-btns {
   display: flex;
   gap: 0.8rem;
   width: 100%;
-  max-width: 320px;
+  max-width: 500px;
 }
 
 .nav-btns .btn-nav {
@@ -163,27 +133,25 @@ a {
   background: #475569;
 }
 
-/* === TTS Button === */
+/* === TTS === */
 .btn-tts {
   margin-top: 0.5rem;
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
-  border: none;
   border-radius: 0.4rem;
   background: #38bdf8;
   color: #fff;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 .btn-tts:hover {
   background: #0ea5e9;
 }
 
-/* === 搜尋框強化 === */
+/* === 搜尋框 === */
 #search {
   width: 100%;
-  max-width: 320px;
-  padding: 0.6rem 1rem 0.6rem 2.2rem; /* 左邊空間給 icon */
+  max-width: 500px;
+  padding: 0.6rem 1rem 0.6rem 2.2rem;
   border: 1px solid #374151;
   border-radius: 0.6rem;
   background: #1f2937 url('https://img.icons8.com/ios-filled/20/9ca3af/search.png') no-repeat 0.7rem center;
@@ -192,7 +160,7 @@ a {
   font-size: 1rem;
   transition: all 0.2s ease;
   outline: none;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 #search::placeholder {
@@ -205,86 +173,39 @@ a {
   background-color: #111827;
 }
 
+/* === 搜尋建議 === */
+#suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 500px;
+}
+
+.suggestion-item {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #374151;
+  background: #1f2937;
+  color: #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background: #374151;
+  color: #fff;
+}
+
 /* === 手機優化 === */
 @media (max-width: 480px) {
+  .flip-card {
+    height: 240px;
+  }
   .word-text {
     font-size: 1.6rem;
   }
   .definition-text {
     font-size: 1.3rem;
   }
-  #vocab-card .card {
-    max-width: 90%;
-    height: 240px;         /* ✅ 手機卡片稍矮 */
-  }
-  .btn-wide {
-    max-width: 100%;
-  }
-  .nav-btns {
-    max-width: 100%;
-  }
 }
 
-/* === 手機滑動體驗 === */
-#vocab-card {
-  touch-action: pan-y;
-}
-
-/* === 翻頁淡入淡出動畫 === */
-.fade {
-  opacity: 0;
-}
-
-.fade-in {
-  animation: fadeIn 0.25s ease forwards;
-}
-
-.fade-out {
-  animation: fadeOut 0.25s ease forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(0.98); }
-}
-
-/* === 搜尋建議列表 === */
-.suggestion-item {
-  padding: 0.6rem 1rem;
-  cursor: pointer;
-  border-bottom: 1px solid #374151;
-  color: #e5e7eb;
-  font-size: 0.95rem;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.suggestion-item:last-child {
-  border-bottom: none;
-}
-
-.suggestion-item:hover {
-  background: #374151;
-  transform: translateX(3px);
-  color: #ffffff;
-}
-
-.suggestion-item:active {
-  background: #2563eb;
-  color: #fff;
-  transform: scale(0.98);
-}
-
-/* 建議列表容器 */
-#search + ul {
-  margin-top: 0.4rem;
-  border: 1px solid #374151;
-  border-radius: 0.5rem;
-  background: #1f2937;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-}
