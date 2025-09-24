@@ -1,6 +1,4 @@
 /* ===== Base ===== */
-:root { --flip-duration: 600ms; }
-
 body {
   margin: 0;
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
@@ -11,12 +9,11 @@ body {
 
 a { color: #38bdf8; text-decoration: none; }
 
-/* ===== Logo（避免被拉伸） ===== */
+/* ===== Logo ===== */
 .logo {
   display: block;
   margin: 0.5rem auto 0.25rem;
-  width: auto;               /* 不固定寬高，避免失真 */
-  height: auto;
+  width: auto;
   max-height: 80px;
   object-fit: contain;
 }
@@ -29,6 +26,41 @@ a { color: #38bdf8; text-decoration: none; }
   align-items: center;
   padding: 1.25rem;
   box-sizing: border-box;
+  text-align: center;
+}
+
+/* ===== Menu Cards on Homepage ===== */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 900px;
+}
+@media (min-width: 768px) {
+  .menu { flex-direction: row; justify-content: center; }
+}
+.menu .card {
+  flex: 1;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #1f2937;
+  border-radius: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.menu .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 16px rgba(59,130,246,0.3);
+}
+.menu .card h2 {
+  margin: 0.5rem 0;
+  font-size: 1.4rem;
+  color: #f9fafb;
+}
+.menu .card p {
+  font-size: 0.9rem;
+  color: #9ca3af;
 }
 
 /* ===== Search ===== */
@@ -57,23 +89,17 @@ a { color: #38bdf8; text-decoration: none; }
 .suggestion-item:last-child { border-bottom:none; }
 .suggestion-item:hover { background:#172033; transform:translateX(3px); }
 
-/* ===== Flip Card ===== */
+/* ===== Vocab Card ===== */
 .flip-card {
-  perspective: 1000px;
-  width: calc(100% - 2rem);       /* 填滿寬度但左右留白 */
+  width: calc(100% - 2rem);
   max-width: 520px;
   height: 300px;
   margin: 1.2rem auto;
-  display: flex; justify-content: center; align-items: center;
-}
-
-.flip-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
-  width: 100%; height: 100%;
-  transform-style: preserve-3d;
-  transition: transform var(--flip-duration) ease;
 }
-.flip-inner.flipped { transform: rotateY(180deg); }
 
 .card {
   position: absolute;
@@ -82,28 +108,21 @@ a { color: #38bdf8; text-decoration: none; }
   border: 1px solid #334155;
   border-radius: 1rem;
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 1rem; box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  transition: opacity 0.25s ease, transform 0.15s ease;
 }
 
-/* 兩面共用 */
-.flip-front, .flip-back {
-  backface-visibility: hidden;   /* 硬體層面先擋一次 */
-}
+.face-hidden { display: none; }
 
-/* 背面朝向 */
-.flip-back { transform: rotateY(180deg); }
-
-/* 90° 切換時再用 visibility 強制隱藏，避免任何瀏覽器出現疊影 */
-.face-hidden { visibility: hidden; }
-
-/* 角落編號 */
 .corner-index {
   position: absolute; top: .6rem; right: .8rem; font-size:.9rem; color:#94a3b8;
 }
 
-/* 文字 */
 .word-text { font-size: 2.1rem; margin: .25rem 0 .4rem; word-break: keep-all; }
 .pos-text  { font-size: 1rem; color:#94a3b8; }
 .definition-text {
@@ -135,4 +154,32 @@ a { color: #38bdf8; text-decoration: none; }
   .flip-card { height: 260px; }
   .word-text { font-size: 1.8rem; }
   .definition-text { font-size: 1.35rem; }
+}
+
+/* ===== Homepage Buttons ===== */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.menu-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+  background: #1f2937;
+  border-radius: 0.8rem;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.menu-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
 }
