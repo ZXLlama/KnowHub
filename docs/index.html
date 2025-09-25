@@ -1,25 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KnowHub — Home</title>
-  <meta name="color-scheme" content="dark" />
-  <link rel="stylesheet" href="assets/css/index.css" />
+  <meta charset="UTF-8">
+  <title>Card Grid Config</title>
+  <link rel="stylesheet" href=".\assets\css\index.css">
 </head>
 <body>
-  <!-- PC：左半邊浮起、從頂到底的 Scrollport Sidebar -->
-  <aside class="sidebar group-scrollport" aria-label="Sidebar">
-    <div class="logo-card">
-      <img src="images/Know-hub.png" alt="KnowHub" class="logo-img" />
-    </div>
+  <!-- 頂部 LOGO -->
+  <header class="header">
+    <img src="images/Know-hub.png" alt="Logo" class="logo">
+  </header>
 
-    <section class="announce-card">
-      <h2>Update Announcement</h2>
-      <p class="muted">這裡放更新／維護／版本資訊；可連到 changelog。</p>
-      <a class="btn" href="#">Read more</a>
-    </section>
+  <!-- 中間 GRID -->
+  <main>
+    <div id="grid" class="grid"></div>
+  </main>
 
+  <!-- 底部社群連結 -->
+  <footer>
+    <!-- 社群：使用 PNG icon -->
     <nav class="socials" aria-label="Social media">
       <a class="social" href="https://instagram.com/zxsnow__1225" target="_blank" rel="noopener">
         <img class="social-icon" src="images/instagram.png" alt="Instagram" />
@@ -38,53 +37,9 @@
         <span class="label">zx</span>
       </a>
     </nav>
-  </aside>
+  </footer>
 
-  <!-- 手機頂部 LOGO（PC 隱藏） -->
-  <div class="mobile-topbar">
-    <img src="images/Know-hub.png" alt="KnowHub" class="topbar-logo" />
-  </div>
-
-  <!-- 右半邊主內容 -->
-  <div class="wrapper">
-    <main class="content">
-      <section id="tile-grid" class="tile-grid" aria-live="polite"></section>
-
-      <!-- 手機底部社群：接在最後一張 tile 後 -->
-      <footer class="mobile-footer" aria-label="Social media">
-        <div class="mobile-socials">
-          <a class="chip" href="https://instagram.com/zxsnow__1225" target="_blank" rel="noopener">
-            <img src="images/instagram.png" alt="Instagram" />
-            <span> @zxsnow__1225</span>
-          </a>
-          <a class="chip" href="https://www.threads.net/@zxsnow__1225" target="_blank" rel="noopener">
-            <img src="images/threads.png" alt="Threads" />
-            <span> @zxsnow__1225</span>
-          </a>
-          <a class="chip" href="https://discord.com/users/your-id" target="_blank" rel="noopener">
-            <img src="images/discord.png" alt="Discord" />
-            <span> @zxsnow</span>
-          </a>
-          <a class="chip" href="https://youtube.com/@ZXSNOW_Llama" target="_blank" rel="noopener">
-            <img src="images/DEV.png" alt="YouTube" />
-            <span> @zx</span>
-          </a>
-        </div>
-      </footer>
-
-      <!-- 卡片模板：左圖右文（和示意圖一致） -->
-      <template id="tile-template">
-        <a class="tile" href="#">
-          <div class="thumb"><img class="thumb-img" alt="" loading="lazy" decoding="async" /></div>
-          <div class="text">
-            <h3 class="title">Title</h3>
-            <p class="sub">Sub Title</p>
-          </div>
-        </a>
-      </template>
-    </main>
-  </div>
-
-  <script src="assets/js/index.js" defer></script>
+  <script src=".\config.js"></script>
+  <script src=".\assets\js\index.js"></script>
 </body>
 </html>
