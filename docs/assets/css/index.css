@@ -1,35 +1,50 @@
-/* ==== 全站等比縮放（PC） ==== */
+/* =========================================================
+   SETTINGS / 站點設定（可手動調整）
+   ---------------------------------------------------------
+   1) Grid 間距：
+      --grid-gap-x    影響 tile 之間的水平間距（column gap）
+      --grid-gap-y    影響 tile 之間的垂直間距（row gap）
+   2) 圓角：
+      --radius-tile   每張 tile 的圓角
+      --radius-thumb  左側縮圖的圓角
+      --radius-shell  Sidebar/卡片等外殼的圓角
+   3) 縮圖與卡片尺寸：
+      --thumb-size    左側縮圖的寬高
+      --tile-height   卡片高度（依照示意圖）
+      --tile-width    卡片最大寬度（RWD 自適應）
+   需要更動視覺時，先改這裡即可。
+   =======================================================*/
 :root{
+  /* 視窗等比縮放（整體比例因子） */
   --s: clamp(0.88, calc(100vw / 1440), 1.25);
 
+  /* 間距（row / column 各自控制） */
+  --grid-gap-x: calc(50px * var(--s));
+  --grid-gap-y: calc(50px * var(--s));
+
+  /* 圓角 */
+  --radius-tile: 22px;
+  --radius-thumb: 18px;
+  --radius-shell: calc(24px * var(--s));
+
+  /* 尺寸 */
+  --thumb-size: calc(86px * var(--s));
+  --tile-height: clamp(120px, calc(150px * var(--s)), 170px);
+  --tile-width: clamp(420px, calc(560px * var(--s)), 640px);
+
+  /* 其他 */
   --page-pad: calc(20px * var(--s));
-
-  /* grid 間距分 row / column */
-  --gap-x: calc(28px * var(--s));   /* column gap */
-  --gap-y: calc(24px * var(--s));   /* row gap    */
-
-  /* 左半邊 sidebar 尺寸（固定佔 50vw，高度從頂到底） */
-  --radius-xl: calc(24px * var(--s));
-  --radius-lg:  calc(18px * var(--s));
-  --fs-xl: calc(28px * var(--s));
-  --fs-md: calc(16px * var(--s));
   --logo-h: clamp(120px, calc(160px * var(--s)), 200px);
 
-  /* Tile 固定比例但跟著 --s 縮放 */
-  --tile-w: clamp(320px, calc(520px * var(--s)), 640px);
-  --tile-h: clamp(110px, calc(140px * var(--s)), 180px);
-  --thumb:  calc(86px * var(--s));
-
-  /* 顏色 */
+  /* 顏色（tile 是淺灰藍） */
   --bg:#0C111B;
   --panel:#0A1F4A;
-  --text:#E7ECF3;
-  --muted:#9aa3af;
-  --accent:#7AF3FF;
-  --accent2:#A07CFF;
-  --card-alpha: rgba(154,163,175,.22);
+  --tile-bg: hsl(220 10% 63% / .95);
+  --text:#FFFFFF;
+  --muted: hsl(0 0% 100% / .85);
   --shadow: 0 16px 36px rgba(0,0,0,.38);
 }
+/* =======================================================*/
 
 *,*::before,*::after{ box-sizing:border-box; }
 html,body{ height:100%; }
@@ -43,28 +58,28 @@ body{
   font:14px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 
-/* ==== 左半邊：浮起來、從頂到底、可滾動（scrollport） ==== */
+/* ==== 左半邊：浮起、從頂到底（scrollport） ==== */
 .sidebar.group-scrollport{
   position: fixed;
   top: var(--page-pad);
-  bottom: var(--page-pad);              /* 從頂到底 */
+  bottom: var(--page-pad);
   left: var(--page-pad);
-  right: calc(50vw + var(--page-pad));  /* 直接吃掉左半邊 */
+  right: calc(50vw + var(--page-pad));  /* 直接吃左半邊 */
   display: flex;
   flex-direction: column;
   gap: calc(18px * var(--s));
   padding: calc(18px * var(--s));
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-shell);
   background: linear-gradient(180deg,#0B2B6A 0%,var(--panel) 60%,#08193A 100%);
   box-shadow: var(--shadow);
-  overflow-y: auto;                     /* scrollport */
-  transition: opacity .5s ease;         /* transition-opacity duration-500 */
+  overflow-y: auto;
+  transition: opacity .5s ease;
   z-index: 10;
 }
 
-/* 卡片們全部圓角 */
+/* 圓角外殼 */
 .logo-card,
-.announce-card{ border-radius: var(--radius-xl); }
+.announce-card{ border-radius: var(--radius-shell); }
 
 .logo-card{
   height: var(--logo-h);
@@ -80,33 +95,28 @@ body{
   padding: calc(18px * var(--s));
   display: grid; gap: calc(10px * var(--s));
 }
-.announce-card h2{ margin:0; font-size: var(--fs-xl); }
-.muted{ color:var(--muted); font-size: var(--fs-md); }
+.announce-card h2{ margin:0; font-size: clamp(22px, calc(28px * var(--s)), 32px); }
+.muted{ color:hsl(215 18% 80%); font-size: clamp(13px, calc(16px * var(--s)), 18px); }
 .btn{
   width: fit-content;
-  background: linear-gradient(135deg,var(--accent),var(--accent2));
+  background: linear-gradient(135deg,#7AF3FF,#A07CFF);
   color:#001019; font-weight:700; text-decoration:none;
   padding: calc(10px * var(--s)) calc(14px * var(--s));
   border-radius: 999px;
   box-shadow: 0 0 24px rgba(122,243,255,.25);
 }
 
-/* 社群（含圖示） */
+/* 社群（PNG） */
 .socials{ display:grid; gap: calc(10px * var(--s)); margin-top:auto; }
 .social{
   display:flex; align-items:center; gap: calc(10px * var(--s));
   padding: calc(8px * var(--s)) calc(10px * var(--s));
-  border-radius: 12px; color: var(--text); text-decoration: none;
+  border-radius: 12px; color:#E7ECF3; text-decoration: none;
   transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
 .social:hover{ background: rgba(122,243,255,.12); box-shadow: 0 0 0 1px rgba(122,243,255,.25) inset; transform: translateY(-1px); }
-.icon{
-  width: calc(28px * var(--s)); height: calc(28px * var(--s));
-  display:grid; place-items:center; border-radius:10px;
-  background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18);
-}
-.icon svg{ display:block; width:18px; height:18px; }
-.label{ font-weight:600; font-size: var(--fs-md); }
+.social-icon{ width: 22px; height: 22px; display:block; object-fit: contain; }
+.label{ font-weight:600; }
 
 /* 手機頂部 LOGO（PC 隱藏） */
 .mobile-topbar{
@@ -116,62 +126,67 @@ body{
 }
 .topbar-logo{ height: 28px; width:auto; object-fit:contain; }
 
-/* ==== 右半邊主內容：直接把容器移到右 50vw ==== */
+/* ==== 右半邊主內容：移到 50vw 右側 ==== */
 .wrapper{
-  margin-left: 50vw;              /* 右半邊 */
+  margin-left: 50vw;
   padding: var(--page-pad);
   max-width: 1920px;
 }
 
-/* ==== Tile Grid：有 row/column 間距、欄數隨寬度 ==== */
+/* ==== Tile Grid（row/column 間距 + 自適應欄數） ==== */
 .tile-grid{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tile-w)), 1fr));
-  column-gap: var(--gap-x);
-  row-gap: var(--gap-y);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tile-width)), 1fr));
+  column-gap: var(--grid-gap-x);
+  row-gap: var(--grid-gap-y);
   justify-items: center;
 }
 
-/* Tile（圓角＋間距明確可見） */
+/* ==== Tile：和示意圖一致（左圖右文） ==== */
 .tile{
-  position: relative;
-  width: min(100%, var(--tile-w));
-  height: var(--tile-h);
-  background: var(--card-alpha);
-  border: 1px solid rgba(154,163,175,.32);
-  border-radius: var(--radius-xl);
-  padding: calc(18px * var(--s));
-  display:grid; grid-template-columns: var(--thumb) 1fr; gap: calc(16px * var(--s));
-  text-decoration:none; color:var(--text);
+  width: min(100%, var(--tile-width));
+  height: var(--tile-height);
+  background: var(--tile-bg);
+  border-radius: var(--radius-tile);
+  border: 1px solid hsl(220 20% 85% / .35);
   box-shadow: var(--shadow);
-  transform-style: preserve-3d;
-  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
-  overflow:hidden;
-}
-.tile::before{
-  content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none;
-  background: radial-gradient(600px 200px at var(--mx,50%) var(--my,0%), rgba(122,243,255,.12), transparent 50%),
-              radial-gradient(600px 200px at calc(100% - var(--mx,50%)) 100%, rgba(160,124,255,.10), transparent 52%);
-  mix-blend-mode: screen; animation: glow 6s ease-in-out infinite alternate;
-}
-@keyframes glow{ 0%{opacity:.5} 100%{opacity:.85} }
+  color: var(--text);
+  text-decoration: none;
 
-.tile:hover{
-  border-color: rgba(122,243,255,.45);
-  box-shadow: 0 14px 32px rgba(0,0,0,.48), 0 0 22px rgba(122,243,255,.22);
-  background: rgba(154,163,175,.28);
+  display: grid;
+  grid-template-columns: var(--thumb-size) 1fr;
+  align-items: center;
+  gap: clamp(14px, calc(18px * var(--s)), 22px);
+  padding: clamp(16px, calc(22px * var(--s)), 26px);
+  overflow: hidden;
 }
 
 .thumb{
-  width: var(--thumb); height: var(--thumb);
-  border-radius: var(--radius-lg); overflow:hidden;
-  background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.20);
-  align-self:center;
+  width: var(--thumb-size); height: var(--thumb-size);
+  border-radius: var(--radius-thumb);
+  overflow: hidden;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.22);
 }
 .thumb-img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-.title{ margin: 2px 0 2px; font-size: calc(26px * var(--s)); font-weight: 800; letter-spacing:.3px; }
-.sub{ margin: 0; color: var(--muted); font-weight:700; font-size: var(--fs-md); }
+.text{ display:flex; flex-direction:column; justify-content:center; min-width: 0; }
+.title{
+  margin: 0 0 4px;
+  font-size: clamp(22px, calc(26px * var(--s)), 32px);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing:.2px;
+  color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sub{
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: clamp(14px, calc(16px * var(--s)), 18px);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 /* 滾動 reveal */
 .tile{ opacity:0; transform: translateY(10px) scale(.985); }
@@ -181,8 +196,8 @@ body{
 @media (max-width: 900px){
   .sidebar{ display:none; }
   .mobile-topbar{ display:block; }
-  .wrapper{ margin-left: 0; }                /* 改成全寬 */
-  .tile-grid{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .wrapper{ margin-left: 0; }
+  .tile-grid{ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
   .tile{ width: 100%; }
   .mobile-footer{ display:block; grid-column: 1 / -1; margin-top: 28px; }
 }
@@ -196,9 +211,9 @@ body{
   padding: 8px 12px; border-radius: 999px;
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.14);
-  color: var(--text); text-decoration: none; font-weight: 600;
+  color: #E7ECF3; text-decoration: none; font-weight: 600;
 }
-.chip svg{ display:block; width:18px; height:18px; }
+.chip img{ width: 18px; height: 18px; display:block; object-fit: contain; }
 
 /* 動畫偏好 */
 @media (prefers-reduced-motion: reduce){
