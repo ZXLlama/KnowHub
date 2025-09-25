@@ -1,12 +1,13 @@
 const grid = document.getElementById("grid");
+const mq = window.matchMedia("(max-width: 768px)");
 
-// 📌 建立卡片函式
+/** 生成卡片（含進場延遲變數） */
 function buildGrid() {
-  grid.innerHTML = ""; // 清空舊內容
-
-  config.tiles.forEach(tile => {
+  grid.innerHTML = "";
+  config.tiles.forEach((tile, i) => {
     const card = document.createElement("div");
     card.className = "card";
+    card.style.setProperty("--delay", `${i * 80}ms`);
 
     const img = document.createElement("img");
     img.className = "card-img";
@@ -23,119 +24,66 @@ function buildGrid() {
 
     text.appendChild(title);
     text.appendChild(subtitle);
-
     card.appendChild(img);
     card.appendChild(text);
 
+    let host = card;
     if (tile.link && tile.link !== "null") {
-      const link = document.createElement("a");
-      link.href = tile.link;
-      link.target = "_blank";
-      link.appendChild(card);
-      grid.appendChild(link);
-    } else {
-      grid.appendChild(card);
+      const a = document.createElement("a");
+      a.href = tile.link;
+      a.target = "_blank";
+      a.appendChild(card);
+      host = a;
     }
+    // 讓 stagger 作用到容器
+    host.style.setProperty("--delay", `${i * 80}ms`);
+    host.style.animationDelay = `var(--delay)`;
+    grid.appendChild(host);
   });
 }
 
-// 📌 桌機 / 手機排版控制
-function applyGridLayout() {
-  const isMobile = window.innerWidth <= 768;
+/** 切換手機/桌機模式（JS 主導） */
+function applyMode() {
+  const isMobile = mq.matches;
+  document.body.classList.toggle("is-mobile", isMobile);
 
   if (isMobile) {
-    // 手機 → 單欄
     grid.style.gridTemplateColumns = "1fr";
     grid.style.gridTemplateRows = "auto";
-
-    // 手機 → 強制隱藏 subtitle、放大字體與圖片
-    document.querySelectorAll(".card").forEach(card => {
-      const img = card.querySelector(".card-img");
-      const title = card.querySelector("h3");
-      const subtitle = card.querySelector("p");
-
-      // 放大圖片
-      img.style.width = "80px";
-      img.style.height = "80px";
-
-      // 放大 Title
-      title.style.fontSize = "24px";
-
-      // 隱藏 Subtitle
-      if (subtitle) subtitle.style.display = "none";
-
-      // 放大 Card padding
-      card.style.padding = "20px";
-    });
-
-    // 手機 → 社群 icon & 字體放大
-    document.querySelectorAll(".social").forEach(social => {
-      social.style.fontSize = "18px";
-      social.style.padding = "12px 16px";
-    });
-    document.querySelectorAll(".social-icon").forEach(icon => {
-      icon.style.width = "32px";
-      icon.style.height = "32px";
-    });
-
+    grid.style.width = "100%";
   } else {
-    // 桌機 → 用 config 設定
     grid.style.gridTemplateColumns = `repeat(${config.grid.columns}, 1fr)`;
     grid.style.gridTemplateRows = `repeat(${config.grid.rows}, auto)`;
+    grid.style.width = "80%";
+  }
 
-    // 桌機 → 還原 subtitle 顯示 & 字體
-    document.querySelectorAll(".card").forEach(card => {
-      const img = card.querySelector(".card-img");
-      const title = card.querySelector("h3");
-      const subtitle = card.querySelector("p");
-
-      img.style.width = "64px";
-      img.style.height = "64px";
-      title.style.fontSize = "20px";
-      if (subtitle) {
-        subtitle.style.display = "block";
-        subtitle.style.fontSize = "15px";
-      }
-      card.style.padding = "16px 20px";
+  // 等到圖片載入後再等高，避免圖片高度尚未就緒
+  const imgs = Array.from(document.images).filter(img => !img.complete);
+  if (imgs.length) {
+    let left = imgs.length;
+    imgs.forEach(img => {
+      img.addEventListener("load", () => { if(--left === 0) equalizeHeights(); }, { once: true });
+      img.addEventListener("error", () => { if(--left === 0) equalizeHeights(); }, { once: true });
     });
-
-    // 桌機 → 還原社群字體大小
-    document.querySelectorAll(".social").forEach(social => {
-      social.style.fontSize = "14px";
-      social.style.padding = "8px 12px";
-    });
-    document.querySelectorAll(".social-icon").forEach(icon => {
-      icon.style.width = "24px";
-      icon.style.height = "24px";
-    });
+  } else {
+    equalizeHeights();
   }
 }
 
-// 📌 強制所有卡片等高
+/** 強制所有卡片等高 */
 function equalizeHeights() {
-  const cards = document.querySelectorAll(".card");
-  let maxHeight = 0;
-  cards.forEach(c => {
-    c.style.height = "auto"; // reset
-    maxHeight = Math.max(maxHeight, c.offsetHeight);
-  });
-  cards.forEach(c => {
-    c.style.height = maxHeight + "px";
-  });
+  const cards = grid.querySelectorAll(".card");
+  let maxH = 0;
+  cards.forEach(c => { c.style.height = "auto"; maxH = Math.max(maxH, c.offsetHeight); });
+  cards.forEach(c => (c.style.height = maxH + "px"));
 }
 
-// 📌 初始化
+/** 初始化 */
 function init() {
   buildGrid();
-  applyGridLayout();
-  equalizeHeights();
+  applyMode();
 }
 
-// 初始執行
 window.addEventListener("load", init);
-
-// 視窗縮放時重新套用
-window.addEventListener("resize", () => {
-  applyGridLayout();
-  equalizeHeights();
-});
+mq.addEventListener("change", applyMode);
+window.addEventListener("resize", applyMode);
