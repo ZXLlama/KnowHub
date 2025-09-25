@@ -1,75 +1,141 @@
-/* ========== 可編輯資料區（卡片內容） ========== */
-const tiles = [
-  { title: "Title #1", sub: "Sub Title #1", href: "./knowledge.html", thumb: "./images/thumb-1.png" },
-  { title: "Title #2", sub: "Sub Title #2", href: "./vocab.html",      thumb: "./images/thumb-2.png" },
-  { title: "Title #3", sub: "Sub Title #3", href: "./notes.html",      thumb: "./images/thumb-3.png" },
-  { title: "Title #4", sub: "Sub Title #4", href: "#",                 thumb: "./images/thumb-4.png" },
-  { title: "Title #5", sub: "Sub Title #5", href: "#",                 thumb: "./images/thumb-5.png" },
-  { title: "Title #6", sub: "Sub Title #6", href: "#",                 thumb: "./images/thumb-6.png" },
-  { title: "Title #7", sub: "Sub Title #7", href: "#",                 thumb: "./images/thumb-7.png" },
-  { title: "Title #8", sub: "Sub Title #8", href: "#",                 thumb: "./images/thumb-8.png" },
-];
-/* ============================================== */
+const grid = document.getElementById("grid");
 
-function makeTileEl({ title, sub, href, thumb }) {
-  const t = document.getElementById("tile-template");
-  const node = t.content.cloneNode(true);
-  const a = node.querySelector(".tile");
-  a.href = href || "#";
-  node.querySelector(".title").textContent = title;
-  node.querySelector(".sub").textContent = sub;
+// 📌 建立卡片函式
+function buildGrid() {
+  grid.innerHTML = ""; // 清空舊內容
 
-  const img = node.querySelector(".thumb-img");
-  img.src = thumb || "./images/Know-hub.png";
-  img.alt = `${title} thumbnail`;
-  img.addEventListener("error", () => { img.src = "./images/Know-hub.png"; }, { once:true });
+  config.tiles.forEach(tile => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-  return node;
+    const img = document.createElement("img");
+    img.className = "card-img";
+    img.src = tile.image && tile.image !== "null" ? tile.image : "DEV.png";
+
+    const text = document.createElement("div");
+    text.className = "card-text";
+
+    const title = document.createElement("h3");
+    title.textContent = tile.title && tile.title !== "null" ? tile.title : "null";
+
+    const subtitle = document.createElement("p");
+    subtitle.textContent = tile.subtitle && tile.subtitle !== "null" ? tile.subtitle : "null";
+
+    text.appendChild(title);
+    text.appendChild(subtitle);
+
+    card.appendChild(img);
+    card.appendChild(text);
+
+    if (tile.link && tile.link !== "null") {
+      const link = document.createElement("a");
+      link.href = tile.link;
+      link.target = "_blank";
+      link.appendChild(card);
+      grid.appendChild(link);
+    } else {
+      grid.appendChild(card);
+    }
+  });
 }
 
-(function initGrid(){
-  const grid = document.getElementById("tile-grid");
-  const frag = document.createDocumentFragment();
-  tiles.forEach(item => frag.appendChild(makeTileEl(item)));
-  grid.appendChild(frag);
-})();
+// 📌 桌機 / 手機排版控制
+function applyGridLayout() {
+  const isMobile = window.innerWidth <= 768;
 
-/* Scroll reveal */
-(function revealOnScroll(){
-  const els = Array.from(document.querySelectorAll(".tile"));
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
-  }, { rootMargin: "0px 0px -10% 0px", threshold: 0.1 });
-  els.forEach(el => io.observe(el));
-})();
+  if (isMobile) {
+    // 手機 → 單欄
+    grid.style.gridTemplateColumns = "1fr";
+    grid.style.gridTemplateRows = "auto";
 
-/* Hover tilt（桌機）+ 霓虹跟隨（保留輕微動態） */
-(function tilt(){
-  if (!matchMedia("(hover: hover)").matches) return;
-  const cards = document.querySelectorAll(".tile");
-  const strength = 8;
-  cards.forEach(card => {
-    card.addEventListener("mousemove", (ev) => {
-      const r = card.getBoundingClientRect();
-      const x = (ev.clientX - r.left) / r.width;
-      const y = (ev.clientY - r.top) / r.height;
-      const rx = (0.5 - y) * strength;
-      const ry = (x - 0.5) * strength;
-      card.style.setProperty("--mx", `${x*100}%`);
-      card.style.setProperty("--my", `${y*100}%`);
-      card.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+    // 手機 → 強制隱藏 subtitle、放大字體與圖片
+    document.querySelectorAll(".card").forEach(card => {
+      const img = card.querySelector(".card-img");
+      const title = card.querySelector("h3");
+      const subtitle = card.querySelector("p");
+
+      // 放大圖片
+      img.style.width = "80px";
+      img.style.height = "80px";
+
+      // 放大 Title
+      title.style.fontSize = "24px";
+
+      // 隱藏 Subtitle
+      if (subtitle) subtitle.style.display = "none";
+
+      // 放大 Card padding
+      card.style.padding = "20px";
     });
-    card.addEventListener("mouseleave", () => {
-      card.style.transform = "";
-      card.style.removeProperty("--mx");
-      card.style.removeProperty("--my");
+
+    // 手機 → 社群 icon & 字體放大
+    document.querySelectorAll(".social").forEach(social => {
+      social.style.fontSize = "18px";
+      social.style.padding = "12px 16px";
     });
+    document.querySelectorAll(".social-icon").forEach(icon => {
+      icon.style.width = "32px";
+      icon.style.height = "32px";
+    });
+
+  } else {
+    // 桌機 → 用 config 設定
+    grid.style.gridTemplateColumns = `repeat(${config.grid.columns}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${config.grid.rows}, auto)`;
+
+    // 桌機 → 還原 subtitle 顯示 & 字體
+    document.querySelectorAll(".card").forEach(card => {
+      const img = card.querySelector(".card-img");
+      const title = card.querySelector("h3");
+      const subtitle = card.querySelector("p");
+
+      img.style.width = "64px";
+      img.style.height = "64px";
+      title.style.fontSize = "20px";
+      if (subtitle) {
+        subtitle.style.display = "block";
+        subtitle.style.fontSize = "15px";
+      }
+      card.style.padding = "16px 20px";
+    });
+
+    // 桌機 → 還原社群字體大小
+    document.querySelectorAll(".social").forEach(social => {
+      social.style.fontSize = "14px";
+      social.style.padding = "8px 12px";
+    });
+    document.querySelectorAll(".social-icon").forEach(icon => {
+      icon.style.width = "24px";
+      icon.style.height = "24px";
+    });
+  }
+}
+
+// 📌 強制所有卡片等高
+function equalizeHeights() {
+  const cards = document.querySelectorAll(".card");
+  let maxHeight = 0;
+  cards.forEach(c => {
+    c.style.height = "auto"; // reset
+    maxHeight = Math.max(maxHeight, c.offsetHeight);
   });
-})();
+  cards.forEach(c => {
+    c.style.height = maxHeight + "px";
+  });
+}
 
-/* Alt+Click → 新分頁開啟 */
-document.getElementById("tile-grid").addEventListener("click", (e) => {
-  const a = e.target.closest("a.tile");
-  if (!a) return;
-  if (e.altKey) { e.preventDefault(); window.open(a.href, "_blank", "noopener"); }
-}, { passive: true });
+// 📌 初始化
+function init() {
+  buildGrid();
+  applyGridLayout();
+  equalizeHeights();
+}
+
+// 初始執行
+window.addEventListener("load", init);
+
+// 視窗縮放時重新套用
+window.addEventListener("resize", () => {
+  applyGridLayout();
+  equalizeHeights();
+});
