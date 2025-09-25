@@ -3,6 +3,7 @@
   --grid-gap: 20px;
 }
 
+/* ========== 動態背景（效能友善） ========== */
 body {
   background: #0f1117;
   font-family: Arial, sans-serif;
@@ -10,16 +11,28 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 10% -10%, rgba(59,130,246,0.25), transparent 60%),
+    radial-gradient(700px 400px at 90% 110%, rgba(244,63,94,0.22), transparent 60%),
+    linear-gradient(180deg, #0f1117 0%, #0f1117 70%, #0e1015 100%);
+  animation: bgFloat 20s ease-in-out infinite alternate;
+  filter: saturate(1.15);
+}
+@keyframes bgFloat {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(-2%) scale(1.02); }
 }
 
-header {
-  text-align: center;
-  padding: 20px;
-}
-
-.logo {
-  height: 60px;
-}
+header { text-align: center; padding: 20px; }
+.logo { height: 60px; }
 
 main {
   flex: 1;
@@ -37,6 +50,7 @@ main {
   align-items: stretch;
 }
 
+/* ========== 卡片 ========== */
 .card {
   display: flex;
   align-items: center;
@@ -44,14 +58,19 @@ main {
   padding: 16px 20px;
   border-radius: var(--card-radius);
   gap: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   height: 100%;
+  /* 動畫/互動：用 transform/opacity（GPU-friendly） */
+  transform: translateZ(0);
+  will-change: transform, box-shadow, opacity;
+  animation: cardIn 420ms cubic-bezier(.2,.8,.2,1) both;
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+.card:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 16px rgba(0,0,0,.22); }
+.card:active { transform: scale(.985); }
 
 .card-img {
   width: 64px;
@@ -67,95 +86,59 @@ main {
 }
 
 .card-text p {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   font-size: 15px;
   color: #e0e0e0;
 }
 
-a {
-  text-decoration: none;
-}
+a { text-decoration: none; display: block; }
 
 /* 底部社群 */
-footer {
-  background: #1a1c24;
-  padding: 20px;
-  text-align: center;
-}
-
-.socials {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
+footer { background: #1a1c24; padding: 20px; text-align: center; }
+.socials { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
 .social {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #fff;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: var(--card-radius);
-  background: #2a2c35;
-  transition: all 0.25s ease;
+  display: flex; align-items: center; gap: 8px;
+  color: #fff; font-size: 14px; padding: 8px 12px;
+  border-radius: var(--card-radius); background: #2a2c35;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
+.social:hover { transform: translateY(-2px); }
+.social-icon { width: 24px; height: 24px; }
 
-.social-icon {
-  width: 24px;
-  height: 24px;
+/* 社群 hover 霓虹 */
+.social[href*="instagram"]:hover { background:#e1306c20; box-shadow:0 0 10px #e1306c,0 0 20px #e1306c; }
+.social[href*="threads"]:hover   { background:#ffffff20; box-shadow:0 0 10px #fff,0 0 20px #fff; }
+.social[href*="discord"]:hover   { background:#5865f220; box-shadow:0 0 10px #5865f2,0 0 20px #5865f2; }
+.social[href*="youtube"]:hover   { background:#ff000020; box-shadow:0 0 10px #f00,0 0 20px #f00; }
+
+/* ========== 手機模式（JS 會在 <body> 加上 .is-mobile） ========== */
+.is-mobile .grid {
+  width: 96%;
+  margin: 0 auto;
+  gap: 16px;
 }
-
-/* ✨ 社群 hover 霓虹 */
-.social[href*="instagram"]:hover {
-  background: #e1306c20;
-  box-shadow: 0 0 10px #e1306c, 0 0 20px #e1306c;
+.is-mobile .card {
+  padding: 26px;
+  margin: 0 8px;        /* 卡片別貼邊 */
 }
-.social[href*="threads"]:hover {
-  background: #ffffff20;
-  box-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
+.is-mobile .card-img { width: 96px; height: 96px; }
+.is-mobile .card-text h3 { font-size: 26px; }
+.is-mobile .card-text p {
+  font-size: 18px;
+  margin-top: 8px;
+  /* ✅ 最多 2 行，自動 … 截斷 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.social[href*="discord"]:hover {
-  background: #5865f220;
-  box-shadow: 0 0 10px #5865f2, 0 0 20px #5865f2;
-}
-.social[href*="youtube"]:hover {
-  background: #ff000020;
-  box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
-}
+.is-mobile .social { font-size: 18px; padding: 12px 16px; }
+.is-mobile .social-icon { width: 32px; height: 32px; }
+/* 手機觸控回饋 */
+.is-mobile .card:active { transform: scale(.98); }
 
-/* 📱 手機優化 */
-@media (max-width: 768px) {
-  .grid {
-    width: 95%;
-  }
-
-  .card {
-    padding: 20px;
-  }
-
-  .card-img {
-    width: 80px;
-    height: 80px;
-  }
-
-  .card-text h3 {
-    font-size: 24px;
-  }
-
-  /* 📌 手機隱藏 subtitle */
-  .card-text p {
-    display: none;
-  }
-
-  .social {
-    font-size: 18px;
-    padding: 12px 16px;
-  }
-
-  .social-icon {
-    width: 32px;
-    height: 32px;
-  }
+/* 低動態偏好：關閉動畫 */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }
