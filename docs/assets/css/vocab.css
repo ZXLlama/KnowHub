@@ -1,0 +1,203 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+  background: #0f1117;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+a {
+  color: #5865f2;
+  text-decoration: none;
+}
+
+.logo {
+  display: block;
+  margin: 0.5rem auto 0.25rem;
+  width: auto;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#search {
+  width: 100%;
+  max-width: 520px;
+  padding: 0.6rem 1rem 0.6rem 2.2rem;
+  border: 1px solid rgb(43.8, 45.56, 50.84);
+  border-radius: 0.6rem;
+  background: rgb(13.8, 15.64, 21.16) url("https://img.icons8.com/ios-filled/20/94a3b8/search.png") no-repeat 0.7rem center;
+  background-size: 1rem;
+  color: #ffffff;
+  outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
+  margin-bottom: 0.4rem;
+}
+#search::placeholder {
+  color: #e0e0e0;
+}
+#search:focus {
+  border-color: #5865f2;
+  box-shadow: 0 0 8px rgba(88, 101, 242, 0.45);
+  background-color: rgb(13.2, 14.96, 20.24);
+}
+
+#suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 0.2rem 0 0 0;
+  width: 100%;
+  max-width: 520px;
+}
+
+.suggestion-item {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgb(43.8, 45.56, 50.84);
+  background: rgb(13.8, 15.64, 21.16);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+.suggestion-item:hover {
+  background: rgb(53.1, 56.9, 65.9);
+  transform: translateX(3px);
+}
+
+.flip-card {
+  width: calc(100% - 2rem);
+  max-width: 520px;
+  height: 300px;
+  margin: 1.2rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  background: #8e96a6;
+  border: 1px solid rgb(43.8, 45.56, 50.84);
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  transition: opacity 0.25s ease, transform 0.15s ease;
+}
+
+.face-hidden {
+  display: none;
+}
+
+.corner-index {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+}
+
+.word-text {
+  font-size: 2.1rem;
+  margin: 0.25rem 0 0.4rem;
+  word-break: keep-all;
+}
+
+.pos-text {
+  font-size: 1rem;
+  color: #e0e0e0;
+}
+
+.definition-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  max-width: 90%;
+  word-break: keep-all;
+}
+
+.btn {
+  background: #5865f2;
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.btn:hover {
+  background: rgb(125.8533333333, 135.9066666667, 244.9466666667);
+}
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-wide {
+  width: 100%;
+  max-width: 520px;
+}
+
+.nav-btns {
+  display: flex;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 520px;
+}
+
+.btn-nav {
+  flex: 1;
+  background: rgb(69.6, 78.2, 166.4);
+}
+
+.btn-tts {
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  background: rgb(235.5, 120.45, 159.45);
+  color: #fff;
+}
+.btn-tts:hover {
+  background: rgb(231, 89.4, 137.4);
+}
+
+@media (max-width: 480px) {
+  .flip-card {
+    height: 260px;
+  }
+  .word-text {
+    font-size: 1.8rem;
+  }
+  .definition-text {
+    font-size: 1.35rem;
+  }
+}
+
+/*# sourceMappingURL=vocab.css.map */
