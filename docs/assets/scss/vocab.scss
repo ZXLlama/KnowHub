@@ -1,15 +1,19 @@
 @import "colors";
 
+/* ===== Global Variables ===== */
+$card-width: 520px;   // 卡片與搜尋框等寬
+$btn-width: 500px;    // 按鈕群組比卡片窄一點
+
 /* ===== Base ===== */
 body {
   margin: 0;
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
-  background: $color-bg-main;     // 原: #0f172a
-  color: $color-text-main;        // 原: #e5e7eb
+  background: $color-bg-main;
+  color: $color-text-main;
   line-height: 1.6;
 }
 
-a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
+a { color: $color-discord; text-decoration: none; }
 
 /* ===== Logo ===== */
 .logo {
@@ -34,9 +38,9 @@ a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
 /* ===== Search ===== */
 #search {
   width: 100%;
-  max-width: 520px;
+  max-width: $card-width; // 和卡片一致
   padding: 0.6rem 1rem 0.6rem 2.2rem;
-  border: 1px solid mix(#fff, $color-bg-main, 18%);   // 原: #334155
+  border: 1px solid mix(#fff, $color-bg-main, 18%);
   border-radius: 0.6rem;
   background: mix(black, $color-bg-main, 8%)
               url('https://img.icons8.com/ios-filled/20/94a3b8/search.png')
@@ -47,20 +51,20 @@ a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
   transition: box-shadow .2s, border-color .2s, background-color .2s;
   margin-bottom: .4rem;
 
-  &::placeholder { color: $color-text-sub; }         // 原: #94a3b8
+  &::placeholder { color: $color-text-sub; }
   &:focus {
-    border-color: $color-discord;                    // 原: #3b82f6
+    border-color: $color-discord;
     box-shadow: 0 0 8px rgba(88,101,242,.45);
     background-color: mix(black, $color-bg-main, 12%);
   }
 }
 
 /* 建議清單 */
-#suggestions { list-style:none; padding:0; margin:.2rem 0 0 0; width:100%; max-width:520px; }
+#suggestions { list-style:none; padding:0; margin:.2rem 0 0 0; width:100%; max-width:$card-width; }
 .suggestion-item {
   padding:.6rem 1rem;
-  border-bottom:1px solid mix(#fff, $color-bg-main, 18%);  // 原: #334155
-  background: mix(black, $color-bg-main, 8%);              // 原: #0b1220
+  border-bottom:1px solid mix(#fff, $color-bg-main, 18%);
+  background: mix(black, $color-bg-main, 8%);
   color:$color-text-main;
   cursor:pointer; transition:background .2s, transform .1s;
 
@@ -70,8 +74,8 @@ a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
 
 /* ===== Vocab Card ===== */
 .flip-card {
-  width: calc(100% - 2rem);
-  max-width: 520px;
+  width: 100%;
+  max-width: $card-width;
   height: 300px;
   margin: 1.2rem auto;
   display: flex;
@@ -83,8 +87,8 @@ a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
 .card {
   position: absolute;
   inset: 0;
-  background: $color-bg-card;                          // 原: #111827
-  border: 1px solid mix(#fff, $color-bg-main, 18%);    // 原: #334155
+  background: $color-bg-card;
+  border: 1px solid mix(#fff, $color-bg-main, 18%);
   border-radius: 1rem;
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
   display: flex;
@@ -96,64 +100,102 @@ a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
   transition: opacity 0.25s ease, transform 0.15s ease;
 }
 
-.face { }
 .face-hidden { display: none; }
 
 .corner-index {
-  position: absolute; top: .6rem; right: .8rem; font-size:.9rem; color:$color-text-sub; // 原: #94a3b8
+  position: absolute;
+  top: .6rem;
+  right: .8rem;
+  font-size:.9rem;
+  color:$color-text-sub;
 }
 
-.word-text { font-size: 2.1rem; margin: .25rem 0 .4rem; word-break: keep-all; }
-.pos-text  { font-size: 1rem;  color: $color-text-sub; }
-
+/* 單字文字寬度與卡片對齊 */
+.word-text,
+.pos-text,
 .definition-text {
-  font-size: 1.6rem; font-weight: 700; text-align: center; max-width: 90%; word-break: keep-all;
+  width: 100%;
+  max-width: 90%;
+  margin: .4rem auto;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.word-text { font-size: 2.1rem; }
+.pos-text  { font-size: 1rem;  color: $color-text-sub; }
+.definition-text { font-size: 1.6rem; font-weight: 700; }
+
+/* ===== 發音按鈕（卡片頂部左側） ===== */
+.top-tts {
+  position: absolute;
+  top: .6rem;
+  left: .6rem;
+  font-size: .9rem;
+  padding: .3rem .6rem;
 }
 
 /* ===== Buttons ===== */
 .btn {
-  background:$color-discord; color:#fff; border:none; border-radius:.6rem;
-  padding:.6rem 1rem; cursor:pointer; transition:background .2s, transform .1s;
-  font-size:1rem; font-weight:500;
+  background:$color-discord;
+  color:#fff;
+  border:none;
+  border-radius:.6rem;
+  padding:.6rem 1rem;
+  cursor:pointer;
+  transition:background .2s, transform .1s;
+  font-size:1rem;
+  font-weight:500;
 
   &:hover { background: lighten($color-discord, 8%); }
   &:active { transform:scale(.96); }
 }
 
+/* 操作按鈕群組 */
 .btn-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: .8rem;
   margin-top: 1rem;
   width: 100%;
-  max-width: 520px;
+  max-width: $btn-width; // 故意比卡片窄一點
 }
 
-.btn-wide { width: 100%; }
-
-.nav-btns {
+/* 隨機 + 上下箭頭一排 */
+.row-btns {
   display: flex;
-  gap: .8rem;
   width: 100%;
+  gap: .6rem;
 }
 
-.btn-nav {
-  flex: 1;
-  padding: .6rem 1rem;
+#random { flex: 1; }
+#prev, #next {
+  width: 48px;
+  padding: .6rem 0;
   text-align: center;
 }
 
-
-.btn-tts {
-  margin-top:.6rem; padding:.45rem .9rem; font-size:.95rem; border-radius:.5rem;
-  background: mix(#fff, $color-instagram, 35%); color:#fff;             // 原: #38bdf8
-  &:hover { background: mix(#fff, $color-instagram, 20%); }
+/* 模式切換等寬 */
+.btn-mode {
+  width: 100%;
 }
 
-.btn-mode {
-  margin-top: .4rem;
-  background: mix($color-bg-social, $color-discord, 45%);
+/* 回首頁次要色 */
+.btn-home {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: mix($color-bg-social, $color-discord, 30%);
+  color: #fff;
+  border-radius: .6rem;
+  padding: .6rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background .2s;
+
+  &:hover {
+    background: mix($color-bg-social, $color-discord, 45%);
+  }
 }
 
 /* ===== Mobile ===== */
@@ -163,6 +205,6 @@ a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
   .definition-text { font-size: 1.35rem; }
 }
 
-/* ===== 同面模式（JS 會加 .same-face 在 #vocab-card） ===== */
-.same-face .face { display: block; }     // 前後面一起顯示
+/* ===== 同面模式 ===== */
+.same-face .face { display: block; }
 .same-face .card { justify-content: space-evenly; }
