@@ -1,4 +1,5 @@
 @charset "UTF-8";
+/* ===== Global Variables ===== */
 /* ===== Base ===== */
 body {
   margin: 0;
@@ -83,7 +84,7 @@ a {
 
 /* ===== Vocab Card ===== */
 .flip-card {
-  width: calc(100% - 2rem);
+  width: 100%;
   max-width: 520px;
   height: 300px;
   margin: 1.2rem auto;
@@ -121,10 +122,19 @@ a {
   color: #e0e0e0;
 }
 
+/* 單字文字寬度與卡片對齊 */
+.word-text,
+.pos-text,
+.definition-text {
+  width: 100%;
+  max-width: 90%;
+  margin: 0.4rem auto;
+  text-align: center;
+  box-sizing: border-box;
+}
+
 .word-text {
   font-size: 2.1rem;
-  margin: 0.25rem 0 0.4rem;
-  word-break: keep-all;
 }
 
 .pos-text {
@@ -135,9 +145,15 @@ a {
 .definition-text {
   font-size: 1.6rem;
   font-weight: 700;
-  text-align: center;
-  max-width: 90%;
-  word-break: keep-all;
+}
+
+/* ===== 發音按鈕（卡片頂部左側） ===== */
+.top-tts {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.6rem;
 }
 
 /* ===== Buttons ===== */
@@ -159,46 +175,53 @@ a {
   transform: scale(0.96);
 }
 
+/* 操作按鈕群組 */
 .btn-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
   margin-top: 1rem;
   width: 100%;
-  max-width: 520px;
+  max-width: 500px;
 }
 
-.btn-wide {
-  width: 100%;
-}
-
-.nav-btns {
+/* 隨機 + 上下箭頭一排 */
+.row-btns {
   display: flex;
-  gap: 0.8rem;
   width: 100%;
+  gap: 0.6rem;
 }
 
-.btn-nav {
+#random {
   flex: 1;
-  padding: 0.6rem 1rem;
+}
+
+#prev, #next {
+  width: 48px;
+  padding: 0.6rem 0;
   text-align: center;
 }
 
-.btn-tts {
-  margin-top: 0.6rem;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.95rem;
-  border-radius: 0.5rem;
-  background: rgb(235.5, 120.45, 159.45);
-  color: #fff;
-}
-.btn-tts:hover {
-  background: rgb(231, 89.4, 137.4);
+/* 模式切換等寬 */
+.btn-mode {
+  width: 100%;
 }
 
-.btn-mode {
-  margin-top: 0.4rem;
+/* 回首頁次要色 */
+.btn-home {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: rgb(74.2, 83.9, 185.3);
+  color: #fff;
+  border-radius: 0.6rem;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.btn-home:hover {
   background: rgb(67.3, 75.35, 156.95);
 }
 
@@ -214,7 +237,7 @@ a {
     font-size: 1.35rem;
   }
 }
-/* ===== 同面模式（JS 會加 .same-face 在 #vocab-card） ===== */
+/* ===== 同面模式 ===== */
 .same-face .face {
   display: block;
 }
