@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KnowHub - 英文單字</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>單字卡</title>
+  <link rel="stylesheet" href="assets/css/vocab.css">
 </head>
 <body>
-  <div class="container" style="text-align:center;">
-    <!-- Header -->
-    <header style="margin-bottom:2rem;">
-      <img src="Know-hub.png" alt="KnowHub Logo" class="logo"/>
-      <h1 style="font-size:2rem;">📝 英文單字</h1>
+  <div class="container">
+    <header>
+      <img class="logo" src="assets/images/logo.png" alt="Logo">
     </header>
 
-    <!-- 搜尋 -->
-    <input type="search" id="search" placeholder="🔍 搜尋單字..." />
+    <!-- 搜尋框 -->
+    <input type="text" id="search" placeholder="🔍 搜尋單字">
     <ul id="suggestions"></ul>
 
-    <!-- 字卡：正反兩面 -->
-    <div id="vocab-card" class="flip-card">
-      <!-- 正面：英文 -->
-      <div class="flip-front card" id="face-front">
-        <span class="corner-index" id="corner-index">#1</span>
-        <h2 class="word-text" id="word">Loading…</h2>
-        <p class="pos-text" id="pos"></p>
-        <button id="tts-btn" class="btn-tts">🔊 發音</button>
-      </div>
-      <!-- 背面：中文 -->
-      <div class="flip-back card face-hidden" id="face-back">
-        <p class="definition-text" id="def">請選擇單字</p>
+    <!-- 單字卡 -->
+    <div id="vocab-card">
+      <div class="card flip-card">
+        <!-- 正面 -->
+        <div id="front" class="flip-front">
+          <h2 id="word" class="word-text">單字</h2>
+          <p id="pos" class="pos-text">(詞性)</p>
+        </div>
+
+        <!-- 背面 -->
+        <div id="back" class="flip-back face-hidden">
+          <p id="definition" class="definition-text">中文解釋</p>
+        </div>
+
+        <span id="index" class="corner-index">#1</span>
       </div>
     </div>
 
@@ -42,13 +43,10 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer style="margin-top:2rem;">
-      <a href="index.html">← 回首頁</a>
-    </footer>
+    <!-- 模式切換 -->
+    <button id="mode-toggle">🔀 切換到「同面模式」</button>
   </div>
 
-  <!-- JS -->
-  <script type="module" src="assets/js/vocab.js"></script>
+  <script src="assets/js/vocab.js"></script>
 </body>
 </html>
