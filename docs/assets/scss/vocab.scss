@@ -1,42 +1,26 @@
 @import "colors";
 
-// 尺寸 token
-$radius: 1rem;
-$radius-sm: .6rem;
-$max-w: 520px;
-
-// 可調整的功能色（按鈕等，保留「藍系按鈕」「青系 TTS」的對比感）
-$accent-primary: $color-discord;                  // 主按鈕色（原本 #3b82f6）
-$accent-primary-hover: lighten($color-discord, 8%);
-
-$accent-tts: mix(#fff, $color-instagram, 35%);    // TTS 按鈕色（原本 #38bdf8）
-$accent-tts-hover: mix(#fff, $color-instagram, 20%);
-
-// 邊框/分隔（以主背景推導）
-$border-color: mix(#fff, $color-bg-main, 12%);
-$muted: $color-text-sub;
-
-// ===== Base =====
+/* ===== Base ===== */
 body {
   margin: 0;
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
-  background: $color-bg-main;     // ← 改成你的主題底色
-  color: $color-text-main;        // ← 改成你的主題文字色
+  background: $color-bg-main;     // 原: #0f172a
+  color: $color-text-main;        // 原: #e5e7eb
   line-height: 1.6;
 }
 
-a { color: $accent-primary; text-decoration: none; }
+a { color: $color-discord; text-decoration: none; } // 原: #38bdf8
 
-// ===== Logo =====
+/* ===== Logo ===== */
 .logo {
   display: block;
-  margin: .5rem auto .25rem;
+  margin: 0.5rem auto 0.25rem;
   width: auto;
   max-height: 80px;
   object-fit: contain;
 }
 
-// ===== Container =====
+/* ===== Container ===== */
 .container {
   min-height: 100vh;
   display: flex;
@@ -47,46 +31,47 @@ a { color: $accent-primary; text-decoration: none; }
   text-align: center;
 }
 
-// ===== Search =====
+/* ===== Search ===== */
 #search {
   width: 100%;
-  max-width: $max-w;
-  padding: .6rem 1rem .6rem 2.2rem;
-  border: 1px solid $border-color;
-  border-radius: $radius-sm;
-  background: mix(black, $color-bg-main, 8%) url('https://img.icons8.com/ios-filled/20/94a3b8/search.png') no-repeat .7rem center;
+  max-width: 520px;
+  padding: 0.6rem 1rem 0.6rem 2.2rem;
+  border: 1px solid mix(#fff, $color-bg-main, 18%);   // 原: #334155
+  border-radius: 0.6rem;
+  background: mix(black, $color-bg-main, 8%)
+              url('https://img.icons8.com/ios-filled/20/94a3b8/search.png')
+              no-repeat 0.7rem center;
   background-size: 1rem;
   color: $color-text-main;
   outline: none;
   transition: box-shadow .2s, border-color .2s, background-color .2s;
   margin-bottom: .4rem;
 
-  &::placeholder { color: $muted; }
+  &::placeholder { color: $color-text-sub; }         // 原: #94a3b8
   &:focus {
-    border-color: $accent-primary;
-    box-shadow: 0 0 8px rgba(88,101,242,.45);     // 以 Discord 藍為例
+    border-color: $color-discord;                    // 原: #3b82f6
+    box-shadow: 0 0 8px rgba(88,101,242,.45);
     background-color: mix(black, $color-bg-main, 12%);
   }
 }
 
-// 建議清單
-#suggestions { list-style:none; padding:0; margin:.2rem 0 0 0; width:100%; max-width:$max-w; }
+/* 建議清單 */
+#suggestions { list-style:none; padding:0; margin:.2rem 0 0 0; width:100%; max-width:520px; }
 .suggestion-item {
   padding:.6rem 1rem;
-  border-bottom:1px solid $border-color;
-  background: mix(black, $color-bg-main, 8%);
+  border-bottom:1px solid mix(#fff, $color-bg-main, 18%);  // 原: #334155
+  background: mix(black, $color-bg-main, 8%);              // 原: #0b1220
   color:$color-text-main;
-  cursor:pointer;
-  transition:background .2s, transform .1s;
+  cursor:pointer; transition:background .2s, transform .1s;
 
   &:last-child { border-bottom:none; }
   &:hover { background: mix($color-bg-main, $color-bg-card, 70%); transform:translateX(3px); }
 }
 
-// ===== Vocab Card =====
+/* ===== Vocab Card ===== */
 .flip-card {
   width: calc(100% - 2rem);
-  max-width: $max-w;
+  max-width: 520px;
   height: 300px;
   margin: 1.2rem auto;
   display: flex;
@@ -98,9 +83,9 @@ a { color: $accent-primary; text-decoration: none; }
 .card {
   position: absolute;
   inset: 0;
-  background: $color-bg-card;                // ← 卡片底
-  border: 1px solid $border-color;
-  border-radius: $radius;
+  background: $color-bg-card;                          // 原: #111827
+  border: 1px solid mix(#fff, $color-bg-main, 18%);    // 原: #334155
+  border-radius: 1rem;
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
   display: flex;
   flex-direction: column;
@@ -108,47 +93,76 @@ a { color: $accent-primary; text-decoration: none; }
   justify-content: center;
   padding: 1rem;
   box-sizing: border-box;
-  transition: opacity .25s ease, transform .15s ease;
+  transition: opacity 0.25s ease, transform 0.15s ease;
 }
 
+.face { }
 .face-hidden { display: none; }
 
 .corner-index {
-  position: absolute; top:.6rem; right:.8rem;
-  font-size:.9rem; color:$muted;
+  position: absolute; top: .6rem; right: .8rem; font-size:.9rem; color:$color-text-sub; // 原: #94a3b8
 }
 
-.word-text { font-size: 2.1rem; margin:.25rem 0 .4rem; word-break: keep-all; }
-.pos-text  { font-size: 1rem;  color:$muted; }
+.word-text { font-size: 2.1rem; margin: .25rem 0 .4rem; word-break: keep-all; }
+.pos-text  { font-size: 1rem;  color: $color-text-sub; }
+
 .definition-text {
-  font-size: 1.6rem; font-weight: 700; text-align:center; max-width:90%; word-break: keep-all;
+  font-size: 1.6rem; font-weight: 700; text-align: center; max-width: 90%; word-break: keep-all;
 }
 
-// ===== Buttons =====
+/* ===== Buttons ===== */
 .btn {
-  background:$accent-primary; color:#fff; border:none; border-radius:$radius-sm;
+  background:$color-discord; color:#fff; border:none; border-radius:.6rem;
   padding:.6rem 1rem; cursor:pointer; transition:background .2s, transform .1s;
   font-size:1rem; font-weight:500;
 
-  &:hover { background:$accent-primary-hover; }
+  &:hover { background: lighten($color-discord, 8%); }
   &:active { transform:scale(.96); }
 }
 
-.btn-group { display:flex; flex-direction:column; align-items:center; gap:1rem; margin-top:1rem; }
-.btn-wide  { width:100%; max-width:$max-w; }
-.nav-btns  { display:flex; gap:.8rem; width:100%; max-width:$max-w; }
-.btn-nav   { flex:1; background: mix($color-bg-social, $accent-primary, 40%); }
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 520px;
+}
+
+.btn-wide { width: 100%; }
+
+.nav-btns {
+  display: flex;
+  gap: .8rem;
+  width: 100%;
+}
+
+.btn-nav {
+  flex: 1;
+  padding: .6rem 1rem;
+  text-align: center;
+}
+
 
 .btn-tts {
   margin-top:.6rem; padding:.45rem .9rem; font-size:.95rem; border-radius:.5rem;
-  background:$accent-tts; color:#fff;
-
-  &:hover { background:$accent-tts-hover; }
+  background: mix(#fff, $color-instagram, 35%); color:#fff;             // 原: #38bdf8
+  &:hover { background: mix(#fff, $color-instagram, 20%); }
 }
 
-// ===== Mobile =====
+.btn-mode {
+  margin-top: .4rem;
+  background: mix($color-bg-social, $color-discord, 45%);
+}
+
+/* ===== Mobile ===== */
 @media (max-width: 480px) {
   .flip-card { height: 260px; }
   .word-text { font-size: 1.8rem; }
   .definition-text { font-size: 1.35rem; }
 }
+
+/* ===== 同面模式（JS 會加 .same-face 在 #vocab-card） ===== */
+.same-face .face { display: block; }     // 前後面一起顯示
+.same-face .card { justify-content: space-evenly; }
