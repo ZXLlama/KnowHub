@@ -10,7 +10,7 @@ body {
 }
 
 a {
-  color: #5865f2;
+  color: #0087c5;
   text-decoration: none;
 }
 
@@ -52,7 +52,7 @@ a {
   color: #e0e0e0;
 }
 #search:focus {
-  border-color: #5865f2;
+  border-color: #0087c5;
   box-shadow: 0 0 8px rgba(88, 101, 242, 0.45);
   background-color: rgb(13.2, 14.96, 20.24);
 }
@@ -158,7 +158,7 @@ a {
 
 /* ===== Buttons ===== */
 .btn {
-  background: #5865f2;
+  background: #0087c5;
   color: #fff;
   border: none;
   border-radius: 0.6rem;
@@ -169,7 +169,7 @@ a {
   font-weight: 500;
 }
 .btn:hover {
-  background: rgb(125.8533333333, 135.9066666667, 244.9466666667);
+  background: rgb(0, 162.9593908629, 237.8);
 }
 .btn:active {
   transform: scale(0.96);
@@ -213,7 +213,7 @@ a {
   display: block;
   width: 100%;
   text-align: center;
-  background: rgb(74.2, 83.9, 185.3);
+  background: rgb(12.6, 107.7, 153.8);
   color: #fff;
   border-radius: 0.6rem;
   padding: 0.6rem 1rem;
@@ -222,7 +222,7 @@ a {
   transition: background 0.2s;
 }
 .btn-home:hover {
-  background: rgb(67.3, 75.35, 156.95);
+  background: rgb(18.9, 94.05, 132.2);
 }
 
 /* ===== Mobile ===== */
