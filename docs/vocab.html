@@ -1,33 +1,31 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>單字卡</title>
-  <link rel="stylesheet" href="assets/css/vocab.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Knowhub · 單字卡</title>
+  <link rel="stylesheet" href="assets/css/vocab.css" />
 </head>
 <body>
   <div class="container">
-    <header>
-      <img class="logo" src="assets/images/logo.png" alt="Logo">
-    </header>
+    <img class="logo" src="./images/Know-hub.png" alt="Knowhub" />
 
-    <!-- 搜尋框 -->
-    <input type="text" id="search" placeholder="🔍 搜尋單字">
+    <input type="text" id="search" placeholder="🔍 搜尋單字" autocomplete="off" />
     <ul id="suggestions"></ul>
 
     <!-- 單字卡 -->
-    <div id="vocab-card">
-      <div class="card flip-card">
-        <!-- 正面 -->
-        <div id="front" class="flip-front">
-          <h2 id="word" class="word-text">單字</h2>
-          <p id="pos" class="pos-text">(詞性)</p>
+    <div id="vocab-card" class="flip-card">
+      <div class="card" id="card">
+        <!-- 正面（英文） -->
+        <div id="front" class="face">
+          <h2 id="word" class="word-text">word</h2>
+          <p id="pos" class="pos-text">(pos)</p>
+          <button id="speak-en" class="btn btn-tts no-flip" title="朗讀英文">🔊 EN</button>
         </div>
 
-        <!-- 背面 -->
-        <div id="back" class="flip-back face-hidden">
-          <p id="definition" class="definition-text">中文解釋</p>
+        <!-- 背面（中文） -->
+        <div id="back" class="face face-hidden">
+          <p id="definition" class="definition-text">中文翻譯</p>
         </div>
 
         <span id="index" class="corner-index">#1</span>
@@ -38,13 +36,11 @@
     <div class="btn-group">
       <button id="random" class="btn btn-wide">🎲 隨機單字</button>
       <div class="nav-btns">
-        <button id="prev" class="btn btn-nav">⬅ 上一個</button>
-        <button id="next" class="btn btn-nav">➡ 下一個</button>
+        <button id="prev" class="btn btn-nav">⬅️ 上一個</button>
+        <button id="next" class="btn btn-nav">下一個 ➡️</button>
       </div>
+      <button id="mode-toggle" class="btn btn-mode">🔀 切換到「同面模式」</button>
     </div>
-
-    <!-- 模式切換 -->
-    <button id="mode-toggle">🔀 切換到「同面模式」</button>
   </div>
 
   <script src="assets/js/vocab.js"></script>
