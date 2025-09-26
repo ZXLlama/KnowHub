@@ -267,8 +267,7 @@ async function init() {
     renderItem(allWords[pointer], true);
   } catch (err) {
     console.error("Load vocab failed:", err);
-    // very small fallback
-    allWords = [{ index: 1, word: "fallback", pos: "n.", definition: "後備方案" }];
+    allWords = [{ index: 1, word: "ZXSNOW", pos: "n.", definition: "你爹" }];
     pointer = 0;
     renderItem(allWords[pointer], true);
   } finally {
