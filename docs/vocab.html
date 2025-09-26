@@ -16,16 +16,18 @@
     <!-- 單字卡 -->
     <div id="vocab-card" class="flip-card">
       <div class="card" id="card">
-        <!-- 正面（英文） -->
+        <!-- 英文發音按鈕（卡片頂部） -->
+        <button id="btnSpeakEn" class="btn btn-tts top-tts no-flip" title="英文發音">🔊</button>
+
+        <!-- 正面 -->
         <div id="front" class="face">
           <h2 id="word" class="word-text">word</h2>
           <p id="pos" class="pos-text">(pos)</p>
-          <button id="speak-en" class="btn btn-tts no-flip" title="朗讀英文">🔊 EN</button>
         </div>
 
-        <!-- 背面（中文） -->
+        <!-- 背面 -->
         <div id="back" class="face face-hidden">
-          <p id="definition" class="definition-text">中文翻譯</p>
+          <p id="definition" class="definition-text">中文解釋</p>
         </div>
 
         <span id="index" class="corner-index">#1</span>
@@ -34,14 +36,15 @@
 
     <!-- 操作按鈕 -->
     <div class="btn-group">
-      <button id="random" class="btn btn-wide">🎲 隨機單字</button>
-      <div class="nav-btns">
-        <button id="prev" class="btn btn-nav">⬅️ 上一個</button>
-        <button id="next" class="btn btn-nav">下一個 ➡️</button>
+      <div class="row-btns">
+        <button id="prev" class="btn btn-nav">⬅️</button>
+        <button id="random" class="btn btn-wide">🎲 隨機單字</button>
+        <button id="next" class="btn btn-nav">➡️</button>
       </div>
       <button id="mode-toggle" class="btn btn-mode">🔀 切換到「同面模式」</button>
+      <a href="index.html" class="btn btn-home">🏠 回首頁</a>
     </div>
-  </div>
+
 
   <script src="assets/js/vocab.js"></script>
 </body>
