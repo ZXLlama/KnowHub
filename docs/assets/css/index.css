@@ -84,18 +84,23 @@ main {
   border-radius: var(--card-radius);
   gap: 16px;
   height: 100%;
-  /* 動畫/互動：用 transform/opacity（GPU-friendly） */
   transform: translateZ(0);
-  will-change: transform, box-shadow, opacity;
-  animation: cardIn 420ms cubic-bezier(.2,.8,.2,1) both;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  will-change: transform, box-shadow, filter;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+
+.card:hover {
+  transform: translateY(-6px) scale(1.03); /* 提升高度 + 放大 */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 
+              0 0 18px rgba(59,130,246,0.4); /* 陰影 + 藍色光暈 */
+  filter: brightness(1.05); /* 稍微提亮 */
 }
-.card:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 16px rgba(0,0,0,.22); }
-.card:active { transform: scale(.985); }
+
+.card:active {
+  transform: scale(0.98); /* 點擊回饋 */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
 
 .card-img {
   width: 64px;
