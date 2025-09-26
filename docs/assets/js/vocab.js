@@ -1,46 +1,78 @@
-// ====== 設定 ======
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
+const searchInput = document.querySelector("#search");
+const suggestionsEl = document.querySelector("#suggestions");
 
+const cardWrap = document.querySelector("#vocab-card");
+const cardEl = document.querySelector("#card");
+const front = document.querySelector("#front");
+const back = document.querySelector("#back");
 
-// DOM 元素
 const wordEl = document.querySelector("#word");
 const posEl = document.querySelector("#pos");
 const defEl = document.querySelector("#definition");
 const idxEl = document.querySelector("#index");
-const front = document.querySelector("#front");
-const back = document.querySelector("#back");
-const cardEl = document.querySelector("#vocab-card .card");
+
+const btnSpeakEn = document.querySelector("#speak-en");
+const btnRandom = document.querySelector("#random");
+const btnPrev = document.querySelector("#prev");
+const btnNext = document.querySelector("#next");
+const btnMode = document.querySelector("#mode-toggle");
 
 let allWords = [];
 let pointer = 0;
 let isFlipped = false;
-let mode = 1; // 1=翻轉模式(預設), 2=同面模式
+let mode = Number(localStorage.getItem("vocab_mode")) || 1;
 
-// ====== 渲染單字 ======
+function parseCSV(text) {
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+  return text
+    .split(/\r?\n/)
+    .map((line) =>
+      line
+        .split(",")
+        .map((cell) => cell.trim().replace(/^"|"$/g, ""))
+    )
+    .filter((row) => row.length && (row[0] ?? "").trim() !== "");
+}
+
+function speak(text, lang) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  const voices = speechSynthesis.getVoices();
+  const want = voices.find((v) => v.lang.toLowerCase().startsWith(lang.toLowerCase()));
+  if (want) u.voice = want;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
 function renderItem(item, resetToFront = false) {
   wordEl.textContent = item.word || "";
-  posEl.textContent  = item.pos ? `(${item.pos}) #${item.index}` : `#${item.index}`;
-  defEl.textContent  = item.definition || "";
-  idxEl.textContent  = `#${item.index}`;
+  posEl.textContent = item.pos ? `(${item.pos})` : "";
+  defEl.textContent = item.definition || "";
+  idxEl.textContent = `#${item.index}`;
 
   if (mode === 1) {
-    // 翻轉模式
     if (resetToFront) {
       isFlipped = false;
       front.classList.remove("face-hidden");
       back.classList.add("face-hidden");
     }
+    cardWrap.classList.remove("same-face");
   } else {
-    // 同面模式
     front.classList.remove("face-hidden");
     back.classList.remove("face-hidden");
+    isFlipped = false;
+    cardWrap.classList.add("same-face");
   }
+
+  updateModeButton();
 }
 
-// ====== 翻轉 ======
 function toggleCard() {
+  if (mode !== 1) return;
   if (!isFlipped) {
     front.classList.add("face-hidden");
     back.classList.remove("face-hidden");
@@ -51,45 +83,81 @@ function toggleCard() {
   isFlipped = !isFlipped;
 }
 
-// ====== 模式切換 ======
-document.querySelector("#mode-toggle").addEventListener("click", () => {
+function updateModeButton() {
+  btnMode.textContent =
+    mode === 1 ? "🔀 切換到「同面模式」" : "🔀 切換到「雙面模式」";
+}
+
+btnMode.addEventListener("click", () => {
   mode = mode === 1 ? 2 : 1;
-  const toggleBtn = document.querySelector("#mode-toggle");
-  if (mode === 1) {
-    toggleBtn.textContent = "🔀 切換到「同面模式」";
-  } else {
-    toggleBtn.textContent = "🔀 切換到「翻轉模式」";
-  }
+  localStorage.setItem("vocab_mode", String(mode));
   renderItem(allWords[pointer], true);
 });
 
-// ====== 點擊卡片 ======
-cardEl.addEventListener("click", () => {
+btnSpeakEn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const word = allWords[pointer]?.word || "";
+  if (word) speak(word, "en-US");
+});
+
+cardEl.addEventListener("click", (e) => {
+  if (e.target.closest(".no-flip")) return;
   if (mode === 1) toggleCard();
 });
 
-// ====== 按鈕事件 ======
-document.querySelector("#next").addEventListener("click", () => {
+btnNext.addEventListener("click", () => {
   pointer = (pointer + 1) % allWords.length;
   renderItem(allWords[pointer], true);
 });
-
-document.querySelector("#prev").addEventListener("click", () => {
+btnPrev.addEventListener("click", () => {
   pointer = (pointer - 1 + allWords.length) % allWords.length;
   renderItem(allWords[pointer], true);
 });
-
-document.querySelector("#random").addEventListener("click", () => {
+btnRandom.addEventListener("click", () => {
   pointer = Math.floor(Math.random() * allWords.length);
   renderItem(allWords[pointer], true);
 });
 
-// ====== 載入資料 ======
-async function loadSheet() {
+window.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") btnNext.click();
+  else if (e.key === "ArrowLeft") btnPrev.click();
+  else if (e.key === " " || e.key === "Enter") {
+    if (mode === 1) { e.preventDefault(); toggleCard(); }
+  }
+});
+
+searchInput.addEventListener("input", () => {
+  const q = searchInput.value.trim().toLowerCase();
+  suggestionsEl.innerHTML = "";
+  if (!q) return;
+  const matches = allWords
+    .filter((x) => x.word.toLowerCase().includes(q))
+    .slice(0, 8);
+  for (const m of matches) {
+    const li = document.createElement("li");
+    li.className = "suggestion-item";
+    li.textContent = `${m.word} — ${m.definition}`;
+    li.addEventListener("click", () => {
+      pointer = m.index - 1;
+      renderItem(allWords[pointer], true);
+      suggestionsEl.innerHTML = "";
+      searchInput.blur();
+    });
+    suggestionsEl.appendChild(li);
+  }
+});
+
+searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const first = suggestionsEl.querySelector(".suggestion-item");
+    if (first) first.click();
+  }
+});
+
+async function init() {
   const res = await fetch(SHEET_URL);
   const text = await res.text();
-
-  const rows = text.split("\n").map(r => r.split(",").map(s => s.trim()));
+  const rows = parseCSV(text);
 
   allWords = rows
     .map((r, i) => ({
@@ -98,11 +166,11 @@ async function loadSheet() {
       pos: r[1] || "",
       definition: r[2] || ""
     }))
-    .filter(x => x.word);
+    .filter((x) => x.word);
 
-  // ✅ 初始隨機單字
   pointer = Math.floor(Math.random() * allWords.length);
+  speechSynthesis?.getVoices?.();
   renderItem(allWords[pointer], true);
 }
 
-loadSheet();
+init();
