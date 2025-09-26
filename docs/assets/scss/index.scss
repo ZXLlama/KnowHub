@@ -1,0 +1,186 @@
+@import "colors";
+
+:root {
+  --card-radius: 12px;
+  --grid-gap: 20px;
+}
+
+/* ========== 動態背景 ========== */
+body {
+  background: $color-bg-main;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    left: -30%;
+    width: 90vw;
+    height: 90vw;
+    background: radial-gradient(circle, $blob-blue, transparent 70%);
+    border-radius: 50%;
+    filter: blur(140px);
+    animation: blobMove1 28s ease-in-out infinite alternate;
+    z-index: -1;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -25%;
+    right: -25%;
+    width: 80vw;
+    height: 80vw;
+    background: radial-gradient(circle, $blob-red, transparent 70%);
+    border-radius: 50%;
+    filter: blur(120px);
+    animation: blobMove2 32s ease-in-out infinite alternate;
+    z-index: -1;
+  }
+}
+
+/* === 動畫 === */
+@keyframes blobMove1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30%, 80%) scale(3); }
+}
+
+@keyframes blobMove2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-30%, -80%) scale(3); }
+}
+
+header { text-align: center; padding: 20px; }
+.logo { height: 60px; }
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.grid {
+  display: grid;
+  gap: var(--grid-gap);
+  width: 80%;
+  max-width: 1200px;
+  align-items: stretch;
+}
+
+/* ========== 卡片 ========== */
+.card {
+  display: flex;
+  align-items: center;
+  background: $color-bg-card;
+  padding: 16px 20px;
+  border-radius: var(--card-radius);
+  gap: 16px;
+  height: 100%;
+  transform: translateZ(0);
+  will-change: transform, box-shadow, filter;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+
+  &:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3),
+                0 0 18px rgba(59,130,246,0.4);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  }
+
+  .card-img {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--card-radius);
+    object-fit: cover;
+  }
+
+  .card-text {
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      color: $color-text-main;
+    }
+    p {
+      margin: 6px 0 0;
+      font-size: 15px;
+      color: $color-text-sub;
+    }
+  }
+}
+
+a { text-decoration: none; display: block; }
+
+/* 底部社群 */
+footer { background: $color-bg-footer; padding: 20px; text-align: center; }
+.socials { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+
+.social {
+  display: flex; align-items: center; gap: 8px;
+  color: $color-text-main;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: var(--card-radius);
+  background: $color-bg-social;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+
+  &:hover { transform: translateY(-2px); }
+}
+
+.social-icon { width: 24px; height: 24px; }
+
+/* 社群 hover */
+.social[href*="instagram"]:hover { background:$color-instagram-bg; box-shadow:0 0 10px $color-instagram,0 0 20px $color-instagram; }
+.social[href*="threads"]:hover   { background:$color-threads-bg;   box-shadow:0 0 10px $color-threads,0 0 20px $color-threads; }
+.social[href*="discord"]:hover   { background:$color-discord-bg;   box-shadow:0 0 10px $color-discord,0 0 20px $color-discord; }
+.social[href*="youtube"]:hover   { background:$color-youtube-bg;   box-shadow:0 0 10px $color-youtube,0 0 20px $color-youtube; }
+
+/* ========== 手機模式 ========= */
+.is-mobile {
+  .grid {
+    width: 96%;
+    margin: 0 auto;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 26px;
+    margin: 0 8px;
+  }
+
+  .card-img { width: 96px; height: 96px; }
+
+  .card-text {
+    h3 { font-size: 26px; }
+    p {
+      font-size: 18px;
+      margin-top: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .social { font-size: 18px; padding: 12px 16px; }
+  .social-icon { width: 32px; height: 32px; }
+
+  .card:active { transform: scale(.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

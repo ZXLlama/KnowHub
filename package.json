@@ -1,0 +1,10 @@
+{
+  "name": "knowhub",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "sass --watch docs/assets/scss/index.scss docs/assets/css/index.css"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0"
+  }
+}

@@ -1,9 +1,10 @@
+@charset "UTF-8";
 :root {
   --card-radius: 12px;
   --grid-gap: 20px;
 }
 
-/* ========== 動態背景（效能友善） ========== */
+/* ========== 動態背景 ========== */
 body {
   background: #0f1117;
   font-family: Arial, sans-serif;
@@ -14,8 +15,6 @@ body {
   position: relative;
   overflow: hidden;
 }
-
-/* === 光斑 1（藍色系） === */
 body::before {
   content: "";
   position: absolute;
@@ -29,8 +28,6 @@ body::before {
   animation: blobMove1 28s ease-in-out infinite alternate;
   z-index: -1;
 }
-
-/* === 光斑 2（紅色系） === */
 body::after {
   content: "";
   position: absolute;
@@ -47,17 +44,29 @@ body::after {
 
 /* === 動畫 === */
 @keyframes blobMove1 {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(30%, 80%) scale(3); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(30%, 80%) scale(3);
+  }
 }
-
 @keyframes blobMove2 {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(-30%, -80%) scale(3); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-30%, -80%) scale(3);
+  }
+}
+header {
+  text-align: center;
+  padding: 20px;
 }
 
-header { text-align: center; padding: 20px; }
-.logo { height: 60px; }
+.logo {
+  height: 60px;
+}
 
 main {
   flex: 1;
@@ -88,60 +97,93 @@ main {
   will-change: transform, box-shadow, filter;
   transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
-
 .card:hover {
-  transform: translateY(-6px) scale(1.03); /* 提升高度 + 放大 */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 
-              0 0 18px rgba(59,130,246,0.4); /* 陰影 + 藍色光暈 */
-  filter: brightness(1.05); /* 稍微提亮 */
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 0 0 18px rgba(59, 130, 246, 0.4);
+  filter: brightness(1.05);
 }
-
 .card:active {
-  transform: scale(0.98); /* 點擊回饋 */
+  transform: scale(0.98);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
-
-
-.card-img {
+.card .card-img {
   width: 64px;
   height: 64px;
   border-radius: var(--card-radius);
   object-fit: cover;
 }
-
-.card-text h3 {
+.card .card-text h3 {
   margin: 0;
   font-size: 20px;
-  color: #fff;
+  color: #ffffff;
 }
-
-.card-text p {
+.card .card-text p {
   margin: 6px 0 0;
   font-size: 15px;
   color: #e0e0e0;
 }
 
-a { text-decoration: none; display: block; }
+a {
+  text-decoration: none;
+  display: block;
+}
 
 /* 底部社群 */
-footer { background: #1a1c24; padding: 20px; text-align: center; }
-.socials { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+footer {
+  background: #1a1c24;
+  padding: 20px;
+  text-align: center;
+}
+
+.socials {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .social {
-  display: flex; align-items: center; gap: 8px;
-  color: #fff; font-size: 14px; padding: 8px 12px;
-  border-radius: var(--card-radius); background: #2a2c35;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: var(--card-radius);
+  background: #2a2c35;
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
-.social:hover { transform: translateY(-2px); }
-.social-icon { width: 24px; height: 24px; }
+.social:hover {
+  transform: translateY(-2px);
+}
 
-/* 社群 hover 霓虹 */
-.social[href*="instagram"]:hover { background:#e1306c20; box-shadow:0 0 10px #e1306c,0 0 20px #e1306c; }
-.social[href*="threads"]:hover   { background:#ffffff20; box-shadow:0 0 10px #fff,0 0 20px #fff; }
-.social[href*="discord"]:hover   { background:#5865f220; box-shadow:0 0 10px #5865f2,0 0 20px #5865f2; }
-.social[href*="youtube"]:hover   { background:#ff000020; box-shadow:0 0 10px #f00,0 0 20px #f00; }
+.social-icon {
+  width: 24px;
+  height: 24px;
+}
 
-/* ========== 手機模式（JS 會在 <body> 加上 .is-mobile） ========== */
+/* 社群 hover */
+.social[href*=instagram]:hover {
+  background: rgba(225, 48, 108, 0.12);
+  box-shadow: 0 0 10px #e1306c, 0 0 20px #e1306c;
+}
+
+.social[href*=threads]:hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
+}
+
+.social[href*=discord]:hover {
+  background: rgba(88, 101, 242, 0.12);
+  box-shadow: 0 0 10px #5865f2, 0 0 20px #5865f2;
+}
+
+.social[href*=youtube]:hover {
+  background: rgba(255, 0, 0, 0.12);
+  box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+}
+
+/* ========== 手機模式 ========= */
 .is-mobile .grid {
   width: 96%;
   margin: 0 auto;
@@ -149,26 +191,41 @@ footer { background: #1a1c24; padding: 20px; text-align: center; }
 }
 .is-mobile .card {
   padding: 26px;
-  margin: 0 8px;        /* 卡片別貼邊 */
+  margin: 0 8px;
 }
-.is-mobile .card-img { width: 96px; height: 96px; }
-.is-mobile .card-text h3 { font-size: 26px; }
+.is-mobile .card-img {
+  width: 96px;
+  height: 96px;
+}
+.is-mobile .card-text h3 {
+  font-size: 26px;
+}
 .is-mobile .card-text p {
   font-size: 18px;
   margin-top: 8px;
-  /* ✅ 最多 2 行，自動 … 截斷 */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.is-mobile .social { font-size: 18px; padding: 12px 16px; }
-.is-mobile .social-icon { width: 32px; height: 32px; }
-/* 手機觸控回饋 */
-.is-mobile .card:active { transform: scale(.98); }
-
-/* 低動態偏好：關閉動畫 */
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+.is-mobile .social {
+  font-size: 18px;
+  padding: 12px 16px;
 }
+.is-mobile .social-icon {
+  width: 32px;
+  height: 32px;
+}
+.is-mobile .card:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/*# sourceMappingURL=index.css.map */
