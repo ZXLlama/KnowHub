@@ -144,7 +144,7 @@ a {
 
 .definition-text {
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* ===== 發音按鈕（卡片頂部左側） ===== */
@@ -244,6 +244,14 @@ a {
 
 .same-face .card {
   justify-content: space-evenly;
+}
+
+/* ===== 背面卡片寬度控制 ===== */
+#back {
+  width: calc(100% - 1rem);
+  max-width: calc(520px - 1rem);
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /*# sourceMappingURL=vocab.css.map */
