@@ -1,278 +1,311 @@
-// ────────────────────────────────────────────────────────────
-//  Config
-// ────────────────────────────────────────────────────────────
+/* ===========================================
+ * KnowHub Vocab - 完整 JS（合併詞性/英/中於同一區塊）
+ * 規則：
+ * - 順序：詞性 → 英文 → 中文
+ * - 字級：詞性最小、中文次之、英文最大（由 CSS 控制）
+ * - 雙面模式：英文面清空中文；中文面清空英文
+ * - 單面模式：兩面皆同時顯示中英文
+ * =========================================== */
+
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1qIeWrbWWvpkwjLq2pd_3VmjxeHrPGYptyZG4P624qL0/export?format=csv";
 
-// ────────────────────────────────────────────────────────────
-//  Helpers
-// ────────────────────────────────────────────────────────────
-const $  = (sel, root = document) => root.querySelector(sel);
-const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
+/* ---------- 工具 ---------- */
+const $  = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const escapeHTML = (s) =>
+  (s ?? "").toString()
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
-const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-
-function debounce(fn, wait = 120) {
-  let t;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), wait);
-  };
-}
-
-// Robust CSV line parser (supports quotes, commas, "" escape)
-function parseCSVLine(line) {
-  const out = [];
-  let cur = "", q = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      if (q && line[i + 1] === '"') { cur += '"'; i++; }
-      else q = !q;
-    } else if (c === "," && !q) {
-      out.push(cur.trim()); cur = "";
-    } else cur += c;
+/* 可處理引號/逗號/跨行的 CSV 解析器 */
+function parseCSV(text){
+  const rows = [];
+  let cur = [], val = "", i = 0, inQuotes = false;
+  while (i < text.length){
+    const ch = text[i];
+    if (inQuotes){
+      if (ch === '"'){
+        if (text[i+1] === '"'){ val += '"'; i += 2; }
+        else { inQuotes = false; i++; }
+      } else { val += ch; i++; }
+    } else {
+      if (ch === '"'){ inQuotes = true; i++; }
+      else if (ch === ","){ cur.push(val); val = ""; i++; }
+      else if (ch === "\n"){ cur.push(val); rows.push(cur); cur = []; val = ""; i++; }
+      else if (ch === "\r"){ i++; }
+      else { val += ch; i++; }
+    }
   }
-  out.push(cur.trim());
-  return out;
-}
-function parseCSV(text) {
-  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // BOM
-  return text
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .map(parseCSVLine);
+  cur.push(val); rows.push(cur);
+  return rows;
 }
 
-// ────────────────────────────────────────────────────────────
-/** speech */
-function speak(text, lang) {
-  if (!("speechSynthesis" in window) || !text) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang;
-  // pick a suitable voice if available
-  const pick = (voices) =>
-    voices.find(v => v.lang?.toLowerCase().startsWith(lang.toLowerCase()));
-  const voices = speechSynthesis.getVoices();
-  const v = pick(voices);
-  if (v) u.voice = v;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
-
-// Prewarm voices (Safari)
-on(window, "voiceschanged", () => speechSynthesis.getVoices());
-
-// ────────────────────────────────────────────────────────────
-//  DOM refs (null-safe)
-// ────────────────────────────────────────────────────────────
+/* ---------- DOM ---------- */
 const searchInput   = $("#search");
-const suggestionsEl = $("#suggestions");
+const suggestionsUl = $("#suggestions");
 
-const cardWrap = $("#vocab-card");
 const cardEl   = $("#card");
 const front    = $("#front");
 const back     = $("#back");
 
-const wordEl = $("#word");
-const posEl  = $("#pos");
-const defEl  = $("#definition");
-const idxEl  = $("#index");
+// 六個文字節點（同一結構，正反面各三個）
+const posFront = $("#pos-front");
+const enFront  = $("#en-front");
+const zhFront  = $("#zh-front");
 
-const btnSpeakEn = $("#speak-en");     // ← 只宣告一次
+const posBack  = $("#pos-back");
+const enBack   = $("#en-back");
+const zhBack   = $("#zh-back");
+
+const indexEl  = $("#index");
+const btnSpeakEn = $("#speak-en"); // 需有 .no-flip
 const btnRandom  = $("#random");
 const btnPrev    = $("#prev");
 const btnNext    = $("#next");
-const btnMode    = $("#mode-toggle");
+const modeToggle = $("#mode-toggle");
 
-// ────────────────────────────────────────────────────────────
-//  State
-// ────────────────────────────────────────────────────────────
-let allWords = [];
-let pointer  = 0;
-let isFlipped = false;
-let mode = Number(localStorage.getItem("vocab_mode")) || 1; // 1=雙面 2=同面
+/* ---------- 狀態 ---------- */
+let items      = [];   // {word, pos, definition}
+let idx        = 0;
+let isDualMode = true; // true=雙面（可翻面）；false=單面（兩面同顯）
+let flipped    = false;
 
-// ────────────────────────────────────────────────────────────
-//  UI helpers
-// ────────────────────────────────────────────────────────────
-function setButtonsEnabled(enabled) {
-  [btnRandom, btnPrev, btnNext, btnMode, btnSpeakEn].forEach(b => {
-    if (b) b.disabled = !enabled;
-  });
+/* ---------- 語音 ---------- */
+function speakEn(text){
+  try{
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const best = voices.find(v => /en(-|_)|English/i.test(v.lang || v.name)) || voices[0];
+    if (best) u.voice = best;
+    u.rate = 0.95; u.pitch = 1.0; u.volume = 1.0;
+    speechSynthesis.speak(u);
+  }catch{}
 }
+window.addEventListener("voiceschanged", () => {});
 
-function updateModeButton() {
-  if (!btnMode) return;
-  btnMode.textContent = mode === 1
-    ? "🔀 切換到「同面模式」"
-    : "🔀 切換到「雙面模式」";
-}
-
-// 強制讓卡片兩面高度一致（文字變動後仍一致）
-function equalizeCard() {
+/* ---------- 顯示邏輯 ---------- */
+function applyCardFace() {
   if (!front || !back) return;
-  front.style.minHeight = back.style.minHeight = "auto";
-  const h = Math.max(front.offsetHeight, back.offsetHeight);
-  front.style.minHeight = back.style.minHeight = h + "px";
-}
-
-// ────────────────────────────────────────────────────────────
-//  Render
-// ────────────────────────────────────────────────────────────
-function renderItem(item, resetToFront = false) {
-  if (!item) return;
-
-  if (wordEl) wordEl.textContent = item.word || "";
-  if (posEl)  posEl.textContent  = item.pos ? `(${item.pos})` : "";
-  if (defEl)  defEl.textContent  = item.definition || "";
-  if (idxEl)  idxEl.textContent  = `#${item.index}`;
-
-  if (mode === 1) {
-    // 雙面
-    if (resetToFront) {
-      isFlipped = false;
-      front?.classList.remove("face-hidden");
-      back?.classList.add("face-hidden");
-    }
-    cardWrap?.classList.remove("same-face");
-  } else {
-    // 同面
-    front?.classList.remove("face-hidden");
-    back?.classList.remove("face-hidden");
-    isFlipped = false;
-    cardWrap?.classList.add("same-face");
-  }
-
-  equalizeCard();
-  updateModeButton();
-}
-
-function toggleCard() {
-  if (mode !== 1) return;
-  if (!front || !back) return;
-  if (!isFlipped) {
-    front.classList.add("face-hidden");
+  if (!isDualMode) {
+    // 單面：兩面同時顯示
+    front.classList.remove("face-hidden");
     back.classList.remove("face-hidden");
+    return;
+  }
+  // 雙面：只顯示其一
+  if (flipped) {
+    back.classList.remove("face-hidden");
+    front.classList.add("face-hidden");
   } else {
     front.classList.remove("face-hidden");
     back.classList.add("face-hidden");
   }
-  isFlipped = !isFlipped;
 }
 
-// ────────────────────────────────────────────────────────────
-//  Events（全部 null-safe 綁定）
-// ────────────────────────────────────────────────────────────
-on(btnMode, "click", () => {
-  mode = mode === 1 ? 2 : 1;
-  localStorage.setItem("vocab_mode", String(mode));
-  renderItem(allWords[pointer], true);
-});
+/* 固定高度下讓兩面等高（以卡片容器高為準） */
+function equalizeCard(){
+  if (!front || !back || !cardEl) return;
+  const h = cardEl.clientHeight;
+  front.style.minHeight = h + "px";
+  back.style.minHeight  = h + "px";
+}
 
-on(btnSpeakEn, "click", (e) => {
-  e.stopPropagation();
-  const w = allWords[pointer]?.word || "";
-  speak(w, "en-US");
-});
+/* 將目前 idx 的資料，依模式與面向，填入正反兩面 */
+function updateContent(){
+  if (!items.length) return;
+  const item = items[idx];
+  const W = (item.word || "").trim() || "—";
+  const P = (item.pos  || "").trim();
+  const Z = (item.definition || "").trim() || "—";
 
-on(cardEl, "click", (e) => {
-  if (e.target?.closest?.(".no-flip")) return; // TTS/控制元件不翻面
-  if (mode === 1) toggleCard();
-});
+  // 詞性兩面都相同
+  posFront.textContent = P;
+  posBack.textContent  = P;
 
-on(btnNext, "click", () => {
-  if (!allWords.length) return;
-  pointer = (pointer + 1) % allWords.length;
-  renderItem(allWords[pointer], true);
-});
+  if (isDualMode){
+    // 雙面：英文面清空中文；中文面清空英文
+    // 英文面（front）
+    enFront.textContent = W;
+    zhFront.textContent = "";    // 清空中文
 
-on(btnPrev, "click", () => {
-  if (!allWords.length) return;
-  pointer = (pointer - 1 + allWords.length) % allWords.length;
-  renderItem(allWords[pointer], true);
-});
+    // 中文面（back）
+    enBack.textContent  = "";    // 清空英文
+    zhBack.textContent  = Z;
+  } else {
+    // 單面：兩面都同時顯示（不清空）
+    enFront.textContent = W;
+    zhFront.textContent = Z;
 
-on(btnRandom, "click", () => {
-  if (!allWords.length) return;
-  pointer = Math.floor(Math.random() * allWords.length);
-  renderItem(allWords[pointer], true);
-});
-
-// Keyboard: ← → / 空白 / Enter
-on(window, "keydown", (e) => {
-  if (!allWords.length) return;
-  if (e.key === "ArrowRight") btnNext?.click();
-  else if (e.key === "ArrowLeft") btnPrev?.click();
-  else if (e.key === " " || e.key === "Enter") {
-    if (mode === 1) { e.preventDefault(); toggleCard(); }
+    enBack.textContent  = W;
+    zhBack.textContent  = Z;
   }
-});
+}
 
-// 搜尋（debounce）
-on(searchInput, "input", debounce(() => {
-  const q = (searchInput?.value || "").trim().toLowerCase();
-  if (!suggestionsEl) return;
-  suggestionsEl.innerHTML = "";
-  if (!q) return;
-  const matches = allWords
-    .filter(x => x.word.toLowerCase().includes(q))
+/* ---------- 資料載入 ---------- */
+async function loadFromSheet(){
+  const resp = await fetch(SHEET_URL, { cache: "no-store" });
+  if (!resp.ok) throw new Error("Fetch CSV failed");
+  const text = await resp.text();
+  const rows = parseCSV(text).filter(r => r.some(c => (c ?? "").toString().trim() !== ""));
+  if (!rows.length) return [];
+
+  // 可有表頭也可無表頭（自動判斷）
+  let start = 0;
+  const first = rows[0].map(x => (x ?? "").toString().trim().toLowerCase());
+  const mayHeader =
+    first[0] === "word" || first[1] === "pos" || first[2] === "definition" ||
+    first.join(",").includes("詞性") || first.join(",").includes("中文");
+  if (mayHeader) start = 1;
+
+  const list = [];
+  for (let i = start; i < rows.length; i++){
+    const r = rows[i];
+    const word = (r[0] ?? "").toString().trim();
+    const pos  = (r[1] ?? "").toString().trim();
+    const def  = (r[2] ?? "").toString().trim();
+    if (!word && !pos && !def) continue;
+    list.push({ word, pos, definition: def });
+  }
+  return list;
+}
+
+/* ---------- 渲染 ---------- */
+function renderItem(i){
+  if (!items.length) return;
+  const item = items[i];
+  indexEl.textContent = `#${i + 1}`;
+
+  // 換卡：預設回到英文面（flipped=false）
+  flipped = false;
+
+  // 依模式填內容 & 設定可見面
+  updateContent();
+  applyCardFace();
+  equalizeCard();
+
+  try{ localStorage.setItem("vocab_idx", String(i)); }catch{}
+}
+
+/* ---------- 導航 ---------- */
+function clampIndex(n){
+  if (!items.length) return 0;
+  if (n < 0) return items.length - 1;
+  if (n >= items.length) return 0;
+  return n;
+}
+function go(i){ idx = clampIndex(i); renderItem(idx); }
+function next(){ go(idx + 1); }
+function prev(){ go(idx - 1); }
+function random(){ if (!items.length) return; go(Math.floor(Math.random() * items.length)); }
+
+/* ---------- 搜尋 ---------- */
+function updateSuggestions(q){
+  const query = (q || "").trim().toLowerCase();
+  if (!query){ suggestionsUl.innerHTML = ""; suggestionsUl.classList.remove("show"); return; }
+  const res = items.map((it,i)=>({...it,i}))
+    .filter(it => (it.word || "").toLowerCase().includes(query))
     .slice(0, 8);
-  for (const m of matches) {
-    const li = document.createElement("li");
-    li.className = "suggestion-item";
-    li.textContent = `${m.word} — ${m.definition}`;
-    li.addEventListener("click", () => {
-      pointer = m.index - 1; // 因為我們會重新編號，這裡一定安全
-      renderItem(allWords[pointer], true);
-      suggestionsEl.innerHTML = "";
-      searchInput?.blur();
-    });
-    suggestionsEl.appendChild(li);
-  }
-}, 120));
 
-on(searchInput, "keydown", (e) => {
-  if (e.key === "Enter" && suggestionsEl) {
-    const first = suggestionsEl.querySelector(".suggestion-item");
-    if (first) first.click();
+  suggestionsUl.innerHTML = res.map(r =>
+    `<li data-i="${r.i}" role="option">${escapeHTML(r.word)} <small style="opacity:.7">${escapeHTML(r.pos || "")}</small></li>`
+  ).join("");
+  suggestionsUl.classList.toggle("show", res.length > 0);
+}
+
+/* ---------- 事件 ---------- */
+// 卡片點擊：空白處翻面（只在雙面模式）
+cardEl.addEventListener("click", (e) => {
+  if (e.target.closest(".no-flip")) return;
+  if (!isDualMode) return;
+  flipped = !flipped;
+  applyCardFace();
+});
+
+// 模式切換（文字可自行調整）
+modeToggle.addEventListener("click", () => {
+  isDualMode = !isDualMode;
+
+  if (isDualMode){
+    flipped = false; // 回到英文面
+    modeToggle.textContent = "🔀 切換到「單面模式」";
+  }else{
+    modeToggle.textContent = "🔁 切換到「雙面模式」";
+  }
+
+  updateContent();  // 依新模式填寫內容（清空/顯示）
+  applyCardFace();  // 立即套用顯示狀態
+});
+
+// 導航
+btnPrev.addEventListener("click", prev);
+btnNext.addEventListener("click", next);
+btnRandom.addEventListener("click", random);
+
+// 發音（直接念目前單字的英文，不依面向）
+btnSpeakEn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const text = (items[idx]?.word || "").trim();
+  if (text) speakEn(text);
+});
+
+// 搜尋
+searchInput.addEventListener("input", (e) => updateSuggestions(e.target.value || ""));
+searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter"){
+    const li = suggestionsUl.querySelector("li");
+    if (li){
+      go(Number(li.getAttribute("data-i")));
+      suggestionsUl.classList.remove("show");
+      searchInput.blur();
+    }
+  }
+});
+suggestionsUl.addEventListener("click", (e) => {
+  const li = e.target.closest("li"); if (!li) return;
+  go(Number(li.getAttribute("data-i")));
+  suggestionsUl.classList.remove("show");
+});
+
+// 鍵盤（桌機 UX）
+window.addEventListener("keydown", (e) => {
+  if (["INPUT","TEXTAREA"].includes(document.activeElement?.tagName)) return;
+  if (e.key === "ArrowRight") next();
+  else if (e.key === "ArrowLeft") prev();
+  else if (e.key === " "){
+    if (isDualMode){ e.preventDefault(); flipped = !flipped; applyCardFace(); }
   }
 });
 
-// ────────────────────────────────────────────────────────────
-//  Data loading
-// ────────────────────────────────────────────────────────────
-async function init() {
-  setButtonsEnabled(false);
-  try {
-    const res  = await fetch(SHEET_URL, { cache: "no-store" });
-    const text = await res.text();
-    const rows = parseCSV(text);
+// 尺寸改變時維持兩面等高
+window.addEventListener("resize", equalizeCard);
 
-    // 先 map 再 filter，最後重新編號（確保 index 與陣列索引一致）
-    const cleaned = rows
-      .map((r) => ({ word: r[0] || "", pos: r[1] || "", definition: r[2] || "" }))
-      .filter(x => x.word);
-
-    allWords = cleaned.map((x, i) => ({ ...x, index: i + 1 }));
-
-    if (!allWords.length) throw new Error("No data in sheet.");
-
-    // 初始隨機單字
-    pointer = Math.floor(Math.random() * allWords.length);
-
-    // Safari: 預熱 voices
-    speechSynthesis?.getVoices?.();
-
-    renderItem(allWords[pointer], true);
-  } catch (err) {
-    console.error("Load vocab failed:", err);
-    allWords = [{ index: 1, word: "ZXSNOW", pos: "n.", definition: "你爹" }];
-    pointer = 0;
-    renderItem(allWords[pointer], true);
-  } finally {
-    setButtonsEnabled(true);
+/* ---------- 初始化 ---------- */
+(async function init(){
+  try{
+    items = await loadFromSheet();
+  }catch{
+    items = [
+      { word: "example", pos: "noun", definition: "例子；範例" },
+      { word: "quarrel",  pos: "noun/verb", definition: "爭吵／爭執／口角" },
+    ];
   }
-}
 
-init();
+  try{
+    const saved = Number(localStorage.getItem("vocab_idx"));
+    if (!Number.isNaN(saved) && saved >= 0 && saved < items.length) idx = saved;
+  }catch{}
+
+  renderItem(idx);
+
+  // 保險：首幀確保正確顯示
+  applyCardFace();
+  equalizeCard();
+
+  // 點其它區域關閉建議
+  document.body.addEventListener("click", (e) => {
+    if (!e.target.closest(".search-wrap")) suggestionsUl.classList.remove("show");
+  }, { capture: true });
+})();
