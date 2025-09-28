@@ -1,51 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Knowhub · 單字卡</title>
+  <title>KnowHub · 單字卡</title>
+
+  <!-- 先載入 template 的通用樣式，再載入本頁樣式（本頁可覆蓋細節） -->
+  <link rel="stylesheet" href="assets/css/template.css" />
   <link rel="stylesheet" href="assets/css/vocab.css" />
 </head>
-<body>
-  <div class="container">
-    <img class="logo" src="./images/Know-hub.png" alt="Knowhub" />
-
-    <input type="text" id="search" placeholder="🔍 搜尋單字" autocomplete="off" />
-    <ul id="suggestions"></ul>
-
-    <!-- 單字卡 -->
-    <div id="vocab-card" class="flip-card">
-      <div class="card" id="card">
-        <!-- 英文發音按鈕（卡片頂部） -->
-        <button id="btnSpeakEn" class="btn btn-tts top-tts no-flip" title="英文發音">🔊</button>
-
-        <!-- 正面 -->
-        <div id="front" class="face">
-          <h2 id="word" class="word-text">word</h2>
-          <p id="pos" class="pos-text">(pos)</p>
-        </div>
-
-        <!-- 背面 -->
-        <div id="back" class="face face-hidden">
-          <p id="definition" class="definition-text">中文解釋</p>
-        </div>
-
-        <span id="index" class="corner-index">#1</span>
-      </div>
+<body class="kh-body vocab-body">
+  <!-- Header：採用 template，Logo 可回首頁 -->
+  <header class="kh-header">
+    <div class="kh-header__inner">
+      <a class="kh-logo" href="./index.html" aria-label="回到首頁">
+        <img src="./images/Know-hub.png" alt="KnowHub Logo">
+      </a>
     </div>
+  </header>
 
-    <!-- 操作按鈕 -->
-    <div class="btn-group">
-      <div class="row-btns">
-        <button id="prev" class="btn btn-nav">⬅️</button>
-        <button id="random" class="btn btn-wide">🎲 隨機單字</button>
-        <button id="next" class="btn btn-nav">➡️</button>
+  <!-- Main：主要內容置中且不會產生水平捲動 -->
+  <main class="kh-main">
+    <div class="kh-container vocab-container">
+      <!-- 搜尋區 -->
+      <div class="search-wrap" role="search">
+        <input type="text" id="search" placeholder="🔍 搜尋單字" autocomplete="off" inputmode="search" />
+        <ul id="suggestions" class="suggestions" role="listbox" aria-label="搜尋建議"></ul>
       </div>
-      <button id="mode-toggle" class="btn btn-mode">🔀 切換到「同面模式」</button>
-      <a href="index.html" class="btn btn-home">🏠 回首頁</a>
+
+      <!-- 單字卡 -->
+      <section aria-label="單字卡">
+        <div id="vocab-card" class="flip-card">
+          <div class="card" id="card" role="button" aria-live="polite">
+            <!-- 左上角: INDEX -->
+            <span id="index" class="corner-index" aria-label="單字序號">#1</span>
+
+            <!-- 右上角: 英文發音 -->
+            <button id="speak-en" class="btn btn-tts no-flip" title="播放英文發音" aria-label="播放英文發音">🔊</button>
+
+            <!-- 正面（英文面預設） -->
+            <div id="front" class="face">
+              <div class="entry">
+                <p id="pos-front" class="pos-text" aria-label="詞性">(pos)</p>
+                <h2 id="en-front" class="en-text" aria-label="英文">word</h2>
+                <p id="zh-front" class="zh-text" aria-label="中文">中文解釋</p>
+              </div>
+            </div>
+
+            <!-- 背面（中文面） -->
+            <div id="back" class="face face-hidden">
+              <div class="entry">
+                <p id="pos-back" class="pos-text" aria-label="詞性">(pos)</p>
+                <h2 id="en-back" class="en-text" aria-label="英文">word</h2>
+                <p id="zh-back" class="zh-text" aria-label="中文">中文解釋</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 操作按鈕群 -->
+      <nav class="btn-group" aria-label="操作按鈕">
+        <div class="row-btns">
+          <button id="prev" class="btn btn-primary btn-nav" title="上一個">⬅️</button>
+          <button id="random" class="btn btn-primary btn-wide">🎲 隨機單字</button>
+          <button id="next" class="btn btn-primary btn-nav" title="下一個">➡️</button>
+        </div>
+        <button id="mode-toggle" class="btn btn-primary btn-mode">🔀 切換到「單面模式」</button>
+        <a href="index.html" class="btn btn-primary btn-home">🏠 回首頁</a>
+      </nav>
     </div>
+  </main>
 
+  <!-- Footer（可留白簡潔） -->
+  <footer class="kh-footer">
+    <div class="kh-footer__inner">
+      <small>© <span id="year"></span> KnowHub</small>
+    </div>
+  </footer>
 
+  <script>
+    // Footer 年份
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
   <script src="assets/js/vocab.js"></script>
 </body>
 </html>
