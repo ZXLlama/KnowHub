@@ -1,42 +1,177 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KnowHub - 強制灌入知識</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Knowledge | KnowHub</title>
+    <meta name="description" content="學測知識庫：快速重點／解釋定義／詳細說明／常見考點／舉例說明，一頁全掌握（支援 LaTeX）。" />
 
-  <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-</head>
-<body>
-  <div class="container">
-    <!-- Header -->
-    <h1 style="font-size:2rem; margin-bottom:1rem;">📚 強制灌入知識</h1>
+    <!-- Page CSS (由 SCSS 編譯產出到 docs/assets/css/knowledge.css) -->
+    <link rel="stylesheet" href="./assets/css/knowledge.css" />
 
-    <!-- 工具列 -->
-    <div class="toolbar" id="subject-chips"></div>
-    <input type="search" id="search" placeholder="🔍 搜尋標題..." style="margin-bottom:1.5rem;">
+    <!-- KaTeX（LaTeX 渲染） -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'$',right:'$',display:false},
+          {left:'\\(',right:'\\)',display:false},
+          {left:'\\[',right:'\\]',display:true}
+        ],
+        throwOnError:false
+      });"
+    ></script>
+  </head>
 
-    <!-- 顯示卡片 -->
-    <div id="knowledge-card" class="card skeleton" style="min-height:200px;"></div>
+  <body>
+    <header class="page-header container" role="banner">
+      <img src="images/Know-hub.png" alt="Logo" class="logo" />
+      <h1 class="title">Knowledge</h1>
+      <p class="subtitle">用搜尋、科目篩選、隨機抽卡快速複習（支援 LaTeX）</p>
+    </header>
 
-    <!-- 動作按鈕 -->
-    <div style="margin-top:1.5rem; display:flex; gap:1rem;">
-      <button id="random" class="btn">🎲 隨機知識</button>
-      <button id="prev" class="btn" style="background:#475569;">⬅️ 上一則</button>
-      <button id="next" class="btn" style="background:#475569;">➡️ 下一則</button>
+
+      <!-- 工具列 -->
+      <section class="toolbar" aria-label="篩選工具列">
+        <div class="container">
+          <div class="row">
+            <!-- 搜尋 -->
+            <label class="input" for="searchInput" aria-label="搜尋知識">
+              <span class="icon" aria-hidden="true">🔎</span>
+              <input id="searchInput" type="search" placeholder="搜尋標題、內容、考點…" />
+            </label>
+
+            <!-- 科目篩選（動態注入 options） -->
+            <select id="subjectSelect" class="select" aria-label="科目篩選">
+              <option value="">全部科目</option>
+            </select>
+
+            <!-- 重置 -->
+            <button id="resetBtn" class="btn btn-ghost" type="button" aria-label="重置篩選">
+              <span class="label">重置</span> ♻️
+            </button>
+
+            <!-- 隨機 -->
+            <button id="randomBtn" class="btn btn-primary" type="button" aria-label="隨機抽一則知識">
+              <span class="label">隨機知識</span> 🎲
+            </button>
+          </div>
+
+          <!-- Tag / 章節 pills（JS 動態注入） -->
+          <div class="pills" id="tagPills" role="listbox" aria-label="標籤篩選"></div>
+
+          <!-- 統計 -->
+          <div class="stats" id="stats" aria-live="polite">0 / 0</div>
+        </div>
+      </section>
+
+      <!-- 內容 -->
+      <main class="container" id="main" tabindex="-1">
+        <!-- Grid -->
+        <div id="knowledgeGrid" aria-live="polite" aria-busy="false"></div>
+
+        <!-- 空狀態 -->
+        <div id="emptyState" class="empty hide">
+          沒找到符合條件的筆記。試試其他關鍵字或移除篩選 👀
+        </div>
+
+        <!-- 卡片模板（五大段落 + 科目 + 建/更時間 + Notion 連結） -->
+        <template id="cardTpl">
+          <article class="card" tabindex="0" role="article">
+            <div class="card-img-wrap">
+              <img class="card-img" alt="" />
+              <div class="card-badge" aria-hidden="true"></div>
+            </div>
+
+            <div class="card-body">
+              <header class="card-head">
+                <h2 class="card-title"></h2>
+                <p class="card-subtitle"></p>
+              </header>
+
+              <div class="chips">
+                <span class="chip subject-chip">科目</span>
+              </div>
+
+              <div class="card-meta">
+                <span class="card-updated"></span>
+                <div class="card-tags"></div>
+              </div>
+
+              <section class="card-section">
+                <h3>快速重點</h3>
+                <div class="card-desc fast md"></div>
+              </section>
+
+              <section class="card-section">
+                <h3>解釋／定義</h3>
+                <div class="md def"></div>
+              </section>
+
+              <section class="card-section">
+                <h3>詳細說明</h3>
+                <div class="md detail"></div>
+              </section>
+
+              <section class="card-section">
+                <h3>常見考點／易錯點</h3>
+                <div class="md pitfalls"></div>
+              </section>
+
+              <section class="card-section">
+                <h3>舉例說明</h3>
+                <div class="md examples"></div>
+              </section>
+
+              <div class="card-actions">
+                <a class="btn" target="_blank" rel="noopener" aria-label="在 Notion 開啟">在 Notion 開啟 ↗</a>
+              </div>
+            </div>
+          </article>
+        </template>
+      </main>
+
+      <footer class="page-footer container">
+        <small>© <span id="year"></span> KnowHub — Keep learning, keep earning 💸</small>
+      </footer>
     </div>
 
-    <!-- Footer -->
-    <footer style="margin-top:3rem; font-size:0.85rem; color:#94a3b8;">
-      <a href="index.html" style="color:#38bdf8;">← 回首頁</a>
-    </footer>
-  </div>
+    <!-- 前端設定（knowledge.js 會讀取） -->
+    <script>
+      // 你的 Worker 反向代理（後端持有 Notion Secret；前端不暴露）
+      window.NOTION_PROXY_BASE = "https://your-worker-subdomain.workers.dev";
+      // Notion Database ID（知識庫資料表）
+      window.NOTION_DB_ID = "YOUR_NOTION_DATABASE_ID";
 
-  <!-- 改成 ES module -->
-  <script type="module" src="assets/js/knowledge.js"></script>
-</body>
+      // Notion 資料庫欄位映射（改成你的實際欄位名）
+      window.NOTION_FIELDS = {
+        title: "標題",           // title 或 rich_text
+        subject: "科目",         // select / multi-select
+        createdTime: "建立時間",  // date 或系統欄位
+        updatedTime: "更新時間",  // 建議用 last_edited_time
+        fast: "快速重點",        // rich_text / markdown
+        def: "解釋/定義",
+        detail: "詳細說明",
+        pitfalls: "常見考點/易錯點",
+        examples: "舉例說明",
+        tags: "標籤",            // optional multi-select
+        cover: "封面"            // optional 外連圖片 URL
+      };
+    </script>
+
+    <!-- 頁面邏輯（抓 Notion、渲染 Grid、搜尋/篩選/隨機） -->
+    <script src="./assets/js/knowledge.js" defer></script>
+
+    <script>
+      // 年份
+      document.addEventListener('DOMContentLoaded', () => {
+        const y = document.getElementById('year');
+        if (y) y.textContent = new Date().getFullYear();
+      });
+    </script>
+  </body>
 </html>
