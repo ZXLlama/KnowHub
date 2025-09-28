@@ -227,3 +227,192 @@
 /* KaTeX inline 與區塊微調 */
 .math-inline{ display: inline-block; }
 .katex-display{ overflow-x: auto; padding: 4px 2px; }
+
+/* === 微調 1：行動裝置下，側欄預設收起時的外觀更乾淨 === */
+@media (max-width: 960px){
+  /* 既有：.kh-shell 會單欄；這裡強化側欄收起時的呈現 */
+  .kh-sidenav{
+    margin-bottom: 10px;
+  }
+  .kh-sidenav__toggle{
+    display: block;         /* 顯示 ☰ 按鈕 */
+    margin-bottom: 6px;
+  }
+  /* 收起時僅保留切換鈕，其他區塊隱藏 */
+  .kh-sidenav[data-open="false"] {
+    .kh-side-search,
+    .kh-random-filter,
+    .kh-tree{
+      display: none !important;
+    }
+  }
+  /* 收起時避免側欄佔高度：讓卡片更靠上 */
+  .kh-content{
+    margin-top: 0;
+  }
+}
+
+/* === 微調 2：按鈕禁用狀態（隨機沒有候選時） === */
+.btn[disabled],
+.btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+  box-shadow: none;
+}
+
+/* === 微調 3：工具列在窄螢幕更緊湊 === */
+.kh-toolbar{
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.kh-toolbar .btn{
+  padding: 9px 12px;
+}
+
+/* === 微調 4：卡片內 KaTeX 可水平捲動，且不撐破版面 === */
+.section-card .katex-display{
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* === 微調 5：側欄群組（<details>）在手機上展開/收起更順眼 === */
+.kh-tree .group{
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.kh-tree .group[open] summary{ filter: brightness(1.03); }
+.kh-tree .items{ max-height: 320px; overflow: auto; }
+
+/* === 微調 6：側欄選單項在小裝置不擁擠 === */
+@media (max-width: 520px){
+  .kh-tree .item{ padding: 10px 12px; }
+  .kh-subject-checks label{ padding: 8px 10px; }
+}
+
+/* 科目勾選 + 展開清單 */
+.sub-check{
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #131a2a, #0e1524);
+  border: 1px solid #ffffff18;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.sub-check label{ display:flex; align-items:center; gap:8px; }
+.sub-check input[type="checkbox"]{
+  appearance: none; width:18px; height:18px; border-radius:4px;
+  border:1px solid #ffffff33; background:#0005; position:relative;
+}
+.sub-check input[type="checkbox"]:checked{
+  border-color: color-mix(in oklab, var(--kh-primary) 60%, #fff0);
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--kh-primary) 70%, transparent),
+    color-mix(in oklab, var(--kh-accent) 50%, transparent));
+}
+.sub-check input[type="checkbox"]:checked::after{
+  content:""; position:absolute; inset:3px; border-radius:2px; background:#03131a;
+}
+.sub-check .name{ color: var(--kh-text); }
+
+.sub-list-btn{
+  border:1px solid #ffffff29; border-radius:8px; padding:4px 8px;
+  background: linear-gradient(135deg, #1b2030, #121826);
+  color: var(--kh-text); cursor: pointer;
+}
+.sub-list-btn:hover{ box-shadow: 0 6px 14px rgba(0,0,0,.35); transform: translateY(-1px); }
+
+/* 下拉清單 */
+.sub-list{
+  position: absolute;
+  left: 10px; right: 10px; top: calc(100% + 6px);
+  z-index: 30;
+  background: color-mix(in oklab, var(--kh-surface) 96%, transparent);
+  border: 1px solid #ffffff22;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.45);
+  max-height: 260px; overflow: auto; padding: 6px;
+}
+.sub-list[hidden]{ display: none !important; }
+.sub-item{
+  width: 100%; text-align: left;
+  border: 1px solid #ffffff12; border-radius: 8px;
+  background: linear-gradient(135deg, #121826, #101626);
+  color: var(--kh-text);
+  padding: 8px 10px; margin: 4px 0; cursor: pointer;
+}
+.sub-item:hover{ background:#ffffff10; }
+.sub-list-empty{ color: var(--kh-muted); padding: 8px 4px; }
+
+/* 覆蓋整頁的半透明遮罩 */
+.kh-loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);        /* 半透明黑 */
+  backdrop-filter: blur(4px);              /* 輕微毛玻璃 */
+  z-index: 9999;                           /* 蓋過頁面其他元素 */
+  transition: opacity .2s ease;
+}
+
+/* 由 JS 設定/移除 hidden 屬性控制顯示 */
+.kh-loader[hidden] {
+  display: none !important;
+}
+
+/* 置中的卡片樣式（深色主題） */
+.kh-loader__box {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(18, 20, 26, 0.85);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* 文字（自適應大小；沿用主題字色） */
+.kh-loader__text {
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.2;
+  letter-spacing: .02em;
+  color: var(--kh-fg, #e5e7eb);
+}
+
+/* 旋轉圈圈（使用 currentColor 當作主色） */
+.kh-spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  /* 只顯示上/右兩段形成扇形，與背景對比的透明邊 */
+  border: 3px solid transparent;
+  color: var(--kh-accent, #60a5fa);        /* 若有主題變數就吃變數 */
+  border-top-color: currentColor;
+  border-right-color: currentColor;
+  animation: kh-spin .8s linear infinite;
+}
+
+/* 放大版（可選，用在更小/更大畫面時） */
+@media (max-width: 480px) {
+  .kh-spinner { width: 22px; height: 22px; }
+}
+@media (min-width: 1280px) {
+  .kh-spinner { width: 28px; height: 28px; }
+}
+
+/* 降低動效偏好時，轉慢並移除過度動畫 */
+@media (prefers-reduced-motion: reduce) {
+  .kh-spinner { animation-duration: 2s; }
+  .kh-loader { transition: none; }
+}
+
+/* 旋轉動畫 */
+@keyframes kh-spin {
+  to { transform: rotate(1turn); }
+}
