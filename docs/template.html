@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KnowHub | Template</title>
+  <!-- 產出的 CSS 檔（由 template.scss 編譯而來） -->
+  <link rel="stylesheet" href=".\assets\css\template.css" />
+</head>
+<body class="kh-body">
+  <!-- 頂部 Header：只放 Logo，保持極簡 -->
+  <header class="kh-header">
+    <div class="kh-header__inner">
+      <a class="kh-logo" href="./index.html" aria-label="KnowHub 首頁">
+        <img src="./images/Know-hub.png" alt="KnowHub Logo" />
+      </a>
+    </div>
+  </header>
+
+  <!-- 主內容區：所有主要物件皆水平置中 -->
+  <main class="kh-main">
+    <div class="kh-container">
+      <!-- 可選：分頁導覽（之後接到各分頁） -->
+      <nav class="kh-nav" aria-label="主導覽">
+        <button class="btn btn-primary kh-nav__btn">首頁</button>
+        <button class="btn btn-primary kh-nav__btn">單字</button>
+        <button class="btn btn-primary kh-nav__btn">工具</button>
+      </nav>
+
+      <!-- 範例卡片（之後可替換成實際內容區塊） -->
+      <section class="kh-cards" aria-label="重點內容">
+        <article class="kh-card">
+          <h2 class="kh-card__title">模版卡片 A</h2>
+          <p class="kh-card__desc">這是示範說明文字。你可以在這裡放入模組、列表或是互動元件。</p>
+          <div class="kh-card__actions">
+            <button class="btn btn-primary">動作</button>
+          </div>
+        </article>
+
+        <article class="kh-card">
+          <h2 class="kh-card__title">模版卡片 B</h2>
+          <p class="kh-card__desc">所有主要物件已預設水平置中，並採深色主題。</p>
+          <div class="kh-card__actions">
+            <button class="btn btn-primary">了解更多</button>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <!-- 頁尾（簡潔、可放版權或快速連結） -->
+  <footer class="kh-footer">
+    <div class="kh-footer__inner">
+      <small>© <span id="year"></span> KnowHub</small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
