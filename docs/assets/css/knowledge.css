@@ -1,0 +1,731 @@
+@charset "UTF-8";
+/* ── Center & Align & Gradients Patch (no logic change) ───────────────── */
+/* 統一容器寬度、對齊規則 */
+:root {
+  --card-w: min(860px, 92vw); /* 若上面已定義就沿用 */
+  --gap: 14px;
+  --radius: 18px;
+  --accent: #7aa2ff;
+  --accent-2: #08e0ff;
+  --accent-3: #8effc1;
+  --ring: rgba(122,162,255,.35);
+}
+
+/* 全頁：所有主要區塊水平置中（不改結構） */
+body {
+  text-align: center; /* 文字置中 */
+}
+
+.container,
+#search,
+#suggestions,
+#vocab-card,
+.flip-card .card,
+.btn-group,
+.row-btns,
+.logo {
+  width: 100%;
+  max-width: var(--card-w);
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 搜尋列與建議清單寬度一致、置中 */
+#search {
+  display: block;
+}
+
+#suggestions {
+  text-align: left;
+} /* 清單內容維持閱讀性，項目仍會置中容器 */
+/* 單字卡外觀維持，但置中與等寬 */
+.flip-card .card {
+  display: block;
+  text-align: center;
+}
+
+/* 同面模式的兩行維持置中網格，但整塊仍等寬置中 */
+.same-face .card {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center; /* 每一行內容水平置中 */
+  align-items: center;
+}
+
+/* 角落索引仍靠右下，但容器在畫面水平居中 */
+.corner-index {
+  right: 12px;
+  bottom: 10px;
+}
+
+/* ===== 按鈕：統一漸層＋置中＋一致大小 ===== */
+/* 基礎：全部按鈕用漸層 */
+:root {
+  /* 漸層色組（深色霓虹風） */
+  --btn-grad-from: #3a64ff; /* 與 --accent 相近 */
+  --btn-grad-mid: #08e0ff; /* 青藍 */
+  --btn-grad-to: #38ffa8; /* 螢綠 */
+  --btn-br: rgba(122,162,255,.45);
+  --btn-bg: linear-gradient(90deg, var(--btn-grad-from), var(--btn-grad-mid), var(--btn-grad-to));
+}
+
+/* 讓所有 .btn（含 .btn-primary、.btn-nav…）吃到漸層 */
+.btn {
+  /* 外觀 */
+  border-radius: 12px;
+  border: 1px solid var(--btn-br);
+  background-image: var(--btn-bg);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  color: white !important;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  /* 動效 */
+  transition: background-position 0.25s ease, transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  /* 尺寸與置中 */
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; /* 預設讓按鈕「看起來一致寬」 */
+}
+
+/* 小按鈕（上一個/下一個）保留窄寬但仍置中對齊 */
+.btn-nav {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+}
+
+/* 次要大按鈕（隨機、同面、首頁），維持滿寬的視覺 */
+.btn-wide, .btn-mode, .btn-home {
+  width: 100%;
+}
+
+/* 漸層 hover 動畫 */
+.btn:hover {
+  background-position: 100% 50%;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 按鈕群：整列置中＋等寬排列 */
+.btn-group {
+  display: grid;
+  gap: var(--gap);
+  justify-items: center; /* 群組內每個項目水平置中 */
+}
+
+/* 上一個 | 隨機 | 下一個：三欄，整列置中且等寬 */
+.row-btns {
+  display: grid;
+  grid-template-columns: 44px minmax(200px, 1fr) 44px;
+  gap: var(--gap);
+  align-items: stretch;
+  justify-items: center; /* 三顆按鈕都在各自欄位置中 */
+  width: 100%;
+}
+
+/* 讓中間那顆（隨機）吃滿中欄寬度 */
+.row-btns .btn-wide {
+  width: 100%;
+}
+
+/* 補：發音鍵、模式鍵若有其他 class，一律保持中央對齊 */
+.btn-tts, .btn-mode, .btn-home {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== 小螢幕優化：維持置中、間距更緊湊 ===== */
+@media (max-width: 420px) {
+  .row-btns {
+    grid-template-columns: 44px minmax(140px, 1fr) 44px;
+  }
+}
+/* ==========================================================================
+   knowledge.scss
+   Page: knowledge.html
+   ========================================================================== */
+/* =======================
+   設定區（可自行調整）
+   ======================= */
+:root {
+  --container-max: 1100px;
+  --grid-gap: 14px;
+  --grid-cols-mobile: 1;
+  --grid-cols-tablet: 2;
+  --grid-cols-desktop: 3;
+  --card-radius: 14px;
+  --tile-padding: 14px;
+  --img-aspect: 56.25%;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans TC",
+               "PingFang TC", "Microsoft JhengHei", Roboto, Arial, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --line-height: 1.55;
+  --z-sticky: 20;
+  --z-modal: 100;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur-med: 220ms;
+  /* Light */
+  --c-bg: #f7f7f9;
+  --c-elev: #ffffff;
+  --c-text: #15171a;
+  --c-muted: #5b6370;
+  --c-border: #e6e8ee;
+  --c-accent: #7c93ff;
+  --c-accent-2: #22d3ee;
+  --c-danger: #ef4444;
+  --c-pill: #eef2ff;
+  --c-pill-text: #374151;
+  --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
+}
+
+/* Dark 覆蓋 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg: #0c0f14;
+    --c-elev: #121722;
+    --c-text: #e6eaf3;
+    --c-muted: #97a0af;
+    --c-border: #1f2430;
+    --c-accent: #7c93ff;
+    --c-accent-2: #22d3ee;
+    --c-danger: #fb7185;
+    --c-pill: rgba(124,147,255,0.15);
+    --c-pill-text: #cbd5e1;
+    --shadow: 0 8px 30px rgba(8,14,30,0.45);
+  }
+}
+/* Breakpoints / Helpers */
+.pills {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border) transparent;
+}
+.pills::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.pills::-webkit-scrollbar-thumb {
+  background: var(--c-border);
+  border-radius: 999px;
+}
+
+/* Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  color: var(--c-text);
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(124, 147, 255, 0.12), transparent 60%), radial-gradient(1200px 600px at 110% 10%, rgba(34, 211, 238, 0.1), transparent 60%), var(--c-bg);
+  font-family: var(--font-sans);
+  line-height: var(--line-height);
+}
+
+a {
+  color: var(--c-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Page wrapper（置中） */
+.page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 40px;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+}
+
+/* Header（小 LOGO + 置中） */
+.page-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.page-header .logo {
+  display: inline-block;
+  width: 120px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 0 0 2px color-mix(in oklab, var(--c-elev), transparent 10%);
+}
+.page-header .title {
+  font-size: clamp(18px, 2.6vw, 20px);
+  font-weight: 800;
+  margin: 8px 0 0;
+}
+.page-header .subtitle {
+  color: var(--c-muted);
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+
+/* Toolbar（搜尋/篩選/隨機） */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  width: 100%;
+  backdrop-filter: saturate(140%) blur(6px);
+  background: color-mix(in oklab, var(--c-bg) 90%, transparent);
+  border-bottom: 1px solid var(--c-border);
+  margin: 0 calc(-1 * min(16px, 4vw)) 16px;
+  padding: 10px 16px;
+}
+.toolbar .row {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 10px;
+}
+@media (min-width: 768px) {
+  .toolbar .row {
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+  }
+}
+
+/* 控制元件（按鈕交由 _buttons.scss） */
+.input,
+.select,
+.pill {
+  border: 1px solid var(--c-border);
+  background: var(--c-elev);
+  color: var(--c-text);
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 12px;
+  font-size: 15px;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+}
+.input .icon {
+  opacity: 0.7;
+}
+.input input {
+  all: unset;
+  width: 100%;
+  font-size: 15px;
+}
+.input input::placeholder {
+  color: var(--c-muted);
+}
+.input:focus-within {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 28px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--c-muted) 50%), linear-gradient(135deg, var(--c-muted) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 52%, calc(100% - 11px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+.select:focus {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* Tag / 科目 pills */
+.pills {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  padding: 4px 0;
+  justify-content: center;
+}
+
+.pill {
+  background: var(--c-pill, rgba(124, 147, 255, 0.15));
+  color: var(--c-pill-text, #cbd5e1);
+  border: 1px solid color-mix(in oklab, var(--c-accent), transparent 70%);
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.pill:hover {
+  border-color: var(--c-accent);
+}
+.pill.active {
+  background: color-mix(in oklab, var(--c-accent), transparent 70%);
+  color: #0b1020;
+  border-color: var(--c-accent);
+  font-weight: 700;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  color: var(--c-muted);
+  font-size: 12px;
+  padding-top: 6px;
+}
+
+/* Grid + Card */
+#knowledgeGrid {
+  width: 100%;
+  max-width: var(--container-max);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols-mobile), minmax(0, 1fr));
+  gap: var(--grid-gap);
+  justify-items: stretch;
+}
+@media (min-width: 768px) {
+  #knowledgeGrid {
+    grid-template-columns: repeat(var(--grid-cols-tablet), minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  #knowledgeGrid {
+    grid-template-columns: repeat(var(--grid-cols-desktop), minmax(0, 1fr));
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in oklab, var(--c-elev), transparent 0%);
+  border: 1px solid var(--c-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-height: 100%;
+  transform: translateZ(0);
+  transition: transform var(--dur-med) var(--ease), box-shadow var(--dur-med) var(--ease), border-color var(--dur-fast);
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(8, 14, 30, 0.55);
+  border-color: color-mix(in oklab, var(--c-accent), var(--c-border) 60%);
+}
+.card.pinned::before, .card.featured::before {
+  content: attr(data-badge);
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--c-accent), var(--c-accent-2));
+  color: #0b1020;
+  font-weight: 700;
+}
+
+.card-img-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: var(--img-aspect);
+  background: linear-gradient(180deg, rgba(124, 147, 255, 0.15), rgba(34, 211, 238, 0.12));
+}
+.card-img-wrap .card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.05) contrast(1.02);
+  transition: transform var(--dur-med) var(--ease);
+}
+.card:hover .card-img-wrap .card-img {
+  transform: scale(1.04);
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--tile-padding);
+  flex: 1 1 auto;
+}
+
+.card-title {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.card-subtitle {
+  margin: 0;
+  color: var(--c-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.card-desc {
+  margin-top: 4px;
+  font-size: 14px;
+  color: color-mix(in oklab, var(--c-text), #fff 10%);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: center;
+}
+
+.card-meta {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  justify-content: center;
+}
+.card-meta .card-updated {
+  color: var(--c-muted);
+  font-size: 12px;
+}
+.card-meta .card-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.card-meta .card-tags .tag {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-pill);
+  color: var(--c-pill-text);
+  border: 1px solid color-mix(in oklab, var(--c-accent), transparent 70%);
+}
+
+.card-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  justify-content: center;
+}
+
+/* 空狀態 / Skeleton */
+.empty {
+  border: 1px dashed var(--c-border);
+  border-radius: var(--card-radius);
+  background: color-mix(in oklab, var(--c-elev), transparent 10%);
+  padding: 24px;
+  text-align: center;
+  color: var(--c-muted);
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--c-elev), transparent 4%);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 40%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.card.skeleton {
+  height: 280px;
+  border-radius: var(--card-radius);
+}
+
+/* Markdown / MathJax */
+.md {
+  line-height: 1.7;
+  text-align: left;
+}
+.md p {
+  margin: 0 0 10px;
+}
+.md h2, .md h3, .md h4 {
+  margin: 18px 0 8px;
+}
+.md ul, .md ol {
+  margin: 10px 0 10px 18px;
+  padding: 0;
+}
+.md code, .md kbd, .md samp {
+  font-family: var(--font-mono);
+  background: color-mix(in oklab, var(--c-elev), transparent 10%);
+  border: 1px solid var(--c-border);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.md pre {
+  background: color-mix(in oklab, var(--c-elev), transparent 6%);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  padding: 12px;
+  overflow: auto;
+}
+.md pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.mjx-container {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border) transparent;
+}
+
+/* Footer */
+.page-footer {
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--c-border);
+  color: var(--c-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Utilities */
+.hide {
+  display: none !important;
+}
+
+.center {
+  text-align: center;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.mt-6 {
+  margin-top: 24px;
+}
+
+/* Subject chips */
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--c-border);
+  background: color-mix(in oklab, var(--c-elev), transparent 6%);
+  color: var(--c-pill-text, #cbd5e1);
+}
+
+.subject-chi {
+  background: rgba(244, 114, 182, 0.18);
+  border-color: rgba(244, 114, 182, 0.4);
+}
+
+.subject-eng {
+  background: rgba(94, 234, 212, 0.18);
+  border-color: rgba(94, 234, 212, 0.4);
+}
+
+.subject-math {
+  background: rgba(125, 211, 252, 0.18);
+  border-color: rgba(125, 211, 252, 0.4);
+}
+
+.subject-phys {
+  background: rgba(190, 242, 100, 0.18);
+  border-color: rgba(190, 242, 100, 0.4);
+}
+
+.subject-chem {
+  background: rgba(250, 204, 21, 0.18);
+  border-color: rgba(250, 204, 21, 0.4);
+}
+
+.subject-bio {
+  background: rgba(134, 239, 172, 0.18);
+  border-color: rgba(134, 239, 172, 0.4);
+}
+
+.subject-earth {
+  background: rgba(167, 139, 250, 0.18);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.subject-cs {
+  background: rgba(147, 197, 253, 0.18);
+  border-color: rgba(147, 197, 253, 0.4);
+}
+
+/* 小螢幕強化 */
+@media (max-width: 480px) {
+  .toolbar .row {
+    grid-template-columns: 1fr;
+  }
+}
+/* 隨機抽卡動畫 hook */
+@keyframes pop {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.card.pop {
+  animation: pop var(--dur-med) var(--ease);
+}
+
+/*# sourceMappingURL=knowledge.css.map */
