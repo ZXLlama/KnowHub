@@ -1,257 +1,970 @@
 @charset "UTF-8";
-/* ===== Global Variables ===== */
-/* ===== Base ===== */
-body {
-  margin: 0;
-  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
-  background: #0f1117;
-  color: #ffffff;
-  line-height: 1.6;
+/* ======= Imports：沿用你的共用樣式 ======= */
+:root {
+  /* Core palette */
+  --bg-base: #0f1220;
+  --bg-surface: #14182b;
+  --bg-surface-2: #171c33;
+  --bg-contrast: #0b0f19;
+  --bg-accent-1: #6c8cff;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #7efff5;
+  --bg-accent-4: #9a8bff;
+  --bg-muted: #8b93a7;
+  /* Radii & blur */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --blur-sm: 6px;
+  --blur-md: 12px;
+  --blur-lg: 18px;
+  /* Layout tokens */
+  --section-py: clamp(48px, 8vw, 120px);
+  --container-max: 1120px;
+  --container-px: clamp(16px, 4vw, 32px);
+  /* Layer alpha controls */
+  --bg-alpha: 1; /* background opacity */
+  --pattern-alpha: .22; /* pattern intensity */
+  --noise-alpha: .06; /* noise intensity */
+  --glass-alpha: .18; /* glass fill */
+  --glass-stroke: .18; /* glass border alpha */
+  /* Animation speed */
+  --bg-speed: 18s;
+  --bg-beam-speed: 14s;
 }
 
-a {
-  color: #0087c5;
-  text-decoration: none;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #0d1021;
+    --bg-surface: #12162a;
+    --bg-surface-2: #141a33;
+    --bg-contrast: #0b0f19;
+    --bg-muted: #a2aac1;
+  }
+}
+.bg {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-base) calc(var(--bg-alpha) * 100%), transparent);
+  color: white;
 }
 
-/* ===== Logo ===== */
-.logo {
-  display: block;
-  margin: 0.5rem auto 0.25rem;
-  width: auto;
-  max-height: 80px;
-  object-fit: contain;
+.bg--surface {
+  background: var(--bg-surface);
 }
 
-/* ===== Container ===== */
+.bg--surface-2 {
+  background: var(--bg-surface-2);
+}
+
+.bg--contrast {
+  background: var(--bg-contrast);
+}
+
+.rounded-sm {
+  border-radius: var(--radius-sm);
+  overflow: clip;
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+  overflow: clip;
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+}
+
+.rounded-xl {
+  border-radius: var(--radius-xl);
+  overflow: clip;
+}
+
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+  overflow: clip;
+}
+
 .container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.25rem;
-  box-sizing: border-box;
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-py);
+}
+
+/* Subtle radial spotlight */
+.bg-radial {
+  background: radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--bg-accent-1) 12%, transparent), transparent 60%), radial-gradient(1000px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 12%, transparent), transparent 65%), var(--bg-base);
+}
+
+/* Conic aurora swirl */
+.bg-conic {
+  background: conic-gradient(from 200deg at 30% 10%, color-mix(in srgb, var(--bg-accent-1) 26%, transparent) 0 18%, transparent 18% 40%, color-mix(in srgb, var(--bg-accent-3) 20%, transparent) 40% 58%, transparent 58% 100%), var(--bg-base);
+}
+
+/* Linear neon gradient */
+.bg-gradient {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-accent-1) 24%, transparent) 0%, color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 35%, color-mix(in srgb, var(--bg-accent-2) 24%, transparent) 70%, color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 100%), var(--bg-base);
+}
+
+/* Duo gradient (brand + pink) */
+.bg-gradient-duo {
+  background: linear-gradient(120deg, var(--bg-accent-1), var(--bg-accent-2));
+}
+
+/* Mesh gradient (layered radial blobs) */
+.bg-mesh {
+  background: radial-gradient(600px 300px at 20% 10%, color-mix(in srgb, var(--bg-accent-1) 35%, transparent), transparent 60%), radial-gradient(700px 380px at 85% 15%, color-mix(in srgb, var(--bg-accent-2) 35%, transparent), transparent 65%), radial-gradient(900px 420px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 28%, transparent), transparent 70%), radial-gradient(800px 360px at 90% 85%, color-mix(in srgb, var(--bg-accent-4) 26%, transparent), transparent 70%), var(--bg-base);
+}
+
+/* Dots */
+.bg-dots {
+  background: radial-gradient(circle at center, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 2px) 0 0/18px 18px, var(--bg-surface);
+}
+
+/* Grid */
+.bg-grid {
+  background: linear-gradient(to right, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(to bottom, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 1px) 0 0/28px 28px, var(--bg-surface);
+}
+
+/* Stripes (45deg) */
+.bg-stripes {
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 0 10px, transparent 10px 20px), var(--bg-surface);
+}
+
+/* Checkerboard (subtle) */
+.bg-checker {
+  --sz: 28px;
+  background: conic-gradient(from 90deg, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 25%, transparent 0 50%, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 0 75%, transparent 0) 0 0/var(--sz) var(--sz), var(--bg-surface);
+}
+
+/* Paper grain (fake paper) */
+.bg-paper {
+  background: radial-gradient(1200px 600px at 40% -20%, rgba(255, 255, 255, 0.06), transparent 60%), linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.03)), var(--bg-surface);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Procedural-ish noise using multiple gradients */
+.bg-noise::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--noise-alpha);
+  background: radial-gradient(2px 2px at 10% 20%, #fff, transparent) repeat, radial-gradient(1.5px 1.5px at 30% 80%, #fff, transparent) repeat, radial-gradient(1px 1px at 70% 60%, #fff, transparent) repeat, radial-gradient(1.5px 1.5px at 90% 30%, #fff, transparent) repeat;
+  background-size: 8px 8px, 10px 10px, 12px 12px, 14px 14px;
+  mix-blend-mode: soft-light;
+  content: "";
+}
+
+/* Glass layer */
+.bg-glass {
+  position: relative;
+  background: color-mix(in srgb, #fff calc(var(--glass-alpha) * 100%), transparent);
+  border: 1px solid color-mix(in srgb, #fff calc(var(--glass-stroke) * 100%), transparent);
+  backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  color: white;
+}
+
+/* Floating beams */
+.bg-beams {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.bg-beams::before,
+.bg-beams::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  filter: blur(30px);
+  opacity: 0.55;
+  background: radial-gradient(500px 200px at 10% 20%, color-mix(in srgb, var(--bg-accent-2) 60%, transparent), transparent 60%), radial-gradient(600px 220px at 90% 15%, color-mix(in srgb, var(--bg-accent-1) 60%, transparent), transparent 60%), radial-gradient(500px 220px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 60%, transparent), transparent 60%);
+  animation: floatBeams var(--bg-beam-speed) linear infinite alternate;
+}
+
+.bg-beams::after {
+  animation-direction: alternate-reverse;
+  transform: scaleX(-1);
+  opacity: 0.45;
+}
+
+@keyframes floatBeams {
+  0% {
+    transform: translateY(-4%) translateX(-2%) rotate(-1deg);
+  }
+  100% {
+    transform: translateY(4%) translateX(2%) rotate(1deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-beams::before, .bg-beams::after {
+    animation: none;
+  }
+}
+/* Aurora sweep (slow conic rotation) */
+.bg-aurora {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(1200px 600px at 20% -10%, color-mix(in srgb, var(--bg-accent-1) 10%, transparent), transparent 60%), radial-gradient(900px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 10%, transparent), transparent 60%), var(--bg-base);
+}
+
+.bg-aurora::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background: conic-gradient(from 0deg at 50% 50%, transparent 0 10%, color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 10% 25%, transparent 25% 40%, color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 40% 60%, transparent 60% 80%, color-mix(in srgb, var(--bg-accent-2) 18%, transparent) 80% 100%);
+  filter: blur(60px) saturate(130%);
+  animation: auroraSpin var(--bg-speed) linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes auroraSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before {
+    animation: none;
+  }
+}
+.section--hero {
+  position: relative;
+  padding-block: var(--section-py);
+  background: none;
+  position: relative;
+}
+.section--hero .hero-inner {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
   text-align: center;
+  max-width: 980px;
 }
-
-/* ===== Search ===== */
-#search {
-  width: 100%;
-  max-width: 520px;
-  padding: 0.6rem 1rem 0.6rem 2.2rem;
-  border: 1px solid rgb(58.2, 59.84, 64.76);
-  border-radius: 0.6rem;
-  background: rgb(13.8, 15.64, 21.16) url("https://img.icons8.com/ios-filled/20/94a3b8/search.png") no-repeat 0.7rem center;
-  background-size: 1rem;
-  color: #ffffff;
-  outline: none;
-  transition: box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
-  margin-bottom: 0.4rem;
+.section--hero .hero-title {
+  font-size: clamp(28px, 4.5vw, 64px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  margin: 0 0 16px;
 }
-#search::placeholder {
-  color: #e0e0e0;
+.section--hero .hero-sub {
+  font-size: clamp(14px, 1.2vw, 18px);
+  color: color-mix(in srgb, white 80%, var(--bg-muted));
+  margin: 0 auto 28px;
 }
-#search:focus {
-  border-color: #0087c5;
-  box-shadow: 0 0 8px rgba(88, 101, 242, 0.45);
-  background-color: rgb(13.2, 14.96, 20.24);
-}
-
-/* 建議清單 */
-#suggestions {
-  list-style: none;
-  padding: 0;
-  margin: 0.2rem 0 0 0;
-  width: 100%;
-  max-width: 520px;
-}
-
-.suggestion-item {
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid rgb(58.2, 59.84, 64.76);
-  background: rgb(13.8, 15.64, 21.16);
-  color: #ffffff;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-.suggestion-item:last-child {
-  border-bottom: none;
-}
-.suggestion-item:hover {
-  background: rgb(53.1, 56.9, 65.9);
-  transform: translateX(3px);
-}
-
-/* ===== Vocab Card ===== */
-.flip-card {
-  width: 100%;
-  max-width: 520px;
-  height: 300px;
-  margin: 1.2rem auto;
+.section--hero .hero-cta {
+  margin-top: 24px;
   display: flex;
+  gap: 12px;
   justify-content: center;
-  align-items: center;
+  flex-wrap: wrap;
+}
+
+.section--panel {
+  position: relative;
+  padding-block: var(--section-py);
+}
+.section--panel .panel {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+  border-radius: var(--radius-xl);
+  overflow: clip;
+  background: color-mix(in srgb, white 2%, var(--bg-surface));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  padding: clamp(20px, 4vw, 40px);
+}
+
+/* Adjust intensities per section */
+[data-pattern=soft] {
+  --pattern-alpha: .12;
+  --noise-alpha: .04;
+}
+
+[data-pattern=bold] {
+  --pattern-alpha: .35;
+  --noise-alpha: .10;
+}
+
+[data-blur=sm] {
+  --blur-lg: 8px;
+}
+
+[data-blur=lg] {
+  --blur-lg: 26px;
+}
+
+[data-alpha="0"] {
+  --bg-alpha: 0;
+}
+
+[data-alpha="50"] {
+  --bg-alpha: .5;
+}
+
+[data-alpha="80"] {
+  --bg-alpha: .8;
+}
+
+/* Quick padding toggles */
+.section--tight {
+  --section-py: clamp(32px, 5vw, 72px);
+}
+
+.section--loose {
+  --section-py: clamp(72px, 10vw, 160px);
+}
+
+/* Overlay helpers */
+.overlay {
   position: relative;
 }
 
-.card {
+.overlay::before {
   position: absolute;
   inset: 0;
-  background: #8e96a6;
-  border: 1px solid rgb(58.2, 59.84, 64.76);
-  border-radius: 1rem;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(60% 60% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+.overlay--bottom::before {
+  background: radial-gradient(60% 60% at 50% 100%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+/* Shadow ring helpers (nice with rounded panels) */
+.ring-1 {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.ring-2 {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08) inset;
+}
+
+.ring-3 {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) inset;
+}
+
+.theme-neon {
+  --bg-accent-1: #7efff5;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #6c8cff;
+  --bg-accent-4: #9a8bff;
+  --bg-base: #0f1529;
+  --bg-surface: #111632;
+}
+
+.theme-cyber {
+  --bg-accent-1: #00ffd5;
+  --bg-accent-2: #00aaff;
+  --bg-accent-3: #ff00ff;
+  --bg-accent-4: #ffe600;
+  --bg-base: #0a0d15;
+  --bg-surface: #0f1422;
+}
+
+.theme-sunset {
+  --bg-accent-1: #ff9a8b;
+  --bg-accent-2: #ff6a88;
+  --bg-accent-3: #ff99ac;
+  --bg-accent-4: #ffd36e;
+  --bg-base: #1b0f17;
+  --bg-surface: #221320;
+}
+
+.demo-card {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+  background: color-mix(in srgb, white 3%, var(--bg-surface));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+}
+
+/* ── Center & Align & Gradients Patch (no logic change) ───────────────── */
+/* 統一容器寬度、對齊規則 */
+:root {
+  --card-w: min(860px, 92vw); /* 若上面已定義就沿用 */
+  --gap: 14px;
+  --radius: 18px;
+  --accent: #7aa2ff;
+  --accent-2: #08e0ff;
+  --accent-3: #8effc1;
+  --ring: rgba(122,162,255,.35);
+}
+
+/* 全頁：所有主要區塊水平置中（不改結構） */
+body {
+  text-align: center; /* 文字置中 */
+}
+
+.container,
+#search,
+#suggestions,
+#vocab-card,
+.flip-card .card,
+.btn-group,
+.row-btns,
+.logo {
+  width: 100%;
+  max-width: var(--card-w);
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 搜尋列與建議清單寬度一致、置中 */
+#search {
+  display: block;
+}
+
+#suggestions {
+  text-align: left;
+} /* 清單內容維持閱讀性，項目仍會置中容器 */
+/* 單字卡外觀維持，但置中與等寬 */
+.flip-card .card {
+  display: block;
+  text-align: center;
+}
+
+/* 同面模式的兩行維持置中網格，但整塊仍等寬置中 */
+.same-face .card {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center; /* 每一行內容水平置中 */
+  align-items: center;
+}
+
+/* 角落索引仍靠右下，但容器在畫面水平居中 */
+.corner-index {
+  right: 12px;
+  bottom: 10px;
+}
+
+/* ===== 按鈕：統一漸層＋置中＋一致大小 ===== */
+/* 基礎：全部按鈕用漸層 */
+:root {
+  /* 漸層色組（深色霓虹風） */
+  --btn-grad-from: #3a64ff; /* 與 --accent 相近 */
+  --btn-grad-mid: #08e0ff; /* 青藍 */
+  --btn-grad-to: #38ffa8; /* 螢綠 */
+  --btn-br: rgba(122,162,255,.45);
+  --btn-bg: linear-gradient(90deg, var(--btn-grad-from), var(--btn-grad-mid), var(--btn-grad-to));
+}
+
+/* 讓所有 .btn（含 .btn-primary、.btn-nav…）吃到漸層 */
+.btn {
+  /* 外觀 */
+  border-radius: 12px;
+  border: 1px solid var(--btn-br);
+  background-image: var(--btn-bg);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  color: white !important;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  /* 動效 */
+  transition: background-position 0.25s ease, transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  /* 尺寸與置中 */
+  min-height: 42px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; /* 預設讓按鈕「看起來一致寬」 */
+}
+
+/* 小按鈕（上一個/下一個）保留窄寬但仍置中對齊 */
+.btn-nav {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+}
+
+/* 次要大按鈕（隨機、同面、首頁），維持滿寬的視覺 */
+.btn-wide, .btn-mode, .btn-home {
+  width: 100%;
+}
+
+/* 漸層 hover 動畫 */
+.btn:hover {
+  background-position: 100% 50%;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 按鈕群：整列置中＋等寬排列 */
+.btn-group {
+  display: grid;
+  gap: var(--gap);
+  justify-items: center; /* 群組內每個項目水平置中 */
+}
+
+/* 上一個 | 隨機 | 下一個：三欄，整列置中且等寬 */
+.row-btns {
+  display: grid;
+  grid-template-columns: 44px minmax(200px, 1fr) 44px;
+  gap: var(--gap);
+  align-items: stretch;
+  justify-items: center; /* 三顆按鈕都在各自欄位置中 */
+  width: 100%;
+}
+
+/* 讓中間那顆（隨機）吃滿中欄寬度 */
+.row-btns .btn-wide {
+  width: 100%;
+}
+
+/* 補：發音鍵、模式鍵若有其他 class，一律保持中央對齊 */
+.btn-tts, .btn-mode, .btn-home {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== 小螢幕優化：維持置中、間距更緊湊 ===== */
+@media (max-width: 420px) {
+  .row-btns {
+    grid-template-columns: 44px minmax(140px, 1fr) 44px;
+  }
+}
+/* ======= Root：尺寸與字級 ======= */
+:root {
+  /* 版心 */
+  --kh-max-w: 760px;
+  /* 卡片：預設走「行動版**寫死**尺寸」 */
+  --card-w: 360px;
+  --card-h: 440px;
+  /* 固定三行所占的垂直比例（總和=100%） */
+  --fs-pos: clamp(12px, 2.2vmin, 18px); /* 詞性：最小 */
+  --fs-zh: clamp(16px, 3.2vmin, 28px); /* 中文：中等 */
+  --fs-en: clamp(22px, 6.0vmin, 56px); /* 英文：最大 */
+  /* 每個區塊允許的行數，避免文字把版位撐開 */
+  --lines-pos: 1;
+  --lines-en: 2;
+  --lines-zh: 2;
+  /* 卡片寬高比，確保高度穩定（可依喜好微調） */
+  --card-aspect: 3/4;
+  --card-radius: 18px;
+  --card-pad: 22px;
+  --kh-pad-x: clamp(12px, 4vw, 20px);
+  --kh-gap: clamp(12px, 3.6vw, 16px);
+  --card-shadow: 0 10px 30px rgba(0,0,0,.45);
+  --card-border: 1px solid rgba(255,255,255,.08);
+}
+
+/* ======= 基礎布局 ======= */
+* {
   box-sizing: border-box;
-  transition: opacity 0.25s ease, transform 0.15s ease;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+}
+
+.vocab-body {
+  overflow-x: hidden;
+}
+
+.kh-main {
+  min-height: 100svh;
+} /* 讓桌機視覺吃滿視窗高度 */
+.vocab-container {
+  width: 100%;
+  max-width: var(--kh-max-w);
+  margin-inline: auto;
+  padding: calc(var(--kh-gap) + 4px) var(--kh-pad-x) var(--kh-gap);
+  display: grid;
+  gap: var(--kh-gap);
+  justify-items: center;
+}
+
+/* ======= 搜尋 ======= */
+.search-wrap {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+}
+.search-wrap #search {
+  width: 100%;
+  height: 44px;
+  border-radius: 999px;
+  padding: 0 16px;
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.search-wrap .suggestions {
+  width: 100%;
+  max-height: 40vh;
+  overflow: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.35);
+  display: none;
+}
+.search-wrap .suggestions.show {
+  display: block;
+}
+.search-wrap .suggestions li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.search-wrap .suggestions li:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ======= 單字卡 ======= */
+.flip-card {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  aspect-ratio: var(--card-aspect);
+}
+
+.card {
+  position: relative;
+  width: var(--card-w); /* 寫死寬度 */
+  height: var(--card-h); /* 寫死高度 */
+  padding: var(--card-pad);
+  border-radius: var(--card-radius);
+  border: var(--card-border);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 100% at 0% 0%, rgba(98, 0, 255, 0.18), transparent 60%), radial-gradient(120% 100% at 100% 0%, rgba(0, 200, 255, 0.15), transparent 60%), rgba(20, 20, 24, 0.85);
+  box-shadow: var(--card-shadow);
+}
+
+/* 角標與發音 */
+.corner-index {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 12px;
+  opacity: 0.8;
+  user-select: none;
+}
+
+.btn-tts {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  font-size: 16px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.12s ease, background 0.2s ease;
+}
+.btn-tts:hover {
+  transform: translateY(-1px) scale(1.03);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* 面內容 */
+.face {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  gap: 0px;
+  padding-inline: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .face-hidden {
-  display: none;
-}
-
-.corner-index {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.8rem;
-  font-size: 0.9rem;
-  color: #e0e0e0;
-}
-
-/* 單字文字寬度與卡片對齊 */
-.word-text,
-.pos-text,
-.definition-text {
-  width: 100%;
-  max-width: 90%;
-  margin: 0.4rem auto;
-  text-align: center;
-  box-sizing: border-box;
-}
-
+  display: none !important;
+} /* ← 雙面切換關鍵 */
 .word-text {
-  font-size: 2.1rem;
+  font-size: var(--fz-word);
+  font-weight: 800;
+  line-height: 1.08;
+  text-wrap: balance;
+  word-break: break-word;
+  letter-spacing: 0.02em;
+  margin: 0;
 }
 
 .pos-text {
-  font-size: 1rem;
-  color: #e0e0e0;
+  font-size: var(--fz-pos);
+  opacity: 0.8;
+  margin: 0;
 }
 
 .definition-text {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: var(--fz-def);
+  line-height: 1.6;
+  margin: 0;
+  text-align: left;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
-/* ===== 發音按鈕（卡片頂部左側） ===== */
-.top-tts {
-  position: absolute;
-  top: 0.6rem;
-  left: 0.6rem;
-  font-size: 0.9rem;
-  padding: 0.3rem 0.6rem;
-}
-
-/* ===== Buttons ===== */
-.btn {
-  background: #0087c5;
-  color: #fff;
-  border: none;
-  border-radius: 0.6rem;
-  padding: 0.6rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-  font-size: 1rem;
-  font-weight: 500;
-}
-.btn:hover {
-  background: rgb(0, 162.9593908629, 237.8);
-}
-.btn:active {
-  transform: scale(0.96);
-}
-
-/* 操作按鈕群組 */
+/* ======= 按鈕群 ======= */
 .btn-group {
+  width: 100%;
+  display: grid;
+  gap: var(--kh-gap);
+  justify-items: center;
+}
+.btn-group .row-btns {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 52px 1fr 52px; /* ⬅️ 🎲 ➡️ */
+  gap: var(--kh-gap);
+  align-items: center;
+}
+.btn-group .btn {
+  width: 100%;
+}
+.btn-group .btn-nav {
+  min-width: 52px;
+  height: 48px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 18px;
+}
+.btn-group .btn-wide, .btn-group .btn-mode, .btn-group .btn-home {
+  height: 48px;
+  border-radius: 16px;
+  font-weight: 700;
+}
+
+/* ======= Header（一致外觀） ======= */
+.kh-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+}
+.kh-header .kh-header__inner {
+  max-width: min(960px, 94vw);
+  margin-inline: auto;
+  padding: 12px var(--kh-pad-x);
+  display: grid;
+  justify-items: center;
+}
+.kh-header .kh-logo img {
+  height: 36px;
+  display: block;
+}
+
+/* ======= RWD：超小手機 ======= */
+@media (max-width: 360px) {
+  :root {
+    --card-w: 320px;
+    --card-h: 420px;
+    --fz-word: clamp(22px, 8.2vw, 36px);
+  }
+}
+/* ======= RWD：桌機吃滿視窗 ======= */
+@media (min-width: 1024px) {
+  :root {
+    --kh-max-w: 1120px;
+    --card-w: 560px;
+    --card-h: 760px;
+    --fz-word: clamp(32px, 5vw, 72px);
+    --fz-pos: clamp(14px, 1.6vw, 22px);
+    --fz-def: clamp(16px, 1.8vw, 22px);
+  }
+  .vocab-container {
+    max-width: var(--kh-max-w);
+    width: min(96vw, var(--kh-max-w));
+    padding-left: clamp(16px, 2vw, 32px);
+    padding-right: clamp(16px, 2vw, 32px);
+  }
+  .btn-group .row-btns {
+    grid-template-columns: 64px 1fr 64px;
+  }
+  .btn-tts {
+    width: 34px;
+    height: 34px;
+  }
+}
+/* ======= RWD：超大桌機（可選） ======= */
+@media (min-width: 1440px) {
+  :root {
+    --kh-max-w: 1280px;
+    --card-w: 620px;
+    --card-h: 860px;
+  }
+}
+/* 細節 */
+::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ================== 覆蓋：卡片寬度對齊按鈕 + Footer 貼底 ================== */
+/* 1) 全頁結構：Footer 永遠在底部 */
+.kh-body {
+  min-height: 100svh; /* 滿視窗高 */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-  margin-top: 1rem;
-  width: 100%;
-  max-width: 500px;
 }
 
-/* 隨機 + 上下箭頭一排 */
-.row-btns {
-  display: flex;
-  width: 100%;
-  gap: 0.6rem;
-}
-
-#random {
+.kh-main {
   flex: 1;
+} /* 主內容撐開剩餘空間 */
+.kh-footer {
+  margin-top: auto;
+} /* 讓 footer 貼到底部 */
+/* 2) 內容寬度鎖定：卡片 = 按鈕群（也可順便讓搜尋列同寬） */
+:root {
+  /* 用 content 寬度變數，預設就吃卡片固定寬 */
+  --content-w: var(--card-w);
 }
 
-#prev, #next {
-  width: 48px;
-  padding: 0.6rem 0;
+/* 卡片/按鈕/搜尋 都以同一個寬度呈現（置中） */
+.vocab-container {
+  justify-items: center;
+}
+
+.flip-card,
+.btn-group,
+.search-wrap {
+  width: var(--content-w);
+  max-width: none;
+  margin-inline: auto;
+}
+
+/* 卡片本體也鎖成同寬，避免 100% 撐到容器 */
+.card {
+  width: var(--content-w) !important;
+}
+
+/* 3) 桌機段落仍可吃滿（你原本已設定 --card-w/--card-h；這裡同步 content 寬） */
+@media (min-width: 1024px) {
+  :root {
+    --content-w: var(--card-w); /* 桌機卡片放大時，按鈕/搜尋自動跟著放大 */
+  }
+}
+/* 4) 超小手機也同步（依你原本的 --card-w） */
+@media (max-width: 360px) {
+  :root {
+    --content-w: var(--card-w);
+  }
+}
+/* ================================
+   Vocab 卡片：自適應字級 + 位置固定
+   —— 只覆蓋必要的選擇器，其餘不動 ——
+================================ */
+/* 三行固定位置：詞性(上) → 英文(中) → 中文(下) */
+.face .entry {
+  display: grid;
+  /* 依比例固定三行高度，可照喜好微調比例 */
+  grid-template-rows: 18% 52% 30%;
+  align-content: stretch;
+  justify-items: center;
   text-align: center;
+  height: 100%;
+  gap: 0; /* 位置固定，行間距設 0；留白靠各自 line-height */
+  padding: 0 0.75rem; /* 不影響既有外觀的前提下，避免字貼邊 */
 }
 
-/* 模式切換等寬 */
-.btn-mode {
-  width: 100%;
+/* 明確鎖定每行所在的 grid 位置 */
+.pos-text {
+  grid-row: 1;
 }
 
-/* 回首頁次要色 */
-.btn-home {
-  display: block;
-  width: 100%;
-  text-align: center;
-  background: rgb(12.6, 107.7, 153.8);
-  color: #fff;
-  border-radius: 0.6rem;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-.btn-home:hover {
-  background: rgb(18.9, 94.05, 132.2);
+.en-text {
+  grid-row: 2;
 }
 
-/* ===== Mobile ===== */
-@media (max-width: 480px) {
-  .flip-card {
-    height: 260px;
-  }
-  .word-text {
-    font-size: 1.8rem;
-  }
-  .definition-text {
-    font-size: 1.35rem;
-  }
-}
-/* ===== 同面模式 ===== */
-.same-face .face {
-  display: block;
+.zh-text {
+  grid-row: 3;
 }
 
-.same-face .card {
-  justify-content: space-evenly;
+/* —— 動態字級（跟著螢幕變化）——
+   使用 clamp(最小, 相對於視窗的比例, 最大)
+   vmin 會同時考量寬與高，較穩健 */
+.pos-text {
+  font-size: clamp(12px, 2.2vmin, 18px); /* 詞性：最小 */
+  line-height: 1.1;
+  font-weight: 600;
+  opacity: 0.85;
 }
 
-/* ===== 背面卡片寬度控制 ===== */
-#back {
-  width: calc(100% - 1rem);
-  max-width: calc(520px - 1rem);
-  margin: 0 auto;
-  box-sizing: border-box;
+.en-text {
+  font-size: clamp(20px, 8vmin, 60px); /* 英文：最大 */
+  line-height: 1.15;
+  font-weight: 800;
+  word-break: break-word; /* 超長字不擠位 */
+  hyphens: auto;
 }
+
+.zh-text {
+  font-size: clamp(16px, 4vmin, 32px); /* 中文：中等 */
+  line-height: 1.25;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* —— 限制行數，避免把版位撐開導致位置位移 —— */
+.pos-text,
+.en-text,
+.zh-text {
+  /* 在各自格子內置中 */
+  place-self: center;
+  /* 多行截斷（WebKit） */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos-text {
+  -webkit-line-clamp: 1;
+} /* 詞性只顯示一行 */
+.en-text {
+  -webkit-line-clamp: 2;
+} /* 英文預設兩行封頂 */
+.zh-text {
+  -webkit-line-clamp: 2;
+} /* 中文預設兩行封頂 */
+/* —— 若你的現有樣式把 .face 隱藏／顯示，這裡不改 —— */
+/* 僅確保內容填滿容器高度，以配合上方 grid */
+.face {
+  min-height: 100%;
+} /* 不影響原有 card 尺寸設定 */
 
 /*# sourceMappingURL=vocab.css.map */
