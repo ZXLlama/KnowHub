@@ -1,0 +1,196 @@
+/* ===== 基礎匯入（遵守你的專案規則） ===== */
+@use "./_buttons.scss" as *;     /* 內含 .btn, .btn-primary 等 */
+@use "./_background.scss" as *;  /* 內含背景/主題設定 */
+
+/* ===== 全域變數（僅使用 CSS 變數，避免依賴未定義的 SCSS 變數） ===== */
+:root {
+  /* spacing & 寬度控制 */
+  --kh-max-w: 960px;
+  --kh-pad: 16px;
+  --kh-gap: 16px;
+  --kh-radius: 16px;
+
+  /* 排版 */
+  --kh-font-size: 16px;
+  --kh-line-height: 1.6;
+
+  /* 色彩（深色主題）— 若 _background.scss 已定義，這些會作為 fallback */
+  --kh-bg: #0c0f14;
+  --kh-bg-elev: #121722;
+  --kh-text: #e8ecf1;
+  --kh-text-dim: #b5c0cf;
+  --kh-divider: #1f2633;
+
+  /* 卡片陰影（柔和） */
+  --kh-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* 僅深色：即使系統是淺色，也使用深色 */
+html, body {
+  color-scheme: dark;
+}
+
+/* ===== 基礎 Reset（極簡） ===== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { font-size: var(--kh-font-size); }
+
+body.kh-body {
+  margin: 0;
+  background: var(--kh-bg); /* _background.scss 也可覆蓋整體背景 */
+  color: var(--kh-text);
+  line-height: var(--kh-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 容器與水平置中 ===== */
+.kh-container {
+  width: 100%;
+  max-width: var(--kh-max-w);
+  margin-inline: auto;
+  padding: calc(var(--kh-pad) * 1.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 主要物件水平置中 */
+  gap: calc(var(--kh-gap) * 1.25);
+}
+
+/* ===== Header / Logo ===== */
+.kh-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0));
+  backdrop-filter: blur(6px);
+}
+
+.kh-header__inner {
+  max-width: var(--kh-max-w);
+  margin: 0 auto;
+  padding: calc(var(--kh-pad) * 1.25) var(--kh-pad);
+  display: flex;
+  justify-content: center; /* 水平置中 Logo */
+}
+
+.kh-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  user-select: none;
+
+  img {
+    display: block;
+    height: 44px; /* 行動裝置友善高度 */
+    width: auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  }
+}
+
+/* ===== Main ===== */
+.kh-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 主要物件水平置中 */
+}
+
+/* ===== 導覽（使用你現有的 .btn 樣式，保證一致視覺） ===== */
+.kh-nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;   /* 水平置中 */
+  align-items: center;
+  gap: var(--kh-gap);
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.kh-nav__btn {
+  /* 讓行動裝置按鈕更好點擊 */
+  min-width: 108px;
+  padding: 10px 14px;
+  border-radius: var(--kh-radius);
+  /* 若你的 _buttons.scss 已設置 gradient，這裡僅做尺寸/間距控管 */
+}
+
+/* ===== 卡片群（RWD 單欄 → 多欄） ===== */
+.kh-cards {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--kh-gap) * 1.25);
+  align-items: start;
+  justify-items: center; /* 置中每張卡片 */
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ===== 卡片 ===== */
+.kh-card {
+  width: min(100%, 480px);
+  background: var(--kh-bg-elev);
+  border: 1px solid var(--kh-divider);
+  border-radius: var(--kh-radius);
+  padding: calc(var(--kh-pad) * 1.25);
+  box-shadow: var(--kh-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 內部主要元素水平置中 */
+  gap: calc(var(--kh-gap) * 0.75);
+  text-align: center; /* 文字置中 */
+}
+
+.kh-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  letter-spacing: 0.2px;
+}
+
+.kh-card__desc {
+  margin: 0;
+  color: var(--kh-text-dim);
+  font-size: 0.95rem;
+}
+
+.kh-card__actions {
+  display: flex;
+  gap: var(--kh-gap);
+  justify-content: center; /* 水平置中按鈕群 */
+}
+
+/* ===== Footer ===== */
+.kh-footer {
+  border-top: 1px solid var(--kh-divider);
+  margin-top: calc(var(--kh-gap) * 2);
+}
+
+.kh-footer__inner {
+  max-width: var(--kh-max-w);
+  margin: 0 auto;
+  padding: calc(var(--kh-pad) * 1.25) var(--kh-pad);
+  display: flex;
+  justify-content: center; /* 水平置中 */
+  color: var(--kh-text-dim);
+}
+
+/* ===== 可選：行動裝置舒適點觸區 ===== */
+@media (hover: none) {
+  .btn { min-height: 44px; }
+  .kh-nav__btn { min-height: 44px; }
+}
+
+/* ===== 可選：強化鍵盤可見焦點 ===== */
+:where(a, button, [role="button"], [tabindex]) :focus-visible,
+:where(a, button, [role="button"], [tabindex]).focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
