@@ -1,0 +1,756 @@
+@charset "UTF-8";
+/* ===== 基礎匯入（遵守你的專案規則） ===== */
+/* ── Center & Align & Gradients Patch (no logic change) ───────────────── */
+/* 統一容器寬度、對齊規則 */
+:root {
+  --card-w: min(860px, 92vw); /* 若上面已定義就沿用 */
+  --gap: 14px;
+  --radius: 18px;
+  --accent: #7aa2ff;
+  --accent-2: #08e0ff;
+  --accent-3: #8effc1;
+  --ring: rgba(122,162,255,.35);
+}
+
+/* 全頁：所有主要區塊水平置中（不改結構） */
+body {
+  text-align: center; /* 文字置中 */
+}
+
+.container,
+#search,
+#suggestions,
+#vocab-card,
+.flip-card .card,
+.btn-group,
+.row-btns,
+.logo {
+  width: 100%;
+  max-width: var(--card-w);
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 搜尋列與建議清單寬度一致、置中 */
+#search {
+  display: block;
+}
+
+#suggestions {
+  text-align: left;
+} /* 清單內容維持閱讀性，項目仍會置中容器 */
+/* 單字卡外觀維持，但置中與等寬 */
+.flip-card .card {
+  display: block;
+  text-align: center;
+}
+
+/* 同面模式的兩行維持置中網格，但整塊仍等寬置中 */
+.same-face .card {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center; /* 每一行內容水平置中 */
+  align-items: center;
+}
+
+/* 角落索引仍靠右下，但容器在畫面水平居中 */
+.corner-index {
+  right: 12px;
+  bottom: 10px;
+}
+
+/* ===== 按鈕：統一漸層＋置中＋一致大小 ===== */
+/* 基礎：全部按鈕用漸層 */
+:root {
+  /* 漸層色組（深色霓虹風） */
+  --btn-grad-from: #3a64ff; /* 與 --accent 相近 */
+  --btn-grad-mid: #08e0ff; /* 青藍 */
+  --btn-grad-to: #38ffa8; /* 螢綠 */
+  --btn-br: rgba(122,162,255,.45);
+  --btn-bg: linear-gradient(90deg, var(--btn-grad-from), var(--btn-grad-mid), var(--btn-grad-to));
+}
+
+/* 讓所有 .btn（含 .btn-primary、.btn-nav…）吃到漸層 */
+.btn {
+  /* 外觀 */
+  border-radius: 12px;
+  border: 1px solid var(--btn-br);
+  background-image: var(--btn-bg);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  color: white !important;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  /* 動效 */
+  transition: background-position 0.25s ease, transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  /* 尺寸與置中 */
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; /* 預設讓按鈕「看起來一致寬」 */
+}
+
+/* 小按鈕（上一個/下一個）保留窄寬但仍置中對齊 */
+.btn-nav {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+}
+
+/* 次要大按鈕（隨機、同面、首頁），維持滿寬的視覺 */
+.btn-wide, .btn-mode, .btn-home {
+  width: 100%;
+}
+
+/* 漸層 hover 動畫 */
+.btn:hover {
+  background-position: 100% 50%;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 按鈕群：整列置中＋等寬排列 */
+.btn-group {
+  display: grid;
+  gap: var(--gap);
+  justify-items: center; /* 群組內每個項目水平置中 */
+}
+
+/* 上一個 | 隨機 | 下一個：三欄，整列置中且等寬 */
+.row-btns {
+  display: grid;
+  grid-template-columns: 44px minmax(200px, 1fr) 44px;
+  gap: var(--gap);
+  align-items: stretch;
+  justify-items: center; /* 三顆按鈕都在各自欄位置中 */
+  width: 100%;
+}
+
+/* 讓中間那顆（隨機）吃滿中欄寬度 */
+.row-btns .btn-wide {
+  width: 100%;
+}
+
+/* 補：發音鍵、模式鍵若有其他 class，一律保持中央對齊 */
+.btn-tts, .btn-mode, .btn-home {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== 小螢幕優化：維持置中、間距更緊湊 ===== */
+@media (max-width: 420px) {
+  .row-btns {
+    grid-template-columns: 44px minmax(140px, 1fr) 44px;
+  }
+}
+/* 內含 .btn, .btn-primary 等 */
+:root {
+  /* Core palette */
+  --bg-base: #0f1220;
+  --bg-surface: #14182b;
+  --bg-surface-2: #171c33;
+  --bg-contrast: #0b0f19;
+  --bg-accent-1: #6c8cff;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #7efff5;
+  --bg-accent-4: #9a8bff;
+  --bg-muted: #8b93a7;
+  /* Radii & blur */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --blur-sm: 6px;
+  --blur-md: 12px;
+  --blur-lg: 18px;
+  /* Layout tokens */
+  --section-py: clamp(48px, 8vw, 120px);
+  --container-max: 1120px;
+  --container-px: clamp(16px, 4vw, 32px);
+  /* Layer alpha controls */
+  --bg-alpha: 1; /* background opacity */
+  --pattern-alpha: .22; /* pattern intensity */
+  --noise-alpha: .06; /* noise intensity */
+  --glass-alpha: .18; /* glass fill */
+  --glass-stroke: .18; /* glass border alpha */
+  /* Animation speed */
+  --bg-speed: 18s;
+  --bg-beam-speed: 14s;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #0d1021;
+    --bg-surface: #12162a;
+    --bg-surface-2: #141a33;
+    --bg-contrast: #0b0f19;
+    --bg-muted: #a2aac1;
+  }
+}
+.bg {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-base) calc(var(--bg-alpha) * 100%), transparent);
+  color: white;
+}
+
+.bg--surface {
+  background: var(--bg-surface);
+}
+
+.bg--surface-2 {
+  background: var(--bg-surface-2);
+}
+
+.bg--contrast {
+  background: var(--bg-contrast);
+}
+
+.rounded-sm {
+  border-radius: var(--radius-sm);
+  overflow: clip;
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+  overflow: clip;
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+}
+
+.rounded-xl {
+  border-radius: var(--radius-xl);
+  overflow: clip;
+}
+
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+  overflow: clip;
+}
+
+.container {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-py);
+}
+
+/* Subtle radial spotlight */
+.bg-radial {
+  background: radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--bg-accent-1) 12%, transparent), transparent 60%), radial-gradient(1000px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 12%, transparent), transparent 65%), var(--bg-base);
+}
+
+/* Conic aurora swirl */
+.bg-conic {
+  background: conic-gradient(from 200deg at 30% 10%, color-mix(in srgb, var(--bg-accent-1) 26%, transparent) 0 18%, transparent 18% 40%, color-mix(in srgb, var(--bg-accent-3) 20%, transparent) 40% 58%, transparent 58% 100%), var(--bg-base);
+}
+
+/* Linear neon gradient */
+.bg-gradient {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-accent-1) 24%, transparent) 0%, color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 35%, color-mix(in srgb, var(--bg-accent-2) 24%, transparent) 70%, color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 100%), var(--bg-base);
+}
+
+/* Duo gradient (brand + pink) */
+.bg-gradient-duo {
+  background: linear-gradient(120deg, var(--bg-accent-1), var(--bg-accent-2));
+}
+
+/* Mesh gradient (layered radial blobs) */
+.bg-mesh {
+  background: radial-gradient(600px 300px at 20% 10%, color-mix(in srgb, var(--bg-accent-1) 35%, transparent), transparent 60%), radial-gradient(700px 380px at 85% 15%, color-mix(in srgb, var(--bg-accent-2) 35%, transparent), transparent 65%), radial-gradient(900px 420px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 28%, transparent), transparent 70%), radial-gradient(800px 360px at 90% 85%, color-mix(in srgb, var(--bg-accent-4) 26%, transparent), transparent 70%), var(--bg-base);
+}
+
+/* Dots */
+.bg-dots {
+  background: radial-gradient(circle at center, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 2px) 0 0/18px 18px, var(--bg-surface);
+}
+
+/* Grid */
+.bg-grid {
+  background: linear-gradient(to right, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(to bottom, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 1px) 0 0/28px 28px, var(--bg-surface);
+}
+
+/* Stripes (45deg) */
+.bg-stripes {
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 0 10px, transparent 10px 20px), var(--bg-surface);
+}
+
+/* Checkerboard (subtle) */
+.bg-checker {
+  --sz: 28px;
+  background: conic-gradient(from 90deg, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 25%, transparent 0 50%, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 0 75%, transparent 0) 0 0/var(--sz) var(--sz), var(--bg-surface);
+}
+
+/* Paper grain (fake paper) */
+.bg-paper {
+  background: radial-gradient(1200px 600px at 40% -20%, rgba(255, 255, 255, 0.06), transparent 60%), linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.03)), var(--bg-surface);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Procedural-ish noise using multiple gradients */
+.bg-noise::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--noise-alpha);
+  background: radial-gradient(2px 2px at 10% 20%, #fff, transparent) repeat, radial-gradient(1.5px 1.5px at 30% 80%, #fff, transparent) repeat, radial-gradient(1px 1px at 70% 60%, #fff, transparent) repeat, radial-gradient(1.5px 1.5px at 90% 30%, #fff, transparent) repeat;
+  background-size: 8px 8px, 10px 10px, 12px 12px, 14px 14px;
+  mix-blend-mode: soft-light;
+  content: "";
+}
+
+/* Glass layer */
+.bg-glass {
+  position: relative;
+  background: color-mix(in srgb, #fff calc(var(--glass-alpha) * 100%), transparent);
+  border: 1px solid color-mix(in srgb, #fff calc(var(--glass-stroke) * 100%), transparent);
+  backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  color: white;
+}
+
+/* Floating beams */
+.bg-beams {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.bg-beams::before,
+.bg-beams::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  filter: blur(30px);
+  opacity: 0.55;
+  background: radial-gradient(500px 200px at 10% 20%, color-mix(in srgb, var(--bg-accent-2) 60%, transparent), transparent 60%), radial-gradient(600px 220px at 90% 15%, color-mix(in srgb, var(--bg-accent-1) 60%, transparent), transparent 60%), radial-gradient(500px 220px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 60%, transparent), transparent 60%);
+  animation: floatBeams var(--bg-beam-speed) linear infinite alternate;
+}
+
+.bg-beams::after {
+  animation-direction: alternate-reverse;
+  transform: scaleX(-1);
+  opacity: 0.45;
+}
+
+@keyframes floatBeams {
+  0% {
+    transform: translateY(-4%) translateX(-2%) rotate(-1deg);
+  }
+  100% {
+    transform: translateY(4%) translateX(2%) rotate(1deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-beams::before, .bg-beams::after {
+    animation: none;
+  }
+}
+/* Aurora sweep (slow conic rotation) */
+.bg-aurora {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(1200px 600px at 20% -10%, color-mix(in srgb, var(--bg-accent-1) 10%, transparent), transparent 60%), radial-gradient(900px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 10%, transparent), transparent 60%), var(--bg-base);
+}
+
+.bg-aurora::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background: conic-gradient(from 0deg at 50% 50%, transparent 0 10%, color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 10% 25%, transparent 25% 40%, color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 40% 60%, transparent 60% 80%, color-mix(in srgb, var(--bg-accent-2) 18%, transparent) 80% 100%);
+  filter: blur(60px) saturate(130%);
+  animation: auroraSpin var(--bg-speed) linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes auroraSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before {
+    animation: none;
+  }
+}
+.section--hero {
+  position: relative;
+  padding-block: var(--section-py);
+  background: none;
+  position: relative;
+}
+.section--hero .hero-inner {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+  text-align: center;
+  max-width: 980px;
+}
+.section--hero .hero-title {
+  font-size: clamp(28px, 4.5vw, 64px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  margin: 0 0 16px;
+}
+.section--hero .hero-sub {
+  font-size: clamp(14px, 1.2vw, 18px);
+  color: color-mix(in srgb, white 80%, var(--bg-muted));
+  margin: 0 auto 28px;
+}
+.section--hero .hero-cta {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.section--panel {
+  position: relative;
+  padding-block: var(--section-py);
+}
+.section--panel .panel {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+  border-radius: var(--radius-xl);
+  overflow: clip;
+  background: color-mix(in srgb, white 2%, var(--bg-surface));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  padding: clamp(20px, 4vw, 40px);
+}
+
+/* Adjust intensities per section */
+[data-pattern=soft] {
+  --pattern-alpha: .12;
+  --noise-alpha: .04;
+}
+
+[data-pattern=bold] {
+  --pattern-alpha: .35;
+  --noise-alpha: .10;
+}
+
+[data-blur=sm] {
+  --blur-lg: 8px;
+}
+
+[data-blur=lg] {
+  --blur-lg: 26px;
+}
+
+[data-alpha="0"] {
+  --bg-alpha: 0;
+}
+
+[data-alpha="50"] {
+  --bg-alpha: .5;
+}
+
+[data-alpha="80"] {
+  --bg-alpha: .8;
+}
+
+/* Quick padding toggles */
+.section--tight {
+  --section-py: clamp(32px, 5vw, 72px);
+}
+
+.section--loose {
+  --section-py: clamp(72px, 10vw, 160px);
+}
+
+/* Overlay helpers */
+.overlay {
+  position: relative;
+}
+
+.overlay::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(60% 60% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+.overlay--bottom::before {
+  background: radial-gradient(60% 60% at 50% 100%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+/* Shadow ring helpers (nice with rounded panels) */
+.ring-1 {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.ring-2 {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08) inset;
+}
+
+.ring-3 {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) inset;
+}
+
+.theme-neon {
+  --bg-accent-1: #7efff5;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #6c8cff;
+  --bg-accent-4: #9a8bff;
+  --bg-base: #0f1529;
+  --bg-surface: #111632;
+}
+
+.theme-cyber {
+  --bg-accent-1: #00ffd5;
+  --bg-accent-2: #00aaff;
+  --bg-accent-3: #ff00ff;
+  --bg-accent-4: #ffe600;
+  --bg-base: #0a0d15;
+  --bg-surface: #0f1422;
+}
+
+.theme-sunset {
+  --bg-accent-1: #ff9a8b;
+  --bg-accent-2: #ff6a88;
+  --bg-accent-3: #ff99ac;
+  --bg-accent-4: #ffd36e;
+  --bg-base: #1b0f17;
+  --bg-surface: #221320;
+}
+
+.demo-card {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+  background: color-mix(in srgb, white 3%, var(--bg-surface));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+}
+
+/* 內含背景/主題設定 */
+/* ===== 全域變數（僅使用 CSS 變數，避免依賴未定義的 SCSS 變數） ===== */
+:root {
+  /* spacing & 寬度控制 */
+  --kh-max-w: 960px;
+  --kh-pad: 16px;
+  --kh-gap: 16px;
+  --kh-radius: 16px;
+  /* 排版 */
+  --kh-font-size: 16px;
+  --kh-line-height: 1.6;
+  /* 色彩（深色主題）— 若 _background.scss 已定義，這些會作為 fallback */
+  --kh-bg: #0c0f14;
+  --kh-bg-elev: #121722;
+  --kh-text: #e8ecf1;
+  --kh-text-dim: #b5c0cf;
+  --kh-divider: #1f2633;
+  /* 卡片陰影（柔和） */
+  --kh-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* 僅深色：即使系統是淺色，也使用深色 */
+html, body {
+  color-scheme: dark;
+}
+
+/* ===== 基礎 Reset（極簡） ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--kh-font-size);
+}
+
+body.kh-body {
+  margin: 0;
+  background: var(--kh-bg); /* _background.scss 也可覆蓋整體背景 */
+  color: var(--kh-text);
+  line-height: var(--kh-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 容器與水平置中 ===== */
+.kh-container {
+  width: 100%;
+  max-width: var(--kh-max-w);
+  margin-inline: auto;
+  padding: calc(var(--kh-pad) * 1.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 主要物件水平置中 */
+  gap: calc(var(--kh-gap) * 1.25);
+}
+
+/* ===== Header / Logo ===== */
+.kh-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+  backdrop-filter: blur(6px);
+}
+
+.kh-header__inner {
+  max-width: var(--kh-max-w);
+  margin: 0 auto;
+  padding: calc(var(--kh-pad) * 1.25) var(--kh-pad);
+  display: flex;
+  justify-content: center; /* 水平置中 Logo */
+}
+
+.kh-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  user-select: none;
+}
+.kh-logo img {
+  display: block;
+  height: 44px; /* 行動裝置友善高度 */
+  width: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* ===== Main ===== */
+.kh-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 主要物件水平置中 */
+}
+
+/* ===== 導覽（使用你現有的 .btn 樣式，保證一致視覺） ===== */
+.kh-nav {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* 水平置中 */
+  align-items: center;
+  gap: var(--kh-gap);
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.kh-nav__btn {
+  /* 讓行動裝置按鈕更好點擊 */
+  min-width: 108px;
+  padding: 10px 14px;
+  border-radius: var(--kh-radius);
+  /* 若你的 _buttons.scss 已設置 gradient，這裡僅做尺寸/間距控管 */
+}
+
+/* ===== 卡片群（RWD 單欄 → 多欄） ===== */
+.kh-cards {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--kh-gap) * 1.25);
+  align-items: start;
+  justify-items: center; /* 置中每張卡片 */
+}
+@media (min-width: 640px) {
+  .kh-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .kh-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ===== 卡片 ===== */
+.kh-card {
+  width: min(100%, 480px);
+  background: var(--kh-bg-elev);
+  border: 1px solid var(--kh-divider);
+  border-radius: var(--kh-radius);
+  padding: calc(var(--kh-pad) * 1.25);
+  box-shadow: var(--kh-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 內部主要元素水平置中 */
+  gap: calc(var(--kh-gap) * 0.75);
+  text-align: center; /* 文字置中 */
+}
+
+.kh-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  letter-spacing: 0.2px;
+}
+
+.kh-card__desc {
+  margin: 0;
+  color: var(--kh-text-dim);
+  font-size: 0.95rem;
+}
+
+.kh-card__actions {
+  display: flex;
+  gap: var(--kh-gap);
+  justify-content: center; /* 水平置中按鈕群 */
+}
+
+/* ===== Footer ===== */
+.kh-footer {
+  border-top: 1px solid var(--kh-divider);
+  margin-top: calc(var(--kh-gap) * 2);
+}
+
+.kh-footer__inner {
+  max-width: var(--kh-max-w);
+  margin: 0 auto;
+  padding: calc(var(--kh-pad) * 1.25) var(--kh-pad);
+  display: flex;
+  justify-content: center; /* 水平置中 */
+  color: var(--kh-text-dim);
+}
+
+/* ===== 可選：行動裝置舒適點觸區 ===== */
+@media (hover: none) {
+  .btn {
+    min-height: 44px;
+  }
+  .kh-nav__btn {
+    min-height: 44px;
+  }
+}
+/* ===== 可選：強化鍵盤可見焦點 ===== */
+:where(a, button, [role=button], [tabindex]) :focus-visible,
+:where(a, button, [role=button], [tabindex]).focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/*# sourceMappingURL=template.css.map */
