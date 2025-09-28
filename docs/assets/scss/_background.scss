@@ -1,0 +1,430 @@
+// ============================================================================
+// Ultimate Background System (SCSS) — ZXSNOW Edition
+// Stylish, modern, rounded-vibes, responsive, dark-mode aware.
+// Includes gradients, meshes, patterns (dots/grid/stripes/noise/checker/paper),
+// glass layers, animated hero beams, and utility APIs via CSS variables.
+// Dependency-free, drop-in.
+// ============================================================================
+
+// -----------------------------
+// 1) Design Tokens (edit me 😎)
+// -----------------------------
+:root {
+  /* Core palette */
+  --bg-base: #0f1220;
+  --bg-surface: #14182b;
+  --bg-surface-2: #171c33;
+  --bg-contrast: #0b0f19;
+  --bg-accent-1: #6c8cff;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #7efff5;
+  --bg-accent-4: #9a8bff;
+  --bg-muted: #8b93a7;
+
+  /* Radii & blur */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --blur-sm: 6px;
+  --blur-md: 12px;
+  --blur-lg: 18px;
+
+  /* Layout tokens */
+  --section-py: clamp(48px, 8vw, 120px);
+  --container-max: 1120px;
+  --container-px: clamp(16px, 4vw, 32px);
+
+  /* Layer alpha controls */
+  --bg-alpha: 1;                 /* background opacity */
+  --pattern-alpha: .22;          /* pattern intensity */
+  --noise-alpha: .06;            /* noise intensity */
+  --glass-alpha: .18;            /* glass fill */
+  --glass-stroke: .18;           /* glass border alpha */
+
+  /* Animation speed */
+  --bg-speed: 18s;
+  --bg-beam-speed: 14s;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #0d1021;
+    --bg-surface: #12162a;
+    --bg-surface-2: #141a33;
+    --bg-contrast: #0b0f19;
+    --bg-muted: #a2aac1;
+  }
+}
+
+// -----------------------------
+// 2) Helpers & Mixins
+// -----------------------------
+
+@mixin cover {
+  position: absolute; inset: 0;
+}
+
+@mixin bg-layer($z: 0) {
+  @include cover;
+  z-index: $z;
+  pointer-events: none;
+}
+
+@mixin rounded($r: var(--radius-lg)) {
+  border-radius: $r;
+  overflow: clip;
+}
+
+@mixin container {
+  width: min(100% - 2*var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+
+@mixin section {
+  position: relative;
+  padding-block: var(--section-py);
+}
+
+// -----------------------------
+// 3) Base Surfaces
+// -----------------------------
+
+.bg {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-base) calc(var(--bg-alpha)*100%), transparent);
+  color: white;
+}
+
+.bg--surface { background: var(--bg-surface); }
+.bg--surface-2 { background: var(--bg-surface-2); }
+.bg--contrast { background: var(--bg-contrast); }
+
+.rounded-sm { @include rounded(var(--radius-sm)); }
+.rounded-md { @include rounded(var(--radius-md)); }
+.rounded-lg { @include rounded(var(--radius-lg)); }
+.rounded-xl { @include rounded(var(--radius-xl)); }
+.rounded-2xl { @include rounded(var(--radius-2xl)); }
+
+.container { @include container; }
+.section { @include section; }
+
+// -----------------------------
+// 4) Gradient Suites (choose your vibe)
+// -----------------------------
+
+/* Subtle radial spotlight */
+.bg-radial {
+  background:
+    radial-gradient(1200px 600px at 10% -10%,
+      color-mix(in srgb, var(--bg-accent-1) 12%, transparent),
+      transparent 60%),
+    radial-gradient(1000px 600px at 110% 10%,
+      color-mix(in srgb, var(--bg-accent-2) 12%, transparent),
+      transparent 65%),
+    var(--bg-base);
+}
+
+/* Conic aurora swirl */
+.bg-conic {
+  background:
+    conic-gradient(from 200deg at 30% 10%,
+      color-mix(in srgb, var(--bg-accent-1) 26%, transparent) 0 18%,
+      transparent 18% 40%,
+      color-mix(in srgb, var(--bg-accent-3) 20%, transparent) 40% 58%,
+      transparent 58% 100%),
+    var(--bg-base);
+}
+
+/* Linear neon gradient */
+.bg-gradient {
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--bg-accent-1) 24%, transparent) 0%,
+      color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 35%,
+      color-mix(in srgb, var(--bg-accent-2) 24%, transparent) 70%,
+      color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 100%),
+    var(--bg-base);
+}
+
+/* Duo gradient (brand + pink) */
+.bg-gradient-duo {
+  background: linear-gradient(120deg, var(--bg-accent-1), var(--bg-accent-2));
+}
+
+/* Mesh gradient (layered radial blobs) */
+.bg-mesh {
+  background:
+    radial-gradient(600px 300px at 20% 10%, color-mix(in srgb, var(--bg-accent-1) 35%, transparent), transparent 60%),
+    radial-gradient(700px 380px at 85% 15%, color-mix(in srgb, var(--bg-accent-2) 35%, transparent), transparent 65%),
+    radial-gradient(900px 420px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 28%, transparent), transparent 70%),
+    radial-gradient(800px 360px at 90% 85%, color-mix(in srgb, var(--bg-accent-4) 26%, transparent), transparent 70%),
+    var(--bg-base);
+}
+
+// -----------------------------
+// 5) Patterns (performant, pure CSS)
+// -----------------------------
+
+/* Dots */
+.bg-dots {
+  background:
+    radial-gradient(circle at center,
+      color-mix(in srgb, white calc(var(--pattern-alpha)*100%), transparent) 1px,
+      transparent 2px) 0 0/ 18px 18px,
+    var(--bg-surface);
+}
+
+/* Grid */
+.bg-grid {
+  background:
+    linear-gradient(to right, color-mix(in srgb, white calc(var(--pattern-alpha)*100%), transparent) 1px, transparent 1px) 0 0/ 28px 28px,
+    linear-gradient(to bottom, color-mix(in srgb, white calc(var(--pattern-alpha)*100%), transparent) 1px, transparent 1px) 0 0/ 28px 28px,
+    var(--bg-surface);
+}
+
+/* Stripes (45deg) */
+.bg-stripes {
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, white calc(var(--pattern-alpha)*100%), transparent) 0 10px,
+      transparent 10px 20px),
+    var(--bg-surface);
+}
+
+/* Checkerboard (subtle) */
+.bg-checker {
+  --sz: 28px;
+  background:
+    conic-gradient(from 90deg, color-mix(in srgb, white calc(var(--pattern-alpha)*100%), transparent) 25%, transparent 0 50%, color-mix(in srgb, white calc(var(--pattern-alpha)*100%), transparent) 0 75%, transparent 0) 0 0/var(--sz) var(--sz),
+    var(--bg-surface);
+}
+
+/* Paper grain (fake paper) */
+.bg-paper {
+  background:
+    radial-gradient(1200px 600px at 40% -20%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.03)),
+    var(--bg-surface);
+  box-shadow: inset 0 1px rgba(255,255,255,.06);
+}
+
+// -----------------------------
+// 6) Noise & Overlays
+// -----------------------------
+
+/* Procedural-ish noise using multiple gradients */
+.bg-noise::after {
+  @include bg-layer(0);
+  opacity: var(--noise-alpha);
+  background:
+    radial-gradient(2px 2px at 10% 20%, #fff, transparent) repeat,
+    radial-gradient(1.5px 1.5px at 30% 80%, #fff, transparent) repeat,
+    radial-gradient(1px 1px at 70% 60%, #fff, transparent) repeat,
+    radial-gradient(1.5px 1.5px at 90% 30%, #fff, transparent) repeat;
+  background-size: 8px 8px, 10px 10px, 12px 12px, 14px 14px;
+  mix-blend-mode: soft-light;
+  content: "";
+}
+
+/* Glass layer */
+.bg-glass {
+  position: relative;
+  background: color-mix(in srgb, #fff calc(var(--glass-alpha)*100%), transparent);
+  border: 1px solid color-mix(in srgb, #fff calc(var(--glass-stroke)*100%), transparent);
+  backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  color: white;
+}
+
+// -----------------------------
+// 7) Animated Hero Effects (with reduced-motion safeties)
+// -----------------------------
+
+/* Floating beams */
+.bg-beams {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+.bg-beams::before,
+.bg-beams::after {
+  @include bg-layer(-1);
+  content: "";
+  filter: blur(30px);
+  opacity: .55;
+  background:
+    radial-gradient(500px 200px at 10% 20%, color-mix(in srgb, var(--bg-accent-2) 60%, transparent), transparent 60%),
+    radial-gradient(600px 220px at 90% 15%, color-mix(in srgb, var(--bg-accent-1) 60%, transparent), transparent 60%),
+    radial-gradient(500px 220px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 60%, transparent), transparent 60%);
+  animation: floatBeams var(--bg-beam-speed) linear infinite alternate;
+}
+.bg-beams::after {
+  animation-direction: alternate-reverse;
+  transform: scaleX(-1);
+  opacity: .45;
+}
+
+@keyframes floatBeams {
+  0%   { transform: translateY(-4%) translateX(-2%) rotate(-1deg); }
+  100% { transform: translateY(4%) translateX(2%) rotate(1deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-beams::before, .bg-beams::after { animation: none; }
+}
+
+/* Aurora sweep (slow conic rotation) */
+.bg-aurora {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, color-mix(in srgb, var(--bg-accent-1) 10%, transparent), transparent 60%),
+    radial-gradient(900px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 10%, transparent), transparent 60%),
+    var(--bg-base);
+}
+.bg-aurora::before {
+  @include bg-layer(-1);
+  content: "";
+  background:
+    conic-gradient(from 0deg at 50% 50%,
+      transparent 0 10%,
+      color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 10% 25%,
+      transparent 25% 40%,
+      color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 40% 60%,
+      transparent 60% 80%,
+      color-mix(in srgb, var(--bg-accent-2) 18%, transparent) 80% 100%);
+  filter: blur(60px) saturate(130%);
+  animation: auroraSpin var(--bg-speed) linear infinite;
+  opacity: .5;
+}
+
+@keyframes auroraSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before { animation: none; }
+}
+
+// -----------------------------
+// 8) Section Presets (quick drop-ins)
+// -----------------------------
+
+.section--hero {
+  @include section;
+  background: none;
+  position: relative;
+  .hero-inner {
+    @include container;
+    text-align: center;
+    max-width: 980px;
+  }
+  .hero-title {
+    font-size: clamp(28px, 4.5vw, 64px);
+    font-weight: 900;
+    letter-spacing: .02em;
+    line-height: 1.05;
+    margin: 0 0 16px;
+  }
+  .hero-sub {
+    font-size: clamp(14px, 1.2vw, 18px);
+    color: color-mix(in srgb, white 80%, var(--bg-muted));
+    margin: 0 auto 28px;
+  }
+  .hero-cta { margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+}
+
+.section--panel {
+  @include section;
+  .panel {
+    @include container;
+    @include rounded(var(--radius-xl));
+    background: color-mix(in srgb, white 2%, var(--bg-surface));
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    backdrop-filter: blur(var(--blur-md));
+    -webkit-backdrop-filter: blur(var(--blur-md));
+    padding: clamp(20px, 4vw, 40px);
+  }
+}
+
+// -----------------------------
+// 9) Utility Modifiers
+// -----------------------------
+
+/* Adjust intensities per section */
+[data-pattern="soft"]  { --pattern-alpha: .12; --noise-alpha: .04; }
+[data-pattern="bold"]  { --pattern-alpha: .35; --noise-alpha: .10; }
+[data-blur="sm"]       { --blur-lg: 8px; }
+[data-blur="lg"]       { --blur-lg: 26px; }
+[data-alpha="0"]       { --bg-alpha: 0; }
+[data-alpha="50"]      { --bg-alpha: .5; }
+[data-alpha="80"]      { --bg-alpha: .8; }
+
+/* Quick padding toggles */
+.section--tight { --section-py: clamp(32px, 5vw, 72px); }
+.section--loose { --section-py: clamp(72px, 10vw, 160px); }
+
+/* Overlay helpers */
+.overlay {
+  position: relative;
+}
+.overlay::before {
+  @include bg-layer(0);
+  content: "";
+  background: radial-gradient(60% 60% at 50% 0%, rgba(0,0,0,.35), transparent 60%);
+}
+.overlay--bottom::before {
+  background: radial-gradient(60% 60% at 50% 100%, rgba(0,0,0,.35), transparent 60%);
+}
+
+/* Shadow ring helpers (nice with rounded panels) */
+.ring-1 { box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset; }
+.ring-2 { box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset; }
+.ring-3 { box-shadow: 0 0 0 3px rgba(255,255,255,.1) inset; }
+
+// -----------------------------
+// 10) Example Themes (swap on any container)
+// -----------------------------
+
+.theme-neon {
+  --bg-accent-1: #7efff5;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #6c8cff;
+  --bg-accent-4: #9a8bff;
+  --bg-base: #0f1529;
+  --bg-surface: #111632;
+}
+
+.theme-cyber {
+  --bg-accent-1: #00ffd5;
+  --bg-accent-2: #00aaff;
+  --bg-accent-3: #ff00ff;
+  --bg-accent-4: #ffe600;
+  --bg-base: #0a0d15;
+  --bg-surface: #0f1422;
+}
+
+.theme-sunset {
+  --bg-accent-1: #ff9a8b;
+  --bg-accent-2: #ff6a88;
+  --bg-accent-3: #ff99ac;
+  --bg-accent-4: #ffd36e;
+  --bg-base: #1b0f17;
+  --bg-surface: #221320;
+}
+
+// -----------------------------
+// 11) Demo helpers (optional; safe to remove)
+// -----------------------------
+
+.demo-card {
+  @include rounded(var(--radius-lg));
+  background: color-mix(in srgb, white 3%, var(--bg-surface));
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 24px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.24);
+}
