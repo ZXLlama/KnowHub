@@ -1,55 +1,47 @@
-// === 共用設定 ===
-export const SUBJECTS = ["國文","英文","數學","物理","化學","生物","地科","其他"];
+// assets/js/common.js
+export const BASE = (window.KNOWHUB && window.KNOWHUB.API_BASE) || 'https://your-worker.example.workers.dev';
 
-export function subjectColor(tag) {
-  const map = {
-    "國文": ["#fef3c7", "#92400e"],
-    "英文": ["#e0e7ff", "#3730a3"],
-    "數學": ["#d1fae5", "#065f46"],
-    "物理": ["#bae6fd", "#0c4a6e"],
-    "化學": ["#fecdd3", "#881337"],
-    "生物": ["#dcfce7", "#166534"],
-    "地科": ["#ede9fe", "#5b21b6"],
-    "其他": ["#f3f4f6", "#374151"]
-  };
-  return map[tag] || map["其他"];
+export async function api(path, payload = null) {
+  const url = new URL(path, BASE);
+  // GET with querystring for simple filters
+  if (payload && !(payload instanceof FormData) && (path.includes('/random') || path.includes('/knowledge'))) {
+    Object.entries(payload).forEach(([k, v]) => {
+      if (Array.isArray(v)) v.forEach(vv => url.searchParams.append(k, vv));
+      else if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
+    });
+  }
+  const res = await fetch(url.toString(), { method: 'GET', mode: 'cors' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
 }
 
-export function tagChip(tag) {
-  const [bg, fg] = subjectColor(tag);
-  return `
-    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-          style="background:${bg}; color:${fg}; border:1px solid ${fg}22;">
-      ${tag}
-    </span>`;
+export function tagChip(label) {
+  return `<span style="
+    display:inline-block;padding:.25rem .5rem;border-radius:999px;
+    background:linear-gradient(135deg,#7cf0ff55,#8aa9ff55);
+    border:1px solid #ffffff33;color:#e8ecf1;font-size:.8rem
+  ">${label}</span>`;
 }
 
-export function renderMath(scope=document.body) {
+// 讓 KaTeX 自動渲染 knowledge.js 動態注入的內容
+export function renderMath(scope = document) {
   if (!window.renderMathInElement) return;
-  renderMathInElement(scope, {
+  window.renderMathInElement(scope, {
     delimiters: [
-      {left:"$$",right:"$$",display:true},
-      {left:"$",right:"$",display:false},
-      {left:"\\(",right:"\\)",display:false},
-      {left:"\\[",right:"\\]",display:true}
+      {left:'$$',right:'$$',display:true},
+      {left:'$',right:'$',display:false},
+      {left:'\\(',right:'\\)',display:false},
+      {left:'\\[',right:'\\]',display:true}
     ],
     throwOnError:false
   });
 }
 
-export function fmtDate(iso) {
-  try { 
-    return new Date(iso).toLocaleString("zh-TW", {hour12:false}); 
-  }
-  catch { 
-    return ""; 
-  }
-}
-
-// === 全域快捷鍵：按 "/" 聚焦第一個搜尋框 ===
-document.addEventListener("keydown", (e) => {
-  if (e.key === "/" && !e.metaKey && !e.ctrlKey) {
-    const el = document.querySelector("input[type=search]");
-    if (el) { e.preventDefault(); el.focus(); }
-  }
-});
+// 供 knowledge.js 顯示時間
+if (!window.KNOWHUB) window.KNOWHUB = {};
+window.KNOWHUB.fmtDate = (iso) => {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString('zh-TW', { hour12:false });
+  } catch { return iso || ''; }
+};
