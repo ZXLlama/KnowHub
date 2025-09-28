@@ -1,219 +1,349 @@
-@import "colors";
+/* ======= Imports：沿用你的共用樣式 ======= */
+@use "./background" as *;
+@use "./buttons" as *;
 
-/* ===== Global Variables ===== */
-$card-width: 520px;   // 卡片與搜尋框等寬
-$btn-width: 500px;    // 按鈕群組比卡片窄一點
+/* ======= Root：尺寸與字級 ======= */
+:root{
+  /* 版心 */
+  --kh-max-w: 760px;
 
-/* ===== Base ===== */
-body {
-  margin: 0;
-  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
-  background: $color-bg-main;
-  color: $color-text-main;
-  line-height: 1.6;
+  /* 卡片：預設走「行動版**寫死**尺寸」 */
+  --card-w: 360px;
+  --card-h: 440px;
+
+  /* 固定三行所占的垂直比例（總和=100%） */
+  --fs-pos: clamp(12px, 2.2vmin, 18px);   /* 詞性：最小 */
+  --fs-zh:  clamp(16px, 3.2vmin, 28px);   /* 中文：中等 */
+  --fs-en:  clamp(22px, 6.0vmin, 56px);   /* 英文：最大 */
+
+  /* 每個區塊允許的行數，避免文字把版位撐開 */
+  --lines-pos: 1;
+  --lines-en:  2;
+  --lines-zh:  2;
+
+  /* 卡片寬高比，確保高度穩定（可依喜好微調） */
+  --card-aspect: 3/4;
+
+  --card-radius: 18px;
+  --card-pad: 22px;
+
+  --kh-pad-x: clamp(12px, 4vw, 20px);
+  --kh-gap: clamp(12px, 3.6vw, 16px);
+
+  --card-shadow: 0 10px 30px rgba(0,0,0,.45);
+  --card-border: 1px solid rgba(255,255,255,.08);
 }
 
-a { color: $color-button; text-decoration: none; }
+/* ======= 基礎布局 ======= */
+* { box-sizing: border-box; }
+html, body { width: 100%; max-width: 100%; }
+.vocab-body { overflow-x: hidden; }
+.kh-main { min-height: 100svh; } /* 讓桌機視覺吃滿視窗高度 */
 
-/* ===== Logo ===== */
-.logo {
-  display: block;
-  margin: 0.5rem auto 0.25rem;
-  width: auto;
-  max-height: 80px;
-  object-fit: contain;
-}
-
-/* ===== Container ===== */
-.container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.25rem;
-  box-sizing: border-box;
-  text-align: center;
-}
-
-/* ===== Search ===== */
-#search {
+.vocab-container{
   width: 100%;
-  max-width: $card-width; // 和卡片一致
-  padding: 0.6rem 1rem 0.6rem 2.2rem;
-  border: 1px solid mix(#fff, $color-bg-main, 18%);
-  border-radius: 0.6rem;
-  background: mix(black, $color-bg-main, 8%)
-              url('https://img.icons8.com/ios-filled/20/94a3b8/search.png')
-              no-repeat 0.7rem center;
-  background-size: 1rem;
-  color: $color-text-main;
-  outline: none;
-  transition: box-shadow .2s, border-color .2s, background-color .2s;
-  margin-bottom: .4rem;
+  max-width: var(--kh-max-w);
+  margin-inline: auto;
+  padding: calc(var(--kh-gap) + 4px) var(--kh-pad-x) var(--kh-gap);
+  display: grid;
+  gap: var(--kh-gap);
+  justify-items: center;
+}
 
-  &::placeholder { color: $color-text-sub; }
-  &:focus {
-    border-color: $color-button;
-    box-shadow: 0 0 8px rgba(88,101,242,.45);
-    background-color: mix(black, $color-bg-main, 12%);
+/* ======= 搜尋 ======= */
+.search-wrap{
+  width: 100%;
+  display: grid;
+  gap: 8px;
+
+  #search{
+    width: 100%;
+    height: 44px;
+    border-radius: 999px;
+    padding: 0 16px;
+    outline: none;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    backdrop-filter: blur(6px);
+  }
+
+  .suggestions{
+    width: 100%;
+    max-height: 40vh;
+    overflow: auto;
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.35);
+    display: none;
+
+    &.show { display: block; }
+    li{
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      &:hover { background: rgba(255,255,255,.06); }
+    }
   }
 }
 
-/* 建議清單 */
-#suggestions { list-style:none; padding:0; margin:.2rem 0 0 0; width:100%; max-width:$card-width; }
-.suggestion-item {
-  padding:.6rem 1rem;
-  border-bottom:1px solid mix(#fff, $color-bg-main, 18%);
-  background: mix(black, $color-bg-main, 8%);
-  color:$color-text-main;
-  cursor:pointer; transition:background .2s, transform .1s;
+/* ======= 單字卡 ======= */
+.flip-card{ width: 100%; display: grid; justify-items: center; aspect-ratio: var(--card-aspect);}
 
-  &:last-child { border-bottom:none; }
-  &:hover { background: mix($color-bg-main, $color-bg-card, 70%); transform:translateX(3px); }
-}
-
-/* ===== Vocab Card ===== */
-.flip-card {
-  width: 100%;
-  max-width: $card-width;
-  height: 300px;
-  margin: 1.2rem auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.card{
   position: relative;
+  width: var(--card-w);       /* 寫死寬度 */
+  height: var(--card-h);      /* 寫死高度 */
+  padding: var(--card-pad);
+  border-radius: var(--card-radius);
+  border: var(--card-border);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(98,0,255,.18), transparent 60%),
+    radial-gradient(120% 100% at 100% 0%, rgba(0,200,255,.15), transparent 60%),
+    rgba(20,20,24,.85);
+  box-shadow: var(--card-shadow);
 }
 
-.card {
-  position: absolute;
-  inset: 0;
-  background: $color-bg-card;
-  border: 1px solid mix(#fff, $color-bg-main, 18%);
-  border-radius: 1rem;
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  box-sizing: border-box;
-  transition: opacity 0.25s ease, transform 0.15s ease;
+/* 角標與發音 */
+.corner-index{
+  position: absolute; top: 10px; left: 12px;
+  font-size: 12px; opacity: .8; user-select: none;
+}
+.btn-tts{
+  position: absolute; top: 8px; right: 10px;
+  width: 30px; height: 30px; border-radius: 999px;
+  display: grid; place-items: center; line-height: 1; font-size: 16px; padding: 0;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  transition: transform .12s ease, background .2s ease;
+  &:hover { transform: translateY(-1px) scale(1.03); background: rgba(255,255,255,.12); }
 }
 
-.face-hidden { display: none; }
-
-.corner-index {
-  position: absolute;
-  top: .6rem;
-  right: .8rem;
-  font-size:.9rem;
-  color:$color-text-sub;
-}
-
-/* 單字文字寬度與卡片對齊 */
-.word-text,
-.pos-text,
-.definition-text {
+/* 面內容 */
+.face{
   width: 100%;
-  max-width: 90%;
-  margin: .4rem auto;
-  text-align: center;
-  box-sizing: border-box;
+  height: 100%;
+  display: grid; place-items: center;
+  gap: 0px; padding-inline: 6px;
+  overflow-y: auto; overflow-x: hidden;
+}
+.face-hidden{ display: none !important; }  /* ← 雙面切換關鍵 */
+
+.word-text{
+  font-size: var(--fz-word);
+  font-weight: 800;
+  line-height: 1.08;
+  text-wrap: balance;
+  word-break: break-word;
+  letter-spacing: .02em;
+  margin: 0;
+}
+.pos-text{
+  font-size: var(--fz-pos);
+  opacity: .8;
+  margin: 0;
+}
+.definition-text{
+  font-size: var(--fz-def);
+  line-height: 1.6;
+  margin: 0;
+  text-align: left;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
-.word-text { font-size: 2.1rem; }
-.pos-text  { font-size: 1rem;  color: $color-text-sub; }
-.definition-text { font-size: 1.6rem; font-weight: 800; }
-
-/* ===== 發音按鈕（卡片頂部左側） ===== */
-.top-tts {
-  position: absolute;
-  top: .6rem;
-  left: .6rem;
-  font-size: .9rem;
-  padding: .3rem .6rem;
-}
-
-/* ===== Buttons ===== */
-.btn {
-  background:$color-button;
-  color:#fff;
-  border:none;
-  border-radius:.6rem;
-  padding:.6rem 1rem;
-  cursor:pointer;
-  transition:background .2s, transform .1s;
-  font-size:1rem;
-  font-weight:500;
-
-  &:hover { background: lighten($color-button, 8%); }
-  &:active { transform:scale(.96); }
-}
-
-/* 操作按鈕群組 */
-.btn-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .8rem;
-  margin-top: 1rem;
+/* ======= 按鈕群 ======= */
+.btn-group{
   width: 100%;
-  max-width: $btn-width; // 故意比卡片窄一點
+  display: grid;
+  gap: var(--kh-gap);
+  justify-items: center;
+
+  .row-btns{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 52px 1fr 52px; /* ⬅️ 🎲 ➡️ */
+    gap: var(--kh-gap);
+    align-items: center;
+  }
+
+  .btn{ width: 100%; }
+  .btn-nav{ min-width: 52px; height: 48px; padding: 0; border-radius: 999px; font-size: 18px; }
+  .btn-wide, .btn-mode, .btn-home{ height: 48px; border-radius: 16px; font-weight: 700; }
 }
 
-/* 隨機 + 上下箭頭一排 */
-.row-btns {
-  display: flex;
-  width: 100%;
-  gap: .6rem;
+/* ======= Header（一致外觀） ======= */
+.kh-header{
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0));
+  .kh-header__inner{
+    max-width: min(960px, 94vw);
+    margin-inline: auto;
+    padding: 12px var(--kh-pad-x);
+    display: grid; justify-items: center;
+  }
+  .kh-logo img{ height: 36px; display: block; }
 }
 
-#random { flex: 1; }
-#prev, #next {
-  width: 48px;
-  padding: .6rem 0;
-  text-align: center;
-}
-
-/* 模式切換等寬 */
-.btn-mode {
-  width: 100%;
-}
-
-/* 回首頁次要色 */
-.btn-home {
-  display: block;
-  width: 100%;
-  text-align: center;
-  background: mix($color-bg-social, $color-button, 30%);
-  color: #fff;
-  border-radius: .6rem;
-  padding: .6rem 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: background .2s;
-
-  &:hover {
-    background: mix($color-bg-social, $color-button, 45%);
+/* ======= RWD：超小手機 ======= */
+@media (max-width: 360px){
+  :root{
+    --card-w: 320px;
+    --card-h: 420px;
+    --fz-word: clamp(22px, 8.2vw, 36px);
   }
 }
 
-/* ===== Mobile ===== */
-@media (max-width: 480px) {
-  .flip-card { height: 260px; }
-  .word-text { font-size: 1.8rem; }
-  .definition-text { font-size: 1.35rem; }
+/* ======= RWD：桌機吃滿視窗 ======= */
+@media (min-width: 1024px){
+  :root{
+    --kh-max-w: 1120px;
+    --card-w: 560px;
+    --card-h: 760px;
+    --fz-word: clamp(32px, 5vw, 72px);
+    --fz-pos:  clamp(14px, 1.6vw, 22px);
+    --fz-def:  clamp(16px, 1.8vw, 22px);
+  }
+  .vocab-container{
+    max-width: var(--kh-max-w);
+    width: min(96vw, var(--kh-max-w));
+    padding-left: clamp(16px, 2vw, 32px);
+    padding-right: clamp(16px, 2vw, 32px);
+  }
+  .btn-group .row-btns{ grid-template-columns: 64px 1fr 64px; }
+  .btn-tts{ width: 34px; height: 34px; }
 }
 
-/* ===== 同面模式 ===== */
-.same-face .face { display: block; }
-.same-face .card { justify-content: space-evenly; }
-
-/* ===== 背面卡片寬度控制 ===== */
-#back {
-  width: calc(100% - 1rem);   // 永遠比整張卡片窄一點點
-  max-width: calc(#{$card-width} - 1rem);
-  margin: 0 auto;             // 保證水平置中
-  box-sizing: border-box;
+/* ======= RWD：超大桌機（可選） ======= */
+@media (min-width: 1440px){
+  :root{ --kh-max-w: 1280px; --card-w: 620px; --card-h: 860px; }
 }
 
+/* 細節 */
+::placeholder{ color: rgba(255,255,255,.6); }
+
+/* ================== 覆蓋：卡片寬度對齊按鈕 + Footer 貼底 ================== */
+
+/* 1) 全頁結構：Footer 永遠在底部 */
+.kh-body{
+  min-height: 100svh;          /* 滿視窗高 */
+  display: flex;
+  flex-direction: column;
+}
+.kh-main{ flex: 1; }           /* 主內容撐開剩餘空間 */
+.kh-footer{ margin-top: auto; }/* 讓 footer 貼到底部 */
+
+/* 2) 內容寬度鎖定：卡片 = 按鈕群（也可順便讓搜尋列同寬） */
+:root{
+  /* 用 content 寬度變數，預設就吃卡片固定寬 */
+  --content-w: var(--card-w);
+}
+
+/* 卡片/按鈕/搜尋 都以同一個寬度呈現（置中） */
+.vocab-container{ justify-items: center; }
+
+.flip-card,
+.btn-group,
+.search-wrap{
+  width: var(--content-w);
+  max-width: none;
+  margin-inline: auto;
+}
+
+/* 卡片本體也鎖成同寬，避免 100% 撐到容器 */
+.card{
+  width: var(--content-w) !important;
+}
+
+/* 3) 桌機段落仍可吃滿（你原本已設定 --card-w/--card-h；這裡同步 content 寬） */
+@media (min-width: 1024px){
+  :root{
+    --content-w: var(--card-w); /* 桌機卡片放大時，按鈕/搜尋自動跟著放大 */
+  }
+}
+
+/* 4) 超小手機也同步（依你原本的 --card-w） */
+@media (max-width: 360px){
+  :root{
+    --content-w: var(--card-w);
+  }
+}
+
+
+
+/* ================================
+   Vocab 卡片：自適應字級 + 位置固定
+   —— 只覆蓋必要的選擇器，其餘不動 ——
+================================ */
+
+/* 三行固定位置：詞性(上) → 英文(中) → 中文(下) */
+.face .entry {
+  display: grid;
+  /* 依比例固定三行高度，可照喜好微調比例 */
+  grid-template-rows: 18% 52% 30%;
+  align-content: stretch;
+  justify-items: center;
+  text-align: center;
+  height: 100%;
+  gap: 0;               /* 位置固定，行間距設 0；留白靠各自 line-height */
+  padding: 0 .75rem;    /* 不影響既有外觀的前提下，避免字貼邊 */
+}
+
+/* 明確鎖定每行所在的 grid 位置 */
+.pos-text { grid-row: 1; }
+.en-text  { grid-row: 2; }
+.zh-text  { grid-row: 3; }
+
+/* —— 動態字級（跟著螢幕變化）——
+   使用 clamp(最小, 相對於視窗的比例, 最大)
+   vmin 會同時考量寬與高，較穩健 */
+.pos-text {
+  font-size: clamp(12px, 2.2vmin, 18px);   /* 詞性：最小 */
+  line-height: 1.1;
+  font-weight: 600;
+  opacity: .85;
+}
+
+.en-text {
+  font-size: clamp(20px, 8vmin, 60px);     /* 英文：最大 */
+  line-height: 1.15;
+  font-weight: 800;
+  word-break: break-word;                  /* 超長字不擠位 */
+  hyphens: auto;
+}
+
+.zh-text {
+  font-size: clamp(16px, 4vmin, 32px);   /* 中文：中等 */
+  line-height: 1.25;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* —— 限制行數，避免把版位撐開導致位置位移 —— */
+.pos-text,
+.en-text,
+.zh-text {
+  /* 在各自格子內置中 */
+  place-self: center;
+
+  /* 多行截斷（WebKit） */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos-text { -webkit-line-clamp: 1; }  /* 詞性只顯示一行 */
+.en-text  { -webkit-line-clamp: 2; }  /* 英文預設兩行封頂 */
+.zh-text  { -webkit-line-clamp: 2; }  /* 中文預設兩行封頂 */
+
+/* —— 若你的現有樣式把 .face 隱藏／顯示，這裡不改 —— */
+/* 僅確保內容填滿容器高度，以配合上方 grid */
+.face { min-height: 100%; }  /* 不影響原有 card 尺寸設定 */
