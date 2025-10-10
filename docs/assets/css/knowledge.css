@@ -1,659 +1,726 @@
 @charset "UTF-8";
-/* knowledge.scss — Sidenav + Section Cards + Footer Home; KaTeX fine-tune */
-/* 以 template 的色票為基準，保持 vocab 的深色霓虹感 */
 :root {
-  --kh-bg: var(--app-bg, #0b0d12);
-  --kh-surface: var(--surface-1, #121521);
-  --kh-surface-2: var(--surface-2, #0f1320);
-  --kh-text: var(--text-1, #e8ecf1);
-  --kh-subtext: var(--text-2, #a7b0c0);
-  --kh-muted: var(--text-3, #7b8799);
-  --kh-primary: var(--brand, #7cf0ff);
-  --kh-accent: var(--accent, #8aa9ff);
-  --kh-danger: #ff6b6b;
-  --kh-radius: 16px;
-  --kh-shadow: 0 10px 30px rgba(0,0,0,.35);
+  /* Core palette */
+  --bg-base: #0f1220;
+  --bg-surface: #14182b;
+  --bg-surface-2: #171c33;
+  --bg-contrast: #0b0f19;
+  --bg-accent-1: #6c8cff;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #7efff5;
+  --bg-accent-4: #9a8bff;
+  --bg-muted: #8b93a7;
+  /* Radii & blur */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --blur-sm: 6px;
+  --blur-md: 12px;
+  --blur-lg: 18px;
+  /* Layout tokens */
+  --section-py: clamp(48px, 8vw, 120px);
+  --container-max: 1120px;
+  --container-px: clamp(16px, 4vw, 32px);
+  /* Layer alpha controls */
+  --bg-alpha: 1; /* background opacity */
+  --pattern-alpha: .22; /* pattern intensity */
+  --noise-alpha: .06; /* noise intensity */
+  --glass-alpha: .18; /* glass fill */
+  --glass-stroke: .18; /* glass border alpha */
+  /* Animation speed */
+  --bg-speed: 18s;
+  --bg-beam-speed: 14s;
 }
 
-/* ========== Header ========== */
-.kh-header {
-  padding-top: 10px;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #0d1021;
+    --bg-surface: #12162a;
+    --bg-surface-2: #141a33;
+    --bg-contrast: #0b0f19;
+    --bg-muted: #a2aac1;
+  }
+}
+.bg {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-base) calc(var(--bg-alpha) * 100%), transparent);
+  color: white;
 }
 
-.kh-header__inner {
+.bg--surface {
+  background: var(--bg-surface);
+}
+
+.bg--surface-2 {
+  background: var(--bg-surface-2);
+}
+
+.bg--contrast {
+  background: var(--bg-contrast);
+}
+
+.rounded-sm {
+  border-radius: var(--radius-sm);
+  overflow: clip;
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+  overflow: clip;
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+}
+
+.rounded-xl {
+  border-radius: var(--radius-xl);
+  overflow: clip;
+}
+
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+  overflow: clip;
+}
+
+.container {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-py);
+}
+
+/* Subtle radial spotlight */
+.bg-radial {
+  background: radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--bg-accent-1) 12%, transparent), transparent 60%), radial-gradient(1000px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 12%, transparent), transparent 65%), var(--bg-base);
+}
+
+/* Conic aurora swirl */
+.bg-conic {
+  background: conic-gradient(from 200deg at 30% 10%, color-mix(in srgb, var(--bg-accent-1) 26%, transparent) 0 18%, transparent 18% 40%, color-mix(in srgb, var(--bg-accent-3) 20%, transparent) 40% 58%, transparent 58% 100%), var(--bg-base);
+}
+
+/* Linear neon gradient */
+.bg-gradient {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-accent-1) 24%, transparent) 0%, color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 35%, color-mix(in srgb, var(--bg-accent-2) 24%, transparent) 70%, color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 100%), var(--bg-base);
+}
+
+/* Duo gradient (brand + pink) */
+.bg-gradient-duo {
+  background: linear-gradient(120deg, var(--bg-accent-1), var(--bg-accent-2));
+}
+
+/* Mesh gradient (layered radial blobs) */
+.bg-mesh {
+  background: radial-gradient(600px 300px at 20% 10%, color-mix(in srgb, var(--bg-accent-1) 35%, transparent), transparent 60%), radial-gradient(700px 380px at 85% 15%, color-mix(in srgb, var(--bg-accent-2) 35%, transparent), transparent 65%), radial-gradient(900px 420px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 28%, transparent), transparent 70%), radial-gradient(800px 360px at 90% 85%, color-mix(in srgb, var(--bg-accent-4) 26%, transparent), transparent 70%), var(--bg-base);
+}
+
+/* Dots */
+.bg-dots {
+  background: radial-gradient(circle at center, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 2px) 0 0/18px 18px, var(--bg-surface);
+}
+
+/* Grid */
+.bg-grid {
+  background: linear-gradient(to right, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(to bottom, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 1px, transparent 1px) 0 0/28px 28px, var(--bg-surface);
+}
+
+/* Stripes (45deg) */
+.bg-stripes {
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 0 10px, transparent 10px 20px), var(--bg-surface);
+}
+
+/* Checkerboard (subtle) */
+.bg-checker {
+  --sz: 28px;
+  background: conic-gradient(from 90deg, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 25%, transparent 0 50%, color-mix(in srgb, white calc(var(--pattern-alpha) * 100%), transparent) 0 75%, transparent 0) 0 0/var(--sz) var(--sz), var(--bg-surface);
+}
+
+/* Paper grain (fake paper) */
+.bg-paper {
+  background: radial-gradient(1200px 600px at 40% -20%, rgba(255, 255, 255, 0.06), transparent 60%), linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.03)), var(--bg-surface);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Procedural-ish noise using multiple gradients */
+.bg-noise::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--noise-alpha);
+  background: radial-gradient(2px 2px at 10% 20%, #fff, transparent) repeat, radial-gradient(1.5px 1.5px at 30% 80%, #fff, transparent) repeat, radial-gradient(1px 1px at 70% 60%, #fff, transparent) repeat, radial-gradient(1.5px 1.5px at 90% 30%, #fff, transparent) repeat;
+  background-size: 8px 8px, 10px 10px, 12px 12px, 14px 14px;
+  mix-blend-mode: soft-light;
+  content: "";
+}
+
+/* Glass layer */
+.bg-glass {
+  position: relative;
+  background: color-mix(in srgb, #fff calc(var(--glass-alpha) * 100%), transparent);
+  border: 1px solid color-mix(in srgb, #fff calc(var(--glass-stroke) * 100%), transparent);
+  backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(120%);
+  color: white;
+}
+
+/* Floating beams */
+.bg-beams {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.bg-beams::before,
+.bg-beams::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  filter: blur(30px);
+  opacity: 0.55;
+  background: radial-gradient(500px 200px at 10% 20%, color-mix(in srgb, var(--bg-accent-2) 60%, transparent), transparent 60%), radial-gradient(600px 220px at 90% 15%, color-mix(in srgb, var(--bg-accent-1) 60%, transparent), transparent 60%), radial-gradient(500px 220px at 30% 90%, color-mix(in srgb, var(--bg-accent-3) 60%, transparent), transparent 60%);
+  animation: floatBeams var(--bg-beam-speed) linear infinite alternate;
+}
+
+.bg-beams::after {
+  animation-direction: alternate-reverse;
+  transform: scaleX(-1);
+  opacity: 0.45;
+}
+
+@keyframes floatBeams {
+  0% {
+    transform: translateY(-4%) translateX(-2%) rotate(-1deg);
+  }
+  100% {
+    transform: translateY(4%) translateX(2%) rotate(1deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-beams::before, .bg-beams::after {
+    animation: none;
+  }
+}
+/* Aurora sweep (slow conic rotation) */
+.bg-aurora {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(1200px 600px at 20% -10%, color-mix(in srgb, var(--bg-accent-1) 10%, transparent), transparent 60%), radial-gradient(900px 600px at 110% 10%, color-mix(in srgb, var(--bg-accent-2) 10%, transparent), transparent 60%), var(--bg-base);
+}
+
+.bg-aurora::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background: conic-gradient(from 0deg at 50% 50%, transparent 0 10%, color-mix(in srgb, var(--bg-accent-4) 18%, transparent) 10% 25%, transparent 25% 40%, color-mix(in srgb, var(--bg-accent-3) 18%, transparent) 40% 60%, transparent 60% 80%, color-mix(in srgb, var(--bg-accent-2) 18%, transparent) 80% 100%);
+  filter: blur(60px) saturate(130%);
+  animation: auroraSpin var(--bg-speed) linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes auroraSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before {
+    animation: none;
+  }
+}
+.section--hero {
+  position: relative;
+  padding-block: var(--section-py);
+  background: none;
+  position: relative;
+}
+.section--hero .hero-inner {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+  text-align: center;
+  max-width: 980px;
+}
+.section--hero .hero-title {
+  font-size: clamp(28px, 4.5vw, 64px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  margin: 0 0 16px;
+}
+.section--hero .hero-sub {
+  font-size: clamp(14px, 1.2vw, 18px);
+  color: color-mix(in srgb, white 80%, var(--bg-muted));
+  margin: 0 auto 28px;
+}
+.section--hero .hero-cta {
+  margin-top: 24px;
   display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.section--panel {
+  position: relative;
+  padding-block: var(--section-py);
+}
+.section--panel .panel {
+  width: min(100% - 2 * var(--container-px), var(--container-max));
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+  border-radius: var(--radius-xl);
+  overflow: clip;
+  background: color-mix(in srgb, white 2%, var(--bg-surface));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  padding: clamp(20px, 4vw, 40px);
+}
+
+/* Adjust intensities per section */
+[data-pattern=soft] {
+  --pattern-alpha: .12;
+  --noise-alpha: .04;
+}
+
+[data-pattern=bold] {
+  --pattern-alpha: .35;
+  --noise-alpha: .10;
+}
+
+[data-blur=sm] {
+  --blur-lg: 8px;
+}
+
+[data-blur=lg] {
+  --blur-lg: 26px;
+}
+
+[data-alpha="0"] {
+  --bg-alpha: 0;
+}
+
+[data-alpha="50"] {
+  --bg-alpha: .5;
+}
+
+[data-alpha="80"] {
+  --bg-alpha: .8;
+}
+
+/* Quick padding toggles */
+.section--tight {
+  --section-py: clamp(32px, 5vw, 72px);
+}
+
+.section--loose {
+  --section-py: clamp(72px, 10vw, 160px);
+}
+
+/* Overlay helpers */
+.overlay {
+  position: relative;
+}
+
+.overlay::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(60% 60% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+.overlay--bottom::before {
+  background: radial-gradient(60% 60% at 50% 100%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+/* Shadow ring helpers (nice with rounded panels) */
+.ring-1 {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.ring-2 {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08) inset;
+}
+
+.ring-3 {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) inset;
+}
+
+.theme-neon {
+  --bg-accent-1: #7efff5;
+  --bg-accent-2: #ff6ad5;
+  --bg-accent-3: #6c8cff;
+  --bg-accent-4: #9a8bff;
+  --bg-base: #0f1529;
+  --bg-surface: #111632;
+}
+
+.theme-cyber {
+  --bg-accent-1: #00ffd5;
+  --bg-accent-2: #00aaff;
+  --bg-accent-3: #ff00ff;
+  --bg-accent-4: #ffe600;
+  --bg-base: #0a0d15;
+  --bg-surface: #0f1422;
+}
+
+.theme-sunset {
+  --bg-accent-1: #ff9a8b;
+  --bg-accent-2: #ff6a88;
+  --bg-accent-3: #ff99ac;
+  --bg-accent-4: #ffd36e;
+  --bg-base: #1b0f17;
+  --bg-surface: #221320;
+}
+
+.demo-card {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+  background: color-mix(in srgb, white 3%, var(--bg-surface));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+}
+
+.btn-base, .btn, .btn-gradient, .btn-primary, .kh-home-btn, .kh-sidenav__toggle, .btn-primary, .btn-plain {
+  --btn-pad-x: 14px;
+  --btn-pad-y: 10px;
+  --btn-font: 600;
+  --btn-shadow: 0 6px 16px rgba(0,0,0,.35);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border-radius: 14px;
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  text-decoration: none;
+  user-select: none;
+  box-shadow: var(--btn-shadow);
+  transition: transform 0.06s ease, filter 0.15s ease, box-shadow 0.2s ease;
+}
+.btn-base:active, .btn:active, .btn-gradient:active, .btn-primary:active, .kh-home-btn:active, .kh-sidenav__toggle:active, .btn-plain:active {
+  transform: translateY(1px) scale(0.99);
+}
+.btn-base:disabled, .btn:disabled, .btn-gradient:disabled, .btn-primary:disabled, .kh-home-btn:disabled, .kh-sidenav__toggle:disabled, .btn-plain:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-.kh-logo img {
+.btn-plain {
+  background: rgba(255, 255, 255, 0.08);
+}
+.btn-plain:hover {
+  filter: brightness(1.08);
+}
+
+.btn-gradient, .btn-primary, .kh-home-btn, .kh-sidenav__toggle, .btn-primary {
+  background-image: linear-gradient(135deg, #00eaff, #7b61ff, #ff4ecd);
+  background-size: 200% 200%;
+  animation: btn-sheen 6s ease infinite;
+}
+.btn-gradient:hover, .btn-primary:hover, .kh-home-btn:hover, .kh-sidenav__toggle:hover {
+  filter: brightness(1.05);
+}
+.btn-gradient:focus-visible, .btn-primary:focus-visible, .kh-home-btn:focus-visible, .kh-sidenav__toggle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+
+@keyframes btn-sheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+.btn:hover {
+  filter: brightness(1.08);
+}
+
+.kh-body {
+  min-height: 100vh;
+  background: var(--bg, #0b0f14);
+  color: var(--text, #e8eef5);
+}
+
+.kh-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+}
+.kh-header .kh-header__inner {
+  display: flex;
+  justify-content: center;
+  padding: 12px 16px;
+}
+.kh-header .kh-logo img {
+  height: 40px;
   display: block;
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-  border-radius: 12px;
 }
 
-/* ========== Shell Layout (Sidenav + Content) ========== */
 .kh-shell {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 0;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
   max-width: 1200px;
-  margin: 10px auto 0;
-  padding: 0 12px;
+  margin: 0 auto;
+  padding: 16px;
 }
 
 .kh-sidenav {
   position: sticky;
-  top: 12px;
+  top: 72px;
   align-self: start;
-  background: color-mix(in oklab, var(--kh-surface) 90%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.0901960784);
-  border-radius: var(--kh-radius);
-  padding: 10px;
-  box-shadow: var(--kh-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 12px;
+  background: radial-gradient(120% 120% at 0% 0%, rgba(123, 97, 255, 0.22), rgba(0, 0, 0, 0)), linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, max-height 0.25s ease, opacity 0.2s ease;
 }
-
-.kh-sidenav__toggle {
-  display: none; /* 桌面隱藏，行動裝置顯示 */
+.kh-sidenav .kh-sidenav__toggle {
   width: 100%;
-  margin-bottom: 8px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #1b2030, #121826);
-  border: 1px solid rgba(255, 255, 255, 0.1333333333);
-  color: var(--kh-text);
-  padding: 10px 12px;
-}
-
-/* 側欄搜尋 */
-.kh-side-search {
-  display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 8px;
-  align-items: center;
-  background: var(--kh-surface-2);
-  border: 1px solid rgba(255, 255, 255, 0.1215686275);
-  border-radius: 12px;
-  padding: 8px 10px;
   margin-bottom: 10px;
-  color: var(--kh-subtext);
 }
-
-.kh-side-search input {
-  all: unset;
-  color: var(--kh-text);
-  font-size: 14px;
-}
-
-.kh-side-search .icon {
-  opacity: 0.85;
-}
-
-/* 隨機來源科目（只影響「🎲 隨機」） */
-.kh-random-filter {
-  margin: 10px 0 12px;
-}
-
-.kh-random-filter h3 {
-  margin: 0 0 6px;
-  font-size: 12px;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
-  color: var(--kh-subtext);
-}
-
-.kh-subject-checks {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 6px;
-}
-
-.kh-subject-checks label {
+.kh-sidenav .kh-side-search {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #131a2a, #0e1524);
-  border: 1px solid rgba(255, 255, 255, 0.0941176471);
-  border-radius: 10px;
   padding: 8px 10px;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
-}
-
-.kh-subject-checks label:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-}
-
-.kh-subject-checks input[type=checkbox] {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.3333333333);
-  position: relative;
-}
-
-.kh-subject-checks input[type=checkbox]:checked {
-  border-color: color-mix(in oklab, var(--kh-primary) 60%, rgba(255, 255, 255, 0));
-  background: linear-gradient(135deg, color-mix(in oklab, var(--kh-primary) 70%, transparent), color-mix(in oklab, var(--kh-accent) 50%, transparent));
-}
-
-.kh-subject-checks input[type=checkbox]:checked::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border-radius: 2px;
-  background: #03131a;
-}
-
-.kh-random-filter .hint {
-  margin: 6px 2px 0;
-  color: var(--kh-muted);
-  font-size: 12px;
-}
-
-/* 樹狀清單（科目 → 標題） */
-.kh-tree {
-  margin-top: 10px;
-}
-
-.kh-tree .group {
-  border: 1px solid rgba(255, 255, 255, 0.0941176471);
   border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 8px;
-  background: linear-gradient(180deg, #0f1422, #0c1220);
+  background: rgba(255, 255, 255, 0.06);
 }
-
-.kh-tree .group summary {
-  list-style: none;
-  cursor: pointer;
-  padding: 10px 12px;
-  color: var(--kh-text);
-  font-weight: 700;
-  background: linear-gradient(135deg, #1b2236, #141b2c);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.0823529412);
-}
-
-.kh-tree .group[open] summary {
-  background: linear-gradient(135deg, #222a40, #182036);
-}
-
-.kh-tree .group summary::-webkit-details-marker {
-  display: none;
-}
-
-.kh-tree .items {
-  max-height: 320px;
-  overflow: auto;
-}
-
-.kh-tree .item {
-  display: block;
-  padding: 9px 12px;
-  color: var(--kh-subtext);
-  text-decoration: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.062745098);
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.kh-tree .item:first-child {
-  border-top: none;
-}
-
-.kh-tree .item:hover {
-  background: rgba(255, 255, 255, 0.062745098);
-  color: var(--kh-text);
-}
-
-.kh-tree .item.active {
-  color: #03131a;
-  background: linear-gradient(135deg, color-mix(in oklab, var(--kh-primary) 60%, transparent), color-mix(in oklab, var(--kh-accent) 50%, transparent));
-}
-
-/* 右側內容區 */
-.kh-content {
-  min-height: 60vh;
-  padding-left: 16px;
-}
-
-.kh-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.kh-toolbar .btn {
-  border-radius: 12px;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1450980392);
-  background: linear-gradient(135deg, #1b2030, #121826);
-  color: var(--kh-text);
-}
-
-.kh-toolbar .btn:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-  transform: translateY(-1px);
-}
-
-.kh-toolbar__spacer {
-  flex: 1 1 auto;
-}
-
-/* 卡片容器（JS 會注入多個 .section-card） */
-.kh-card-host {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-.kh-card-host > .skeleton {
-  height: 220px;
-  border-radius: calc(var(--kh-radius) + 2px);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.031372549), rgba(255, 255, 255, 0.0784313725), rgba(255, 255, 255, 0.031372549));
-  background-size: 300% 100%;
-  animation: kh-shimmer 1.2s infinite;
-}
-
-@keyframes kh-shimmer {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 100% 0;
-  }
-}
-/* Section 卡片（vocab 風格） */
-.section-card {
-  position: relative;
-  border-radius: calc(var(--kh-radius) + 2px);
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1333333333);
-  background: radial-gradient(1100px 220px at -10% -20%, color-mix(in oklab, var(--kh-primary) 12%, transparent), transparent 60%), radial-gradient(1200px 260px at 110% -30%, color-mix(in oklab, var(--kh-accent) 12%, transparent), transparent 60%), linear-gradient(180deg, color-mix(in oklab, var(--kh-surface) 92%, transparent), color-mix(in oklab, var(--kh-surface-2) 96%, transparent));
-  box-shadow: var(--kh-shadow);
-}
-
-.section-card__title {
-  margin: 0 0 8px;
-  font-size: 14px;
-  letter-spacing: 0.18px;
-  text-transform: uppercase;
-  color: var(--kh-subtext);
-}
-
-.section-card .prose {
-  color: var(--kh-text);
-  line-height: 1.68;
-  font-size: 15px;
-}
-
-.section-card .prose code {
-  background: rgba(0, 0, 0, 0.2666666667);
-  border: 1px solid rgba(255, 255, 255, 0.1333333333);
-  border-radius: 6px;
-  padding: 0.2em 0.45em;
-}
-
-.section-card hr {
+.kh-sidenav .kh-side-search input {
+  width: 100%;
+  background: transparent;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.1019607843);
-  margin: 10px 0;
+  color: inherit;
+  outline: none;
 }
-
-/* 底部回首頁 */
-.kh-bottom-home {
-  display: flex;
-  justify-content: center;
-  margin: 18px 0 8px;
+.kh-sidenav .kh-random-filter {
+  margin: 12px 0;
 }
-
-.kh-home-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 18px;
-  border-radius: 999px;
-  text-decoration: none;
-  color: #03131a;
-  background: linear-gradient(135deg, color-mix(in oklab, var(--kh-primary) 70%, transparent), color-mix(in oklab, var(--kh-accent) 60%, transparent));
-  border: 1px solid rgba(255, 255, 255, 0.6666666667);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), 0 0 0 2px color-mix(in oklab, var(--kh-primary) 30%, transparent) inset;
-}
-
-.kh-home-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.52);
-}
-
-/* Footer */
-.kh-footer {
-  margin-top: 24px;
-}
-
-.kh-footer__inner {
-  text-align: center;
-  color: var(--kh-muted);
-  padding: 20px 12px 40px;
-}
-
-/* ========== KaTeX tweaks ========== */
-.math {
+.kh-sidenav .kh-random-filter h3 {
+  font-size: 13px;
+  opacity: 0.8;
   margin: 8px 0;
 }
-
-.katex-display {
-  overflow-x: auto;
-  padding: 4px 2px;
+.kh-sidenav .kh-random-filter .kh-subject-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.kh-sidenav .kh-random-filter .kh-subject-checks label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.kh-sidenav .kh-random-filter .kh-subject-checks label input {
+  accent-color: #8af;
+}
+.kh-sidenav .kh-random-filter .hint {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+.kh-sidenav .kh-tree {
+  display: block;
+  margin-top: 10px;
+}
+.kh-sidenav .kh-tree details.group {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.kh-sidenav .kh-tree details.group summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  font-weight: 700;
+  list-style: none;
+}
+.kh-sidenav .kh-tree details.group .items {
+  display: flex;
+  flex-direction: column;
+}
+.kh-sidenav .kh-tree details.group .item {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.9;
+}
+.kh-sidenav .kh-tree details.group .item:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.06);
+}
+.kh-sidenav .kh-tree details.group .item.active {
+  background: linear-gradient(135deg, rgba(0, 234, 255, 0.18), rgba(123, 97, 255, 0.18));
 }
 
-.katex-error {
-  color: var(--kh-danger);
-}
-
-/* ========== Responsive ========== */
-@media (max-width: 960px) {
+@media (max-width: 820px) {
   .kh-shell {
     grid-template-columns: 1fr;
   }
-  .kh-sidenav__toggle {
-    display: block;
-  }
   .kh-sidenav {
-    margin-bottom: 10px;
+    position: static;
+    top: auto;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
   }
-  .kh-sidenav[data-open=false] .kh-side-search,
-  .kh-sidenav[data-open=false] .kh-random-filter,
-  .kh-sidenav[data-open=false] .kh-tree {
-    display: none;
-  }
-}
-@media (max-width: 520px) {
-  .kh-logo img {
-    width: 64px;
-    height: 64px;
-  }
-  .kh-content {
-    padding-left: 0;
+  .kh-sidenav[data-open=true] {
+    max-height: 80vh;
+    opacity: 1;
+    transform: none;
   }
 }
-/* 頁面標題卡（置於第一張 section-card 之前） */
-.page-title-card {
-  border-radius: calc(var(--kh-radius) + 2px);
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1333333333);
-  text-align: center;
-  background: radial-gradient(1000px 200px at -10% -30%, color-mix(in oklab, var(--kh-primary) 12%, transparent), transparent 60%), radial-gradient(1000px 220px at 110% -30%, color-mix(in oklab, var(--kh-accent) 12%, transparent), transparent 60%), linear-gradient(180deg, color-mix(in oklab, var(--kh-surface) 92%, transparent), color-mix(in oklab, var(--kh-surface-2) 96%, transparent));
-  box-shadow: var(--kh-shadow);
-  margin-bottom: 10px;
+.kh-content {
+  min-height: 60vh;
 }
-
-.page-title {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--kh-text);
-}
-
-/* KaTeX inline 與區塊微調 */
-.math-inline {
-  display: inline-block;
-}
-
-.katex-display {
-  overflow-x: auto;
-  padding: 4px 2px;
-}
-
-/* === 微調 1：行動裝置下，側欄預設收起時的外觀更乾淨 === */
-@media (max-width: 960px) {
-  /* 既有：.kh-shell 會單欄；這裡強化側欄收起時的呈現 */
-  .kh-sidenav {
-    margin-bottom: 10px;
-  }
-  .kh-sidenav__toggle {
-    display: block; /* 顯示 ☰ 按鈕 */
-    margin-bottom: 6px;
-  }
-  /* 收起時僅保留切換鈕，其他區塊隱藏 */
-  .kh-sidenav[data-open=false] .kh-side-search,
-  .kh-sidenav[data-open=false] .kh-random-filter,
-  .kh-sidenav[data-open=false] .kh-tree {
-    display: none !important;
-  }
-  /* 收起時避免側欄佔高度：讓卡片更靠上 */
-  .kh-content {
-    margin-top: 0;
-  }
-}
-/* === 微調 2：按鈕禁用狀態（隨機沒有候選時） === */
-.btn[disabled],
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  filter: grayscale(0.2);
-  box-shadow: none;
-}
-
-/* === 微調 3：工具列在窄螢幕更緊湊 === */
-.kh-toolbar {
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.kh-toolbar .btn {
-  padding: 9px 12px;
-}
-
-/* === 微調 4：卡片內 KaTeX 可水平捲動，且不撐破版面 === */
-.section-card .katex-display {
-  overflow-x: auto;
-  max-width: 100%;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* === 微調 5：側欄群組（<details>）在手機上展開/收起更順眼 === */
-.kh-tree .group {
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.kh-tree .group[open] summary {
-  filter: brightness(1.03);
-}
-
-.kh-tree .items {
-  max-height: 320px;
-  overflow: auto;
-}
-
-/* === 微調 6：側欄選單項在小裝置不擁擠 === */
-@media (max-width: 520px) {
-  .kh-tree .item {
-    padding: 10px 12px;
-  }
-  .kh-subject-checks label {
-    padding: 8px 10px;
-  }
-}
-/* 科目勾選 + 展開清單 */
-.sub-check {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #131a2a, #0e1524);
-  border: 1px solid rgba(255, 255, 255, 0.0941176471);
-  border-radius: 10px;
-  padding: 8px 10px;
-}
-
-.sub-check label {
+.kh-content .kh-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
-
-.sub-check input[type=checkbox] {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.3333333333);
-  position: relative;
+.kh-content .kh-toolbar .kh-toolbar__spacer {
+  flex: 1;
 }
-
-.sub-check input[type=checkbox]:checked {
-  border-color: color-mix(in oklab, var(--kh-primary) 60%, rgba(255, 255, 255, 0));
-  background: linear-gradient(135deg, color-mix(in oklab, var(--kh-primary) 70%, transparent), color-mix(in oklab, var(--kh-accent) 50%, transparent));
+.kh-content .kh-card-host {
+  display: grid;
+  gap: 12px;
 }
-
-.sub-check input[type=checkbox]:checked::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border-radius: 2px;
-  background: #03131a;
+.kh-content .page-title-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 16px;
 }
-
-.sub-check .name {
-  color: var(--kh-text);
+.kh-content .page-title-card .page-title {
+  /* 需求 #2：標題置中、粗體、字級稍大 */
+  text-align: center;
+  font-weight: 800;
+  font-size: clamp(20px, 2.6vw, 28px);
+  letter-spacing: 0.02em;
 }
-
-.sub-list-btn {
-  border: 1px solid rgba(255, 255, 255, 0.1607843137);
-  border-radius: 8px;
-  padding: 4px 8px;
-  background: linear-gradient(135deg, #1b2030, #121826);
-  color: var(--kh-text);
-  cursor: pointer;
+.kh-content .section-card {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
-
-.sub-list-btn:hover {
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
-  transform: translateY(-1px);
+.kh-content .section-card__title {
+  /* 需求 #2：標題置中、粗體、字級稍大 */
+  text-align: center;
+  font-weight: 800;
+  font-size: clamp(18px, 2.2vw, 24px);
+  margin-bottom: 6px;
 }
-
-/* 下拉清單 */
-.sub-list {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: calc(100% + 6px);
-  z-index: 30;
-  background: color-mix(in oklab, var(--kh-surface) 96%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.1333333333);
-  border-radius: 12px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-  max-height: 260px;
-  overflow: auto;
-  padding: 6px;
-}
-
-.sub-list[hidden] {
-  display: none !important;
-}
-
-.sub-item {
-  width: 100%;
+.kh-content .section-card .prose {
+  /* 需求 #2：內文靠左對齊 */
   text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.0705882353);
+  line-height: 1.8;
+}
+.kh-content .section-card .prose p, .kh-content .section-card .prose li {
+  font-size: clamp(14px, 1.6vw, 17px);
+}
+.kh-content .section-card .prose code, .kh-content .section-card .prose pre {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #121826, #101626);
-  color: var(--kh-text);
-  padding: 8px 10px;
-  margin: 4px 0;
-  cursor: pointer;
+}
+.kh-content .section-card .prose img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+.kh-content .kh-bottom-home {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0 12px;
 }
 
-.sub-item:hover {
-  background: rgba(255, 255, 255, 0.062745098);
-}
-
-.sub-list-empty {
-  color: var(--kh-muted);
-  padding: 8px 4px;
-}
-
-/* 覆蓋整頁的半透明遮罩 */
 .kh-loader {
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.35); /* 半透明黑 */
-  backdrop-filter: blur(4px); /* 輕微毛玻璃 */
-  z-index: 9999; /* 蓋過頁面其他元素 */
-  transition: opacity 0.2s ease;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
 }
-
-/* 由 JS 設定/移除 hidden 屬性控制顯示 */
-.kh-loader[hidden] {
-  display: none !important;
-}
-
-/* 置中的卡片樣式（深色主題） */
 .kh-loader__box {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
-  border-radius: 16px;
-  background: rgba(18, 20, 26, 0.85);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0, 234, 255, 0.2), rgba(123, 97, 255, 0.2));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
-
-/* 文字（自適應大小；沿用主題字色） */
 .kh-loader__text {
-  font-size: clamp(14px, 1.6vw, 16px);
-  line-height: 1.2;
+  font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--kh-fg, #e5e7eb);
 }
 
-/* 旋轉圈圈（使用 currentColor 當作主色） */
 .kh-spinner {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: white;
   border-radius: 50%;
-  /* 只顯示上/右兩段形成扇形，與背景對比的透明邊 */
-  border: 3px solid transparent;
-  color: var(--kh-accent, #60a5fa); /* 若有主題變數就吃變數 */
-  border-top-color: currentColor;
-  border-right-color: currentColor;
-  animation: kh-spin 0.8s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
-/* 放大版（可選，用在更小/更大畫面時） */
-@media (max-width: 480px) {
-  .kh-spinner {
-    width: 22px;
-    height: 22px;
-  }
-}
-@media (min-width: 1280px) {
-  .kh-spinner {
-    width: 28px;
-    height: 28px;
-  }
-}
-/* 降低動效偏好時，轉慢並移除過度動畫 */
-@media (prefers-reduced-motion: reduce) {
-  .kh-spinner {
-    animation-duration: 2s;
-  }
-  .kh-loader {
-    transition: none;
-  }
-}
-/* 旋轉動畫 */
-@keyframes kh-spin {
+@keyframes spin {
   to {
-    transform: rotate(1turn);
+    transform: rotate(360deg);
+  }
+}
+.skeleton {
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+  background-size: 200% 100%;
+  animation: sk 1.2s ease-in-out infinite;
+}
+
+@keyframes sk {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
   }
 }
 
