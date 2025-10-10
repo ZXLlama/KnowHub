@@ -221,14 +221,18 @@ function mdToHtml(md){
   return out.join("\n");
 }
 
-function normalizeAnchor(s){
-  // 同義詞合併到你指定的 5 種
-  const t = (s||"").replace(/\s+/g,"").replace(/[／]/g,"/"); // 把全形 ／ 轉成 /
-  if (/^(快速重點)$/.test(t)) return "快速重點";
-  if (/^(解釋\/定義|解釋|定義)$/.test(t)) return "解釋/定義";
-  if (/^(詳細說明)$/.test(t)) return "詳細說明";
-  if (/^(常見考點\/易錯點|常見考點|易錯點)$/.test(t)) return "常見考點/易錯點";
-  if (/^(舉例說明|例子|範例)$/.test(t)) return "舉例說明";
+function normalizeAnchor(raw){
+  const t = (raw || "")
+    .trim()
+    .replace(/\s+/g, "")     // 移除空白
+    .replace(/[／]/g, "/")   // 全形／→半形/
+    .toLowerCase();          // 比對用
+
+  if (t === "快速重點") return "快速重點";
+  if (t === "解釋/定義" || t === "解釋" || t === "定義") return "解釋/定義";
+  if (t === "詳細說明") return "詳細說明";
+  if (t === "常見考點/易錯點" || t === "常見考點" || t === "易錯點") return "常見考點/易錯點";
+  if (t === "舉例說明" || t === "例子" || t === "範例") return "舉例說明";
   return null;
 }
 
@@ -245,6 +249,32 @@ function sectionClassByTitle(name){
 
 function sectionizeAndRender(meta, html){
   const temp = document.createElement("div");
+  (function cleanContent(){
+  // 刪掉 <hr> 與 只有 '---' 的段落/文字節點
+  temp.querySelectorAll("hr").forEach(x=>x.remove());
+  Array.from(temp.childNodes).forEach(n=>{
+    if (n.nodeType===3 && n.nodeValue && n.nodeValue.trim()==="---") n.remove();
+  });
+  temp.querySelectorAll("p").forEach(p=>{
+    const t = (p.textContent||"").trim();
+    if (t === "---") p.remove();
+  });
+
+  // 刪掉與頁面標題相同的 H1/H2/H3
+  const pageTitle = (meta.title || "").trim();
+  if (pageTitle){
+    temp.querySelectorAll("h1,h2,h3").forEach(h=>{
+      if ((h.textContent||"").trim() === pageTitle) h.remove();
+    });
+  }
+
+  // 刪掉「建立時間: ...」「科目: ...」這種行（中英冒號都移除）
+  const metaLine = /^(建立時間|科目)\s*[:：]/;
+  temp.querySelectorAll("p").forEach(p=>{
+    const t = (p.textContent||"").trim();
+    if (metaLine.test(t)) p.remove();
+  });
+})();
   temp.innerHTML = html;
 
   // 規則 4：移除所有單獨 '---' 的段落與 HR
@@ -253,19 +283,13 @@ function sectionizeAndRender(meta, html){
     if (p.textContent && p.textContent.trim()==="---") p.remove();
   });
 
-  const blocks = Array.from(temp.childNodes).filter(n=>{
-    // 也清掉純文字節點為 '---'
-    if (n.nodeType===3 && n.nodeValue && n.nodeValue.trim()==="---") return false;
-    return true;
-  });
-
-  const isHeading = (el)=> el && el.nodeType===1 && /H2|H3/.test(el.tagName);
+  const blocks = Array.from(temp.childNodes);
+  const isHeading = el => el && el.nodeType===1 && /H2|H3/.test(el.tagName);
 
   const sections=[]; let i=0;
   while(i<blocks.length){
     if (isHeading(blocks[i])){
-      const raw = (blocks[i].textContent||"").trim();
-      const norm = normalizeAnchor(raw);
+      const norm = normalizeAnchor((blocks[i].textContent||"").trim());
       if (norm){
         const nodes=[]; i++;
         while(i<blocks.length){
@@ -278,7 +302,9 @@ function sectionizeAndRender(meta, html){
     }
     i++;
   }
-  if (!sections.length) sections.push({ title: meta.title || "(未命名)", nodes: blocks, noWrap:true });
+
+  // 若完全沒有命中錨點，就把整份內文放進一張容器（不重複顯示標題/科目/時間）
+  if (!sections.length) sections.push({ title:"內容", nodes: blocks, noWrap:true });
 
   // Title + subject chips + createdAt
   const chips = (meta.subject && meta.subject.length)
