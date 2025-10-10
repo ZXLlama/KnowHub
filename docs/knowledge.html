@@ -5,31 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Knowledge | KnowHub</title>
 
-    <!-- Base / Template styles -->
     <link rel="stylesheet" href="./assets/css/template.css" />
-    <!-- Page styles (compile knowledge.scss -> assets/css/knowledge.css) -->
     <link rel="stylesheet" href="./assets/css/knowledge.css" />
+
+    <!-- 句子自動縮排：內文段落沒有「：」就縮排 -->
+    <style>.prose p.indent-1{ text-indent: 2em; }</style>
 
     <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-      onload="renderMathInElement(document.body,{
-        delimiters:[
-          {left:'$$',right:'$$',display:true},
-          {left:'$',right:'$',display:false},
-          {left:'\\(',right:'\\)',display:false},
-          {left:'\\[',right:'\\]',display:true}
-        ],
-        throwOnError:false
-      });"
-    ></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});">
+    </script>
   </head>
   <body class="kh-body">
-
-    <!-- Header（置中 LOGO）-->
     <header class="kh-header">
       <div class="kh-header__inner">
         <a class="kh-logo" href="./index.html" aria-label="回到首頁">
@@ -38,42 +27,32 @@
       </div>
     </header>
 
-    <!-- Layout：左側側欄 + 右側內容 -->
     <div class="kh-shell">
-      <!-- SideNav -->
-      <!-- 預設 data-open 在桌機為 true、手機會由 JS 自動關閉 -->
       <aside class="kh-sidenav" data-open="true">
         <button id="sidenav-toggle" class="kh-sidenav__toggle btn btn-primary" aria-expanded="true">☰ 類別</button>
 
-        <!-- 側欄搜尋（只篩側欄清單；不打 API） -->
         <label class="kh-side-search" for="side-search">
           <span class="icon" aria-hidden="true">🔎</span>
           <input id="side-search" type="search" placeholder="搜尋標題…" autocomplete="off" />
         </label>
 
-        <!-- 科目勾選（只影響『隨機』來源；預設全開） -->
         <section class="kh-random-filter" aria-label="隨機科目來源">
           <h3>隨機來源科目</h3>
           <div id="random-subjects" class="kh-subject-checks"></div>
           <p class="hint">✓ 勾選的科目會用於「🎲 隨機」；手動從清單點標題不受影響。</p>
         </section>
 
-        <!-- 樹狀清單（科目 → 標題） -->
         <nav id="nav-tree" class="kh-tree" aria-label="知識清單"></nav>
       </aside>
 
-      <!-- Content -->
       <main class="kh-content" id="kh-content" aria-live="polite">
         <div class="kh-toolbar">
           <button id="btn-random" class="btn btn-primary" type="button">🎲 隨機</button>
           <span class="kh-toolbar__spacer"></span>
-          <!-- 依照需求 #4：刪除重整索引按鈕 -->
         </div>
 
-        <!-- 內容卡片區（JS 會把每個大段落切成 .section-card 注入這裡） -->
         <div id="knowledge-card" class="kh-card-host"></div>
 
-        <!-- 頁面底部：回首頁 -->
         <div class="kh-bottom-home">
           <a class="kh-home-btn btn" href="./index.html" aria-label="回到首頁">🏠 回首頁</a>
         </div>
@@ -86,19 +65,19 @@
       </div>
     </footer>
 
-    <!-- Config: 設定你的 Worker 網址與科目清單 -->
     <script>
+      // 這裡改成你的 CSV 檔名（建議：/assets/data/notes.csv）
       window.KNOWHUB = window.KNOWHUB || {};
-      // TODO: 換成你實際的 Cloudflare Workers 網址
-      window.KNOWHUB.API_BASE = window.KNOWHUB.API_BASE || "https://knowhub-knowledge.ytllama1225.workers.dev";
-      window.KNOWHUB.SUBJECTS = window.KNOWHUB.SUBJECTS || ["國文","英文","數學","物理","化學","生物","地球科學"];
-      document.addEventListener('DOMContentLoaded', () => {
-        const y = document.getElementById('year');
-        if (y) y.textContent = new Date().getFullYear();
+      window.KNOWHUB.CSV_INDEX = "/assets/data/notes.csv";
+      window.KNOWHUB.SUBJECTS  = ["國文","英文","數學","物理","化學","生物","地球科學"];
+      document.addEventListener('DOMContentLoaded', ()=> {
+        const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
       });
     </script>
 
-    <!-- Main logic -->
-    <script src="./assets/js/knowledge.js" defer></script>
+    <!-- 純 CSV 版主程式，帶 cache-busting 參數 -->
+    <script src="./assets/js/knowledge.js?v=20251010-csv" defer></script>
+    <!-- 保險：1.2s 後若有殘留 loader（舊版遺留），移除掉 -->
+    <script>setTimeout(()=>{ document.querySelector('.kh-loader')?.remove(); }, 1200);</script>
   </body>
 </html>
