@@ -249,43 +249,35 @@ function sectionClassByTitle(name){
 
 function sectionizeAndRender(meta, html){
   const temp = document.createElement("div");
-  (function cleanContent(){
-  // 刪掉 <hr> 與 只有 '---' 的段落/文字節點
+  temp.innerHTML = html;
+
+  // 先清掉多餘內容
+  // 1) 單獨 '---' 與 <hr>
   temp.querySelectorAll("hr").forEach(x=>x.remove());
-  Array.from(temp.childNodes).forEach(n=>{
-    if (n.nodeType===3 && n.nodeValue && n.nodeValue.trim()==="---") n.remove();
-  });
   temp.querySelectorAll("p").forEach(p=>{
-    const t = (p.textContent||"").trim();
-    if (t === "---") p.remove();
+    const t=(p.textContent||"").trim();
+    if (t==="---") p.remove();
   });
 
-  // 刪掉與頁面標題相同的 H1/H2/H3
-  const pageTitle = (meta.title || "").trim();
+  // 2) 與頁面標題相同的 H1/H2/H3
+  const pageTitle = (meta.title||"").trim();
   if (pageTitle){
     temp.querySelectorAll("h1,h2,h3").forEach(h=>{
-      if ((h.textContent||"").trim() === pageTitle) h.remove();
+      if ((h.textContent||"").trim()===pageTitle) h.remove();
     });
   }
 
-  // 刪掉「建立時間: ...」「科目: ...」這種行（中英冒號都移除）
+  // 3) 清掉中英冒號開頭的中繼資料行
   const metaLine = /^(建立時間|科目)\s*[:：]/;
   temp.querySelectorAll("p").forEach(p=>{
-    const t = (p.textContent||"").trim();
+    const t=(p.textContent||"").trim();
     if (metaLine.test(t)) p.remove();
-  });
-})();
-  temp.innerHTML = html;
-
-  // 規則 4：移除所有單獨 '---' 的段落與 HR
-  temp.querySelectorAll("hr").forEach(x=>x.remove());
-  Array.from(temp.querySelectorAll("p")).forEach(p=>{
-    if (p.textContent && p.textContent.trim()==="---") p.remove();
   });
 
   const blocks = Array.from(temp.childNodes);
   const isHeading = el => el && el.nodeType===1 && /H2|H3/.test(el.tagName);
 
+  // 依標題錨點切段
   const sections=[]; let i=0;
   while(i<blocks.length){
     if (isHeading(blocks[i])){
@@ -302,18 +294,15 @@ function sectionizeAndRender(meta, html){
     }
     i++;
   }
-
-  // 若完全沒有命中錨點，就把整份內文放進一張容器（不重複顯示標題/科目/時間）
   if (!sections.length) sections.push({ title:"內容", nodes: blocks, noWrap:true });
 
-  // Title + subject chips + createdAt
+  // Header（頁標題 + 科目 chips + 建立時間）
   const chips = (meta.subject && meta.subject.length)
     ? `<div class="page-chips">` + meta.subject.map(s=>(
         `<span class="chip" style="--chip-color:${subjectColor(s)}">${escapeHTML(s)}</span>`
       )).join("") + `</div>`
     : `<div class="page-chips"></div>`;
   const created = meta.createdAt ? `<div class="page-meta">${escapeHTML(meta.createdAt)}</div>` : "";
-
   const headerCard = `
     <div class="page-title-card">
       <div class="page-title">《${escapeHTML(meta.title||"(未命名)")}》</div>
@@ -321,27 +310,33 @@ function sectionizeAndRender(meta, html){
       ${created}
     </div>`;
 
+  // 章節卡片
   const htmlCards = sections.map(sec=>{
-    if (sec.noWrap){
-      const body = document.createElement("div"); body.className="prose";
-      sec.nodes.forEach(n=>body.appendChild(n.cloneNode(true)));
-      // Auto-indent paragraphs without '：'
-      body.querySelectorAll("p").forEach(p=>{ const t=(p.textContent||"").trim(); if(t && !t.includes("：")) p.classList.add("indent-1"); });
-      return `<div class="section-card sec--generic"><div class="section-card__title">${escapeHTML(sec.title)}</div>${body.outerHTML}</div>`;
-    }
-    const wrap=document.createElement("div"); wrap.className=`section-card ${sectionClassByTitle(sec.title)}`;
-    const titleEl=document.createElement("div"); titleEl.className="section-card__title"; titleEl.textContent=sec.title;
-    const body=document.createElement("div"); body.className="prose";
+    const wrap = document.createElement("div");
+    wrap.className = `section-card ${sectionClassByTitle(sec.title)}`;
+
+    const titleEl = document.createElement("div");
+    titleEl.className = "section-card__title";
+    titleEl.textContent = sec.title;
+
+    const body = document.createElement("div");
+    body.className = "prose";
     sec.nodes.forEach(n=>body.appendChild(n.cloneNode(true)));
-    body.querySelectorAll("p").forEach(p=>{ const t=(p.textContent||"").trim(); if(t && !t.includes("：")) p.classList.add("indent-1"); });
-    wrap.appendChild(titleEl); wrap.appendChild(body);
+
+    // 沒有「：」就自動縮排
+    body.querySelectorAll("p").forEach(p=>{
+      const t=(p.textContent||"").trim();
+      if (t && !t.includes("：")) p.classList.add("indent-1");
+    });
+
+    wrap.appendChild(titleEl);
+    wrap.appendChild(body);
     return wrap.outerHTML;
   });
 
   cardHost.innerHTML = headerCard + htmlCards.join("");
-
   renderMath(cardHost);
-  ensureScrollButtons(); // 右下角捲動按鈕
+  ensureScrollButtons();
 }
 
 function showSkeleton(h=220){ cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`; }
