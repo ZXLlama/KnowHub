@@ -41,8 +41,9 @@
     <!-- Layout：左側側欄 + 右側內容 -->
     <div class="kh-shell">
       <!-- SideNav -->
+      <!-- 預設 data-open 在桌機為 true、手機會由 JS 自動關閉 -->
       <aside class="kh-sidenav" data-open="true">
-        <button id="sidenav-toggle" class="kh-sidenav__toggle" aria-expanded="true">☰ 類別</button>
+        <button id="sidenav-toggle" class="kh-sidenav__toggle btn btn-primary" aria-expanded="true">☰ 類別</button>
 
         <!-- 側欄搜尋（只篩側欄清單；不打 API） -->
         <label class="kh-side-search" for="side-search">
@@ -66,7 +67,7 @@
         <div class="kh-toolbar">
           <button id="btn-random" class="btn btn-primary" type="button">🎲 隨機</button>
           <span class="kh-toolbar__spacer"></span>
-          <button id="btn-refresh" class="btn" type="button" title="重新整理索引">↻ 重整索引</button>
+          <!-- 依照需求 #4：刪除重整索引按鈕 -->
         </div>
 
         <!-- 內容卡片區（JS 會把每個大段落切成 .section-card 注入這裡） -->
@@ -74,7 +75,7 @@
 
         <!-- 頁面底部：回首頁 -->
         <div class="kh-bottom-home">
-          <a class="kh-home-btn" href="./index.html" aria-label="回到首頁">🏠 回首頁</a>
+          <a class="kh-home-btn btn" href="./index.html" aria-label="回到首頁">🏠 回首頁</a>
         </div>
       </main>
     </div>
