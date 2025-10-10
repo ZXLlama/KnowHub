@@ -1,17 +1,17 @@
-/* KnowHub — Knowledge (CSV-only, no overlay) 2025-10-10
- * - Data source: CSV only (window.KNOWHUB.CSV_INDEX is required; fallback to /assets/data/notes.csv)
- * - Sidebar: subjects vertically grouped; each group expandable with all titles
- * - Search: fuzzy by title
- * - Content files: tries pages/{id|slug|title id}.{md|html} and same under assets/data/
- * - Notion export: supports "Title SPACE ID.md/html"
- * - Math: $...$ / $$...$$ via KaTeX (page already includes KaTeX)
- * - Auto-indent: paragraphs without '：' get class .indent-1 (see HTML style)
+/* KnowHub — Knowledge (CSV-only, enhanced UI) 2025-10-10
+ * - CSV only
+ * - Subject color chips + createdAt
+ * - Remove '---' blocks
+ * - Section containers with gradients
+ * - Better mobile sidebar
+ * - Bottom-right scroll to top/bottom buttons
+ * - Auto-indent paragraphs without '：'
  */
 
 /* ===== Config ===== */
 const CSV_INDEX = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
 const SUBJECT_ORDER = (window.KNOWHUB && window.KNOWHUB.SUBJECTS) || ["國文","英文","數學","物理","化學","生物","地球科學"];
-const ANCHORS  = ["快速重點","解釋","解釋／定義","解釋/定義","詳細說明","常見考點","常見考點／易錯點","常見考點/易錯點","舉例說明"];
+const ANCHORS  = ["快速重點","解釋/定義","詳細說明","常見考點/易錯點","舉例說明"]; // 以你指定為主（同義詞自動合併見 normalizeAnchor）
 
 /* ===== DOM ===== */
 const sidenav    = document.querySelector(".kh-sidenav");
@@ -23,7 +23,7 @@ const btnRandom  = document.getElementById("btn-random");
 const randomChecksHost = document.getElementById("random-subjects");
 
 /* ===== State ===== */
-let INDEX = [];                 // [{id,title,subject:[],_fileGuess:string[]}]
+let INDEX = [];                 // [{id,title,subject:[],createdAt?,_fileGuess:string[]}]
 let FILTER_Q = "";
 let CURRENT_PAGE_ID = null;
 let RANDOM_SUBJECTS = new Set(SUBJECT_ORDER);
@@ -32,11 +32,17 @@ let RANDOM_SUBJECTS = new Set(SUBJECT_ORDER);
 const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
 const debounce = (fn,ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 const toSlug = (s)=> (s||"").trim().replace(/[\\/:*?"<>|]+/g,"-").replace(/\s+/g,"-");
+async function fetchText(url){ const r=await fetch(url,{cache:"no-store",mode:"cors",credentials:"omit"}); if(!r.ok) throw new Error(`${r.status} ${r.statusText}`); return await r.text(); }
 
-async function fetchText(url){
-  const r = await fetch(url, { cache:"no-store", mode:"cors", credentials:"omit" });
-  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-  return await r.text();
+/* ===== Subject Colors (stable) ===== */
+const SUBJECT_COLOR_MAP = {
+  "國文":"#E3556B","英文":"#4D9DE0","數學":"#6C5CE7","物理":"#00BCD4","化學":"#00B894","生物":"#55D6BE","地球科學":"#FFA62B","未分類":"#9E9E9E"
+};
+function subjectColor(s){
+  if (SUBJECT_COLOR_MAP[s]) return SUBJECT_COLOR_MAP[s];
+  // 穩定 hash → HSL
+  let h=0; for (let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0;
+  const hue = h%360; return `hsl(${hue},70%,55%)`;
 }
 
 /* ===== CSV ===== */
@@ -71,9 +77,10 @@ function csvRowToItem(r){
   const subjects = subjRaw ? subjRaw.split(/[;,/、\s]+/).filter(Boolean) : [];
   const id = (r.id || r.pageId || r.notionId || "").trim() || toSlug(title);
   const file = (r.file || r.filename || r.path || r.檔案 || "").trim();
+  const createdAt = (r.created || r.建立時間 || r.Created || r.date || "").trim();
 
   const g = [];
-  if (file) g.push(file);
+  if (file) g.push(prefixGuess(file));
   // Preferred under pages/
   g.push(`./assets/data/pages/${id}.md`);
   g.push(`./assets/data/pages/${id}.html`);
@@ -94,20 +101,23 @@ function csvRowToItem(r){
   g.push(`./assets/data/${title} ${id}.md`);
   g.push(`./assets/data/${title} ${id}.html`);
 
-  return { id, title, subject: subjects, _fileGuess: g };
+  return { id, title, subject: subjects, createdAt, _fileGuess: g };
+}
+function prefixGuess(file){
+  // 若 CSV 的 file 欄只有「檔名」（無路徑），預設視為在 pages 目錄
+  if (!file) return file;
+  if (file.includes("/") || file.includes("\\")) return file;
+  return `./assets/data/pages/${file}`;
 }
 
 /* ===== Sidebar & Search ===== */
 function groupBySubject(items){
-  // Keep stable subject order, then alphabetical for others
   const map = new Map();
   items.forEach(x=>{
     const subs = x.subject?.length ? x.subject : ["未分類"];
     subs.forEach(s=>{ if(!map.has(s)) map.set(s,[]); map.get(s).push(x); });
   });
-  // sort each list by title
   for (const [,arr] of map) arr.sort((a,b)=>a.title.localeCompare(b.title,"zh-Hant"));
-  // order subjects
   const ordered = [];
   const set = new Set(map.keys());
   SUBJECT_ORDER.forEach(s=>{ if(set.has(s)) { ordered.push([s,map.get(s)]); set.delete(s); }});
@@ -124,7 +134,12 @@ function renderTree(){
     const details = document.createElement("details");
     details.className = "group";
     details.open = true;
-    details.innerHTML = `<summary>${escapeHTML(sub)}</summary><div class="items"></div>`;
+    details.innerHTML = `
+      <summary>
+        <span class="chip chip--sub" style="--chip-color:${subjectColor(sub)}">${escapeHTML(sub)}</span>
+        <span class="count">${arr.length}</span>
+      </summary>
+      <div class="items"></div>`;
     const box = details.querySelector(".items");
 
     arr.forEach(it=>{
@@ -153,18 +168,10 @@ function renderTree(){
 
 /* ===== Render ===== */
 function waitForKatexReady(timeout=8000){
-  return new Promise((res,rej)=>{
-    const t0=Date.now();
-    (function loop(){
-      if (window.katex) return res();
-      if (Date.now()-t0>timeout) return rej();
-      setTimeout(loop,50);
-    })();
-  });
+  return new Promise((res,rej)=>{ const t0=Date.now(); (function loop(){ if (window.katex) return res(); if (Date.now()-t0>timeout) return rej(); setTimeout(loop,50); })(); });
 }
 async function renderMath(scope=document){
-  try{ await waitForKatexReady(); }catch{} // best-effort
-  // inline $...$
+  try{ await waitForKatexReady(); }catch{}
   const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, {
     acceptNode(n){
       if (!n.nodeValue || !n.nodeValue.includes("$")) return NodeFilter.FILTER_REJECT;
@@ -181,9 +188,7 @@ async function renderMath(scope=document){
     parts.forEach(seg=>{
       if (!seg) return;
       if (seg.startsWith("$") && seg.endsWith("$") && seg.length>2){
-        const span=document.createElement("span"); span.textContent=seg;
-        span.className="math-inline";
-        frag.appendChild(span);
+        const span=document.createElement("span"); span.textContent=seg; span.className="math-inline"; frag.appendChild(span);
       } else frag.appendChild(document.createTextNode(seg));
     });
     tn.parentNode.replaceChild(frag, tn);
@@ -207,70 +212,114 @@ function mdToHtml(md){
   const out=[];
   for (const ln of lines){
     if (!ln.trim()) { out.push(""); continue; }
+    if (ln.trim()==="---") { out.push(""); continue; }                 // 規則 4：移除 '---'
     if (ln.startsWith("### ")) out.push("<h3>"+esc(ln.slice(4))+"</h3>");
     else if (ln.startsWith("## ")) out.push("<h2>"+esc(ln.slice(3))+"</h2>");
     else if (ln.startsWith("# ")) out.push("<h1>"+esc(ln.slice(2))+"</h1>");
-    else out.push("<p>"+ln+"</p>");
+    else out.push("<p>"+esc(ln)+"</p>");
   }
   return out.join("\n");
 }
 
-function sectionizeAndRender(title, html){
+function normalizeAnchor(s){
+  // 同義詞合併到你指定的 5 種
+  const t = (s||"").replace(/\s+/g,"").replace(/[／]/g,"/"); // 把全形 ／ 轉成 /
+  if (/^(快速重點)$/.test(t)) return "快速重點";
+  if (/^(解釋\/定義|解釋|定義)$/.test(t)) return "解釋/定義";
+  if (/^(詳細說明)$/.test(t)) return "詳細說明";
+  if (/^(常見考點\/易錯點|常見考點|易錯點)$/.test(t)) return "常見考點/易錯點";
+  if (/^(舉例說明|例子|範例)$/.test(t)) return "舉例說明";
+  return null;
+}
+
+function sectionClassByTitle(name){
+  switch(name){
+    case "快速重點": return "sec--highlight";
+    case "解釋/定義": return "sec--define";
+    case "詳細說明": return "sec--details";
+    case "常見考點/易錯點": return "sec--pitfalls";
+    case "舉例說明": return "sec--examples";
+    default: return "sec--generic";
+  }
+}
+
+function sectionizeAndRender(meta, html){
   const temp = document.createElement("div");
   temp.innerHTML = html;
+
+  // 規則 4：移除所有單獨 '---' 的段落與 HR
   temp.querySelectorAll("hr").forEach(x=>x.remove());
+  Array.from(temp.querySelectorAll("p")).forEach(p=>{
+    if (p.textContent && p.textContent.trim()==="---") p.remove();
+  });
 
-  const blocks = Array.from(temp.childNodes);
+  const blocks = Array.from(temp.childNodes).filter(n=>{
+    // 也清掉純文字節點為 '---'
+    if (n.nodeType===3 && n.nodeValue && n.nodeValue.trim()==="---") return false;
+    return true;
+  });
+
   const isHeading = (el)=> el && el.nodeType===1 && /H2|H3/.test(el.tagName);
-  const normalize = (s)=> (s||"").replace(/\s+/g,"").replace(/[／/]/g,"/");
-  const anchorSet = new Set(ANCHORS.map(a=>normalize(a)));
-
-  const pageTitleCard = `<div class="page-title-card"><div class="page-title">《${escapeHTML(title||"(未命名)")}》</div></div>`;
 
   const sections=[]; let i=0;
   while(i<blocks.length){
     if (isHeading(blocks[i])){
-      const t = blocks[i].textContent.trim();
-      const k = normalize(t);
-      if (anchorSet.has(k)){
+      const raw = (blocks[i].textContent||"").trim();
+      const norm = normalizeAnchor(raw);
+      if (norm){
         const nodes=[]; i++;
         while(i<blocks.length){
-          if (isHeading(blocks[i]) && anchorSet.has(normalize(blocks[i].textContent.trim()))) break;
+          if (isHeading(blocks[i]) && normalizeAnchor((blocks[i].textContent||"").trim())) break;
           nodes.push(blocks[i]); i++;
         }
-        sections.push({title:t,nodes}); continue;
+        sections.push({ title:norm, nodes });
+        continue;
       }
     }
     i++;
   }
-  if (!sections.length) sections.push({ title, nodes: blocks });
+  if (!sections.length) sections.push({ title: meta.title || "(未命名)", nodes: blocks, noWrap:true });
+
+  // Title + subject chips + createdAt
+  const chips = (meta.subject && meta.subject.length)
+    ? `<div class="page-chips">` + meta.subject.map(s=>(
+        `<span class="chip" style="--chip-color:${subjectColor(s)}">${escapeHTML(s)}</span>`
+      )).join("") + `</div>`
+    : `<div class="page-chips"></div>`;
+  const created = meta.createdAt ? `<div class="page-meta">${escapeHTML(meta.createdAt)}</div>` : "";
+
+  const headerCard = `
+    <div class="page-title-card">
+      <div class="page-title">《${escapeHTML(meta.title||"(未命名)")}》</div>
+      ${chips}
+      ${created}
+    </div>`;
 
   const htmlCards = sections.map(sec=>{
-    const wrap = document.createElement("div");
-    wrap.className="section-card";
-    const h = document.createElement("div");
-    h.className="section-card__title";
-    h.textContent=sec.title;
-    const body = document.createElement("div");
-    body.className="prose";
+    if (sec.noWrap){
+      const body = document.createElement("div"); body.className="prose";
+      sec.nodes.forEach(n=>body.appendChild(n.cloneNode(true)));
+      // Auto-indent paragraphs without '：'
+      body.querySelectorAll("p").forEach(p=>{ const t=(p.textContent||"").trim(); if(t && !t.includes("：")) p.classList.add("indent-1"); });
+      return `<div class="section-card sec--generic"><div class="section-card__title">${escapeHTML(sec.title)}</div>${body.outerHTML}</div>`;
+    }
+    const wrap=document.createElement("div"); wrap.className=`section-card ${sectionClassByTitle(sec.title)}`;
+    const titleEl=document.createElement("div"); titleEl.className="section-card__title"; titleEl.textContent=sec.title;
+    const body=document.createElement("div"); body.className="prose";
     sec.nodes.forEach(n=>body.appendChild(n.cloneNode(true)));
-    wrap.appendChild(h); wrap.appendChild(body);
+    body.querySelectorAll("p").forEach(p=>{ const t=(p.textContent||"").trim(); if(t && !t.includes("：")) p.classList.add("indent-1"); });
+    wrap.appendChild(titleEl); wrap.appendChild(body);
     return wrap.outerHTML;
   });
 
-  cardHost.innerHTML = pageTitleCard + htmlCards.join("");
-
-  // Auto-indent (no fullwidth colon)
-  cardHost.querySelectorAll(".prose p").forEach(p=>{
-    const t=(p.textContent||"").trim();
-    if (t && !t.includes("：")) p.classList.add("indent-1");
-  });
+  cardHost.innerHTML = headerCard + htmlCards.join("");
 
   renderMath(cardHost);
+  ensureScrollButtons(); // 右下角捲動按鈕
 }
 
 function showSkeleton(h=220){ cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`; }
-function showError(msg){ cardHost.innerHTML = `<div class="section-card"><div class="section-card__title">讀取失敗</div><div class="prose"><p>${escapeHTML(msg||"")}</p></div></div>`; }
+function showError(msg){ cardHost.innerHTML = `<div class="section-card sec--generic"><div class="section-card__title">讀取失敗</div><div class="prose"><p>${escapeHTML(msg||"")}</p></div></div>`; }
 
 /* ===== IO ===== */
 async function readIndexFromCSV(){
@@ -298,7 +347,7 @@ async function loadPage(id, meta){
     if (!m) throw new Error("找不到頁面索引");
     const html = await tryLoadFromGuesses(m._fileGuess || []);
     CURRENT_PAGE_ID = id;
-    sectionizeAndRender(m.title, html);
+    sectionizeAndRender(m, html);
     // 高亮側欄
     const hit = treeNav.querySelector(`.item[data-id="${id}"]`);
     if (hit){
@@ -311,7 +360,7 @@ async function loadPage(id, meta){
 
 async function loadRandom(){
   if (!INDEX.length) { await bootstrap(); }
-  const pool = INDEX; // 已可由上方勾選控制要不要加 subject 過濾
+  const pool = INDEX;
   if (!pool.length){ showError("列表為空"); return; }
   const pick = pool[Math.floor(Math.random()*pool.length)];
   await loadPage(pick.id, pick);
@@ -331,16 +380,8 @@ sideSearch?.addEventListener("input", debounce(()=>{
 btnRandom?.addEventListener("click", loadRandom);
 
 function renderRandomChecks(){
-  randomChecksHost.innerHTML = SUBJECT_ORDER.map(s=>{
-    const c = RANDOM_SUBJECTS.has(s) ? "checked" : "";
-    return `<label><input type="checkbox" value="${escapeHTML(s)}" ${c}/><span>${escapeHTML(s)}</span></label>`;
-  }).join("");
-  randomChecksHost.querySelectorAll('input[type="checkbox"]').forEach(el=>{
-    el.addEventListener("change", ()=>{
-      const v = el.value;
-      if (el.checked) RANDOM_SUBJECTS.add(v); else RANDOM_SUBJECTS.delete(v);
-    });
-  });
+  // 可保留；此處省略顯示，若需要也能加回
+  randomChecksHost && (randomChecksHost.innerHTML = "");
 }
 
 async function bootstrap(){
@@ -351,7 +392,6 @@ async function bootstrap(){
   }
   renderRandomChecks();
 
-  // 只吃 CSV
   try{
     INDEX = await readIndexFromCSV();
     renderTree();
@@ -359,7 +399,22 @@ async function bootstrap(){
     showError(`CSV 載入失敗：${e.message}\n請確認 window.KNOWHUB.CSV_INDEX 指向正確檔名。`);
     throw e;
   }
+  ensureScrollButtons();
 }
 
-// 首次載入：先畫一篇（若讀得到）
+// 右下角上下捲動按鈕
+function ensureScrollButtons(){
+  if (document.querySelector(".kh-fab")) return;
+  const wrap = document.createElement("div");
+  wrap.className = "kh-fab";
+  wrap.innerHTML = `
+    <button class="fab fab--up" aria-label="到頂端">↑</button>
+    <button class="fab fab--down" aria-label="到底部">↓</button>
+  `;
+  document.body.appendChild(wrap);
+  wrap.querySelector(".fab--up").addEventListener("click", ()=> window.scrollTo({top:0, behavior:"smooth"}));
+  wrap.querySelector(".fab--down").addEventListener("click", ()=> window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"}));
+}
+
+// 首次載入
 bootstrap().then(()=> loadRandom().catch(()=>{})).catch(()=>{});
