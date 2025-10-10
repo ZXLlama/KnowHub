@@ -66,9 +66,8 @@
     </footer>
 
     <script>
-      // 這裡改成你的 CSV 檔名（建議：/assets/data/notes.csv）
       window.KNOWHUB = window.KNOWHUB || {};
-      window.KNOWHUB.CSV_INDEX = "/assets/data/notes.csv";
+      window.KNOWHUB.CSV_INDEX = "./assets/data/notes.csv";
       window.KNOWHUB.SUBJECTS  = ["國文","英文","數學","物理","化學","生物","地球科學"];
       document.addEventListener('DOMContentLoaded', ()=> {
         const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
