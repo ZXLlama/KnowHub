@@ -9,7 +9,7 @@
  */
 
 /* ===== Config ===== */
-const CSV_INDEX = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "/assets/data/notes.csv";
+const CSV_INDEX = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
 const SUBJECT_ORDER = (window.KNOWHUB && window.KNOWHUB.SUBJECTS) || ["國文","英文","數學","物理","化學","生物","地球科學"];
 const ANCHORS  = ["快速重點","解釋","解釋／定義","解釋/定義","詳細說明","常見考點","常見考點／易錯點","常見考點/易錯點","舉例說明"];
 
