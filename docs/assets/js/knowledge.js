@@ -224,7 +224,6 @@ function renderPage(obj){
 
   cardHost.innerHTML = [pageTitleCard, ...sectionCards].join("");
   renderMath(cardHost);
-  hideLoader();
 }
 
 /* ========= Data IO (Worker only) ========= */
@@ -244,7 +243,6 @@ async function loadIndex({ refresh=false } = {}){
     console.error(e);
     showMessage("索引載入失敗","請稍後再試");
   }finally{
-    // 已有內容則確保 overlay 關閉
     hideLoader();
   }
 }
