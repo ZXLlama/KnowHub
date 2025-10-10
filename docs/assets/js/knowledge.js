@@ -1,4 +1,4 @@
-// assets/js/knowledge.js — Worker-API only
+// assets/js/knowledge.js — Worker-API only (2025-10-10 refreshless)
 
 /* ========= Config ========= */
 const API_BASE = (window.KNOWHUB && window.KNOWHUB.API_BASE) || "";
@@ -12,7 +12,6 @@ const sideSearch = document.getElementById("side-search");
 const treeNav    = document.getElementById("nav-tree");
 const cardHost   = document.getElementById("knowledge-card");
 const btnRandom  = document.getElementById("btn-random");
-const btnRefresh = document.getElementById("btn-refresh");
 const randomChecksHost = document.getElementById("random-subjects");
 
 /* ========= State ========= */
@@ -227,11 +226,10 @@ function renderPage(obj){
 }
 
 /* ========= Data IO (Worker only) ========= */
-async function loadIndex({ refresh=false } = {}){
+async function loadIndex(){
   showLoader("正在載入索引…");
   try{
-    const params = refresh ? { refresh:1 } : undefined;
-    const res = await apiGet("/api/knowledge/titles", params);
+    const res = await apiGet("/api/knowledge/titles");
     const items = Array.isArray(res) ? res : (res?.items || []);
     INDEX = items.map(it=>({
       id: it.id || it.pageId || it.notionId,
@@ -292,13 +290,16 @@ toggleBtn?.addEventListener("click", ()=>{
 });
 sideSearch?.addEventListener("input", debounce(()=>{ FILTER_Q = sideSearch.value || ""; renderTree(); },150));
 btnRandom?.addEventListener("click", loadRandom);
-btnRefresh?.addEventListener("click", async ()=>{
-  btnRefresh.disabled = true; try{ await loadIndex({ refresh:true }); } finally { btnRefresh.disabled = false; }
-});
 
 /* ========= Bootstrap ========= */
 renderRandomChecks();
 (async function init(){
+  // 手機預設關閉側欄（粗略用 coarse pointer 或寬度判定）
+  if (sidenav && (matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 820px)").matches)) {
+    sidenav.setAttribute("data-open","false");
+    toggleBtn?.setAttribute("aria-expanded","false");
+  }
+
   waitForKatexReady().catch(()=>{});
   // 先抽一則，避免索引較慢時畫面空白
   loadRandom().catch(()=>{});
