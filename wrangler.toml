@@ -1,0 +1,20 @@
+name = "knowhub-knowledge"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+# 開發測試可先 *
+ALLOW_ORIGIN = "*"
+TITLE = "標題"
+SUBJECT = "科目"
+FAST = "快速重點"
+DEF = "解釋/定義"
+DETAIL = "詳細說明"
+PITFALLS = "常見考點/易錯點"
+EXAMPLES = "舉例說明"
+UPDATED_TIME = "更新時間"
+SUBJECT_KIND = "select"
+
+[[kv_namespaces]]
+binding = "KNOWHUB_CACHE"
+id = "83221086f916450da1dbd26b2a12d44c"

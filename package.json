@@ -6,6 +6,7 @@
     "build": "sass --style=compressed docs/assets/scss:docs/assets/css"
   },
   "devDependencies": {
-    "sass": "^1.77.0"
+    "sass": "^1.77.0",
+    "wrangler": "^4.40.2"
   }
 }
