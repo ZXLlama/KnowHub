@@ -75,24 +75,24 @@ function csvRowToItem(r){
   const g = [];
   if (file) g.push(file);
   // Preferred under pages/
-  g.push(`/assets/data/pages/${id}.md`);
-  g.push(`/assets/data/pages/${id}.html`);
-  g.push(`/assets/data/pages/${toSlug(title)}.md`);
-  g.push(`/assets/data/pages/${toSlug(title)}.html`);
+  g.push(`./assets/data/pages/${id}.md`);
+  g.push(`./assets/data/pages/${id}.html`);
+  g.push(`./assets/data/pages/${toSlug(title)}.md`);
+  g.push(`./assets/data/pages/${toSlug(title)}.html`);
   // Notion "Title id"
-  g.push(`/assets/data/pages/${toSlug(title)} ${id}.md`);
-  g.push(`/assets/data/pages/${toSlug(title)} ${id}.html`);
-  g.push(`/assets/data/pages/${title} ${id}.md`);
-  g.push(`/assets/data/pages/${title} ${id}.html`);
+  g.push(`./assets/data/pages/${toSlug(title)} ${id}.md`);
+  g.push(`./assets/data/pages/${toSlug(title)} ${id}.html`);
+  g.push(`./assets/data/pages/${title} ${id}.md`);
+  g.push(`./assets/data/pages/${title} ${id}.html`);
   // Also allow directly under assets/data
-  g.push(`/assets/data/${id}.md`);
-  g.push(`/assets/data/${id}.html`);
-  g.push(`/assets/data/${toSlug(title)}.md`);
-  g.push(`/assets/data/${toSlug(title)}.html`);
-  g.push(`/assets/data/${toSlug(title)} ${id}.md`);
-  g.push(`/assets/data/${toSlug(title)} ${id}.html`);
-  g.push(`/assets/data/${title} ${id}.md`);
-  g.push(`/assets/data/${title} ${id}.html`);
+  g.push(`./assets/data/${id}.md`);
+  g.push(`./assets/data/${id}.html`);
+  g.push(`./assets/data/${toSlug(title)}.md`);
+  g.push(`./assets/data/${toSlug(title)}.html`);
+  g.push(`./assets/data/${toSlug(title)} ${id}.md`);
+  g.push(`./assets/data/${toSlug(title)} ${id}.html`);
+  g.push(`./assets/data/${title} ${id}.md`);
+  g.push(`./assets/data/${title} ${id}.html`);
 
   return { id, title, subject: subjects, _fileGuess: g };
 }
