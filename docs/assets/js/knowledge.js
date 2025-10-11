@@ -631,7 +631,8 @@ function ensureScrollButtons(){
       mainScroller.scrollTo({top:max, behavior:"smooth"});
     }
   });
-};
+}
+;
   wrap.querySelector(".fab--down").addEventListener("click", ()=> window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"}));
 
 
