@@ -352,6 +352,19 @@ function fromFileSections(meta, html){
   return { hasContent: true, html: sections.join("") };
 }
 
+function showSkeleton(h=220){
+  if (!cardHost) return;
+  cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`;
+}
+function showError(msg){
+  if (!cardHost) return;
+  const safe = (msg||"").toString();
+  cardHost.innerHTML = `<div class="section-card sec--generic">
+    <div class="section-card__title">讀取失敗</div>
+    <div class="prose"><p>${escapeHTML(safe)}</p></div>
+  </div>`;
+}
+
 
 async function loadRandom(){
   if (!INDEX.length) { await bootstrap(); }
