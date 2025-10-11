@@ -555,6 +555,33 @@ function installMobileDrawer() {
   handleMQ(); // 初始判斷
 }
 
+function rememberScrollPositions() {
+  const side = document.querySelector('.kh-sidenav');
+  const main = document.querySelector('.kh-content') || document.querySelector('.kh-main') || document.querySelector('#kh-content');
+  const K = { side: 'kh-scroll-sidenav', main: 'kh-scroll-main' };
+
+  const load = (el, key) => {
+    try {
+      const y = parseFloat(localStorage.getItem(key) || '0');
+      if (el) el.scrollTop = y;
+    } catch {}
+  };
+  const save = (el, key) => {
+    if (!el) return;
+    let raf = 0;
+    const tick = () => {
+      try { localStorage.setItem(key, String(el.scrollTop)); } catch {}
+    };
+    el.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    });
+  };
+  load(side, K.side); load(main, K.main);
+  save(side, K.side); save(main, K.main);
+}
+
+
 
 async function bootstrap(){
   // 手機：預設關閉側欄
@@ -575,6 +602,7 @@ async function bootstrap(){
 }
 
 // 右下角上下捲動按鈕
+
 function ensureScrollButtons(){
   if (document.querySelector(".kh-fab")) return;
   const wrap = document.createElement("div");
@@ -584,8 +612,25 @@ function ensureScrollButtons(){
     <button class="fab fab--down" aria-label="到底部">↓</button>
   `;
   document.body.appendChild(wrap);
-  wrap.querySelector(".fab--up").addEventListener("click", ()=> window.scrollTo({top:0, behavior:"smooth"}));
-  wrap.querySelector(".fab--down").addEventListener("click", ()=> window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"}));
+
+  const mainScroller = document.querySelector(".kh-content") || document.querySelector(".kh-main") || document.scrollingElement || document.body;
+
+  wrap.querySelector(".fab--up").addEventListener("click", ()=> {
+    if (mainScroller === document.scrollingElement) {
+      window.scrollTo({top:0, behavior:"smooth"});
+    } else {
+      mainScroller.scrollTo({top:0, behavior:"smooth"});
+    }
+  });
+  wrap.querySelector(".fab--down").addEventListener("click", ()=> {
+    const target = (mainScroller === document.scrollingElement) ? document.body : mainScroller;
+    const max = target.scrollHeight;
+    if (mainScroller === document.scrollingElement) {
+      window.scrollTo({top:max, behavior:"smooth"});
+    } else {
+      mainScroller.scrollTo({top:max, behavior:"smooth"});
+    }
+  });
 }
 
 function ensureMobileToggleFab() {
