@@ -377,3 +377,51 @@
   }
   .kh-sidenav[data-open="true"]{ transform: translateX(0); }
 }
+
+/* ====== Tree: 收合箭頭 ====== */
+.kh-tree details > summary {
+  cursor: pointer;
+  list-style: none; /* 隱藏原生 marker（跨瀏覽器保險） */
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  user-select: none;
+}
+.kh-tree details > summary::-webkit-details-marker { display: none; }
+
+.kh-tree details > summary::before {
+  content: "▸";
+  display: inline-block;
+  transform: translateY(-1px);
+  margin-right: .25rem;
+  transition: transform .2s ease;
+  font-weight: 700;
+  opacity: .85;
+}
+.kh-tree details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+/* ====== 手機懸浮類別切換按鈕 ====== */
+.kh-sidenav-fab {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10010; /* 高於側欄與內容 */
+  display: none;  /* 只在小螢幕顯示 */
+}
+
+/* 小螢幕才顯示懸浮按鈕；大螢幕不需要 */
+@media (max-width: 820px) {
+  .kh-sidenav-fab { display: inline-flex; }
+
+  /* 側欄關閉時往左隱藏，確保內容不遮住按鈕 */
+  .kh-sidenav {
+    will-change: transform;
+    transition: transform .25s ease;
+    z-index: 10000; /* 在內容之上，但低於懸浮按鈕 */
+  }
+  .kh-sidenav[data-open="false"] {
+    transform: translateX(-100%);
+  }
+}
