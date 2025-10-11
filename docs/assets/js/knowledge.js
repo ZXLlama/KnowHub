@@ -1,18 +1,15 @@
-/* KnowHub — Knowledge (CSV-only, enhanced UI) 2025-10-11
- * - CSV only
- * - Subject color chips + createdAt
- * - Remove '---' blocks & meta lines
- * - Section containers with gradients (wrap ALL H2/H3 into cards)
- * - Better mobile sidebar (drawer with overlay, independent scrolling)
- * - Bottom-right scroll to top/bottom buttons
- * - Auto-indent paragraphs without '：'
+/* KnowHub — Knowledge (CSV-sections + enhanced UI) 2025-10-11
+ * - Random button fixed at top-right (all devices)
+ * - CSV-driven section groups (優先使用 CSV 欄位拆分)
+ * - Fallback to H2/H3 sectionizing when CSV無對應欄位
+ * - Mobile drawer sidenav with overlay & independent scrolling
  * - On load: auto random once
  */
 
 // ===== Config =====
 const CSV_INDEX = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
 const SUBJECT_ORDER = (window.KNOWHUB && window.KNOWHUB.SUBJECTS) || ["國文","英文","數學","物理","化學","生物","地球科學"];
-const ANCHORS  = ["快速重點","解釋/定義","詳細說明","常見考點/易錯點","舉例說明"]; // 以你指定為主（同義詞自動合併見 normalizeAnchor）
+const CANON_ANCHORS  = ["快速重點","解釋/定義","詳細說明","常見考點/易錯點","舉例說明"]; // 正規化後的標準鍵
 
 // ===== DOM =====
 const sidenav    = document.querySelector(".kh-sidenav");
@@ -20,51 +17,32 @@ const toggleBtn  = document.getElementById("sidenav-toggle");
 const sideSearch = document.getElementById("side-search");
 const treeNav    = document.getElementById("nav-tree");
 const cardHost   = document.getElementById("knowledge-card");
-const btnRandom  = document.getElementById("btn-random");
+const btnRandomInline  = document.getElementById("btn-random"); // 可能不存在（舊 toolbar）
+const btnRandomFixed   = document.getElementById("btn-random-fixed");
 const randomChecksHost = document.getElementById("random-subjects");
 
 // ===== State =====
-let INDEX = [];                 // [{id,title,subject:[],createdAt?,_fileGuess:string[]}]
+let INDEX = [];                 // [{id,title,subject:[],createdAt?,sections?:{anchor:string->text}, _fileGuess:string[]}]
 let FILTER_Q = "";
 let CURRENT_PAGE_ID = null;
 let RANDOM_SUBJECTS = new Set(SUBJECT_ORDER);
 
 // ===== Utils =====
-const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
+const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;","&gt;":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
 const debounce = (fn,ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 const toSlug = (s)=> (s||"").trim().replace(/[\\/:*?"<>|]+/g,"-").replace(/\s+/g,"-");
 async function fetchText(url){
-  try{
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-    return await r.text();
-  }catch(e){
-    // 額外提示（混合內容 / CORS 常見）
-    const pageHTTPS = location.protocol === "https:";
-    const urlHTTPS  = /^https:/.test(url);
-    const urlHTTP   = /^http:/.test(url);
-    if (pageHTTPS && urlHTTP){
-      throw new Error(`Mixed content 被瀏覽器封鎖：頁面是 HTTPS 但你用 HTTP 抓取 ${url}`);
-    }
-    // 無同源時，可能是 CORS
-    try{
-      const sameOrigin = new URL(url, location.href).origin === location.origin;
-      if (!sameOrigin) {
-        throw new Error(`跨網域（CORS）可能被封鎖：${url} 請在伺服器回應加上 Access-Control-Allow-Origin`);
-      }
-    }catch(_){}
-    throw e;
-  }
+  const r = await fetch(url, { cache: "no-store" });
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return await r.text();
 }
 
-
-// ===== Subject Colors (stable) =====
+// ===== Subject Colors =====
 const SUBJECT_COLOR_MAP = {
   "國文":"#E3556B","英文":"#4D9DE0","數學":"#6C5CE7","物理":"#00BCD4","化學":"#00B894","生物":"#55D6BE","地球科學":"#FFA62B","未分類":"#9E9E9E"
 };
 function subjectColor(s){
   if (SUBJECT_COLOR_MAP[s]) return SUBJECT_COLOR_MAP[s];
-  // 穩定 hash → HSL
   let h=0; for (let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0;
   const hue = h%360; return `hsl(${hue},70%,55%)`;
 }
@@ -94,6 +72,33 @@ function parseCSV(text){
   });
 }
 
+// 正規化錨點（回傳標準鍵或 null）
+function normalizeAnchor(raw){
+  if (!raw) return null;
+  const t = String(raw)
+    .trim().replace(/\s+/g,"")
+    .replace(/[／]/g,"/")
+    .toLowerCase();
+  if (t==="快速重點"||t==="重點") return "快速重點";
+  if (t==="解釋/定義"||t==="解釋"||t==="定義") return "解釋/定義";
+  if (t==="詳細說明"||t==="說明"||t==="內容") return "詳細說明";
+  if (t==="常見考點/易錯點"||t==="常見考點"||t==="易錯點") return "常見考點/易錯點";
+  if (t==="舉例說明"||t==="範例"||t==="例子") return "舉例說明";
+  return null;
+}
+
+function collectSectionsFromRow(r){
+  const sections = {}; // {canon: text}
+  for (const [k,v] of Object.entries(r)){
+    const canon = normalizeAnchor(k);
+    if (!canon) continue;
+    const val = (v||"").trim();
+    if (!val) continue;
+    sections[canon] = sections[canon] ? (sections[canon] + "\n\n" + val) : val;
+  }
+  return sections;
+}
+
 function csvRowToItem(r){
   const title = r.title || r.標題 || r.name || r.Name || "";
   if (!title) return null;
@@ -105,30 +110,15 @@ function csvRowToItem(r){
 
   const g = [];
   if (file) g.push(prefixGuess(file));
-  // Preferred under pages/
   g.push(`./assets/data/pages/${id}.md`);
   g.push(`./assets/data/pages/${id}.html`);
   g.push(`./assets/data/pages/${toSlug(title)}.md`);
   g.push(`./assets/data/pages/${toSlug(title)}.html`);
-  // Notion "Title id"
-  g.push(`./assets/data/pages/${toSlug(title)} ${id}.md`);
-  g.push(`./assets/data/pages/${toSlug(title)} ${id}.html`);
-  g.push(`./assets/data/pages/${title} ${id}.md`);
-  g.push(`./assets/data/pages/${title} ${id}.html`);
-  // Also allow directly under assets/data
-  g.push(`./assets/data/${id}.md`);
-  g.push(`./assets/data/${id}.html`);
-  g.push(`./assets/data/${toSlug(title)}.md`);
-  g.push(`./assets/data/${toSlug(title)}.html`);
-  g.push(`./assets/data/${toSlug(title)} ${id}.md`);
-  g.push(`./assets/data/${toSlug(title)} ${id}.html`);
-  g.push(`./assets/data/${title} ${id}.md`);
-  g.push(`./assets/data/${title} ${id}.html`);
 
-  return { id, title, subject: subjects, createdAt, _fileGuess: g };
+  const sections = collectSectionsFromRow(r);
+  return { id, title, subject: subjects, createdAt, sections, _fileGuess: g };
 }
 function prefixGuess(file){
-  // 若 CSV 的 file 欄只有「檔名」（無路徑），預設視為在 pages 目錄
   if (!file) return file;
   if (file.includes("/") || file.includes("\\")) return file;
   return `./assets/data/pages/${file}`;
@@ -195,17 +185,11 @@ function renderTree(){
 function enableSingleOpenInTree(root = document) {
   const tree = root.querySelector('.kh-tree');
   if (!tree) return;
-
-  // 先確保全部預設關閉
   tree.querySelectorAll('details').forEach(d => { d.open = false; });
-
-  // 監聽所有 details 的 toggle 事件
   tree.addEventListener('toggle', (e) => {
     const target = e.target;
     if (!(target instanceof HTMLDetailsElement)) return;
-    if (!target.open) return; // 關閉不處理
-
-    // 關閉兄弟節點（同一層）其他已開啟的 details
+    if (!target.open) return;
     const parent = target.parentElement;
     if (!parent) return;
     parent.querySelectorAll(':scope > details[open]').forEach(d => {
@@ -214,7 +198,7 @@ function enableSingleOpenInTree(root = document) {
   }, true);
 }
 
-// ===== Render =====
+// ===== Math =====
 function waitForKatexReady(timeout=8000){
   return new Promise((res,rej)=>{ const t0=Date.now(); (function loop(){ if (window.katex) return res(); if (Date.now()-t0>timeout) return rej(); setTimeout(loop,50); })(); });
 }
@@ -253,6 +237,7 @@ async function renderMath(scope=document){
   });
 }
 
+// ===== Markdown mini
 function mdToHtml(md){
   if (!md) return "";
   const esc = (t)=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -260,7 +245,7 @@ function mdToHtml(md){
   const out=[];
   for (const ln of lines){
     if (!ln.trim()) { out.push(""); continue; }
-    if (ln.trim()==="---") { out.push(""); continue; }                 // 移除 '---'
+    if (ln.trim()==="---") { out.push(""); continue; }
     if (ln.startsWith("### ")) out.push("<h3>"+esc(ln.slice(4))+"</h3>");
     else if (ln.startsWith("## ")) out.push("<h2>"+esc(ln.slice(3))+"</h2>");
     else if (ln.startsWith("# ")) out.push("<h1>"+esc(ln.slice(2))+"</h1>");
@@ -269,22 +254,7 @@ function mdToHtml(md){
   return out.join("\n");
 }
 
-// 將常見錨點正規化（但不再限制只包裝這些段落；所有 H2/H3 都會包卡片）
-function normalizeAnchor(raw){
-  const t = (raw || "")
-    .trim()
-    .replace(/\s+/g, "")     // 移除空白
-    .replace(/[／]/g, "/")   // 全形／→半形/
-    .toLowerCase();          // 比對用
-
-  if (t === "快速重點") return "快速重點";
-  if (t === "解釋/定義" || t === "解釋" || t === "定義") return "解釋/定義";
-  if (t === "詳細說明") return "詳細說明";
-  if (t === "常見考點/易錯點" || t === "常見考點" || t === "易錯點") return "常見考點/易錯點";
-  if (t === "舉例說明" || t === "例子" || t === "範例") return "舉例說明";
-  return null;
-}
-
+// ===== Render helpers =====
 function sectionClassByTitle(name){
   switch(name){
     case "快速重點": return "sec--highlight";
@@ -296,100 +266,86 @@ function sectionClassByTitle(name){
   }
 }
 
-// 將內文分段並包裝為卡片（所有 H2/H3 都會被包）
-function sectionizeAndRender(meta, html){
+function renderTitleHeader(meta){
+  const chips = (meta.subject && meta.subject.length)
+    ? `<div class="page-chips">` + meta.subject.map(s=>(`<span class="chip" style="--chip-color:${subjectColor(s)}">${escapeHTML(s)}</span>`)).join("") + `</div>`
+    : `<div class="page-chips"></div>`;
+  const created = meta.createdAt ? `<div class="page-meta">${escapeHTML(meta.createdAt)}</div>` : "";
+  return `<div class="page-title-card">
+      <div class="page-title">《${escapeHTML(meta.title||"(未命名)")}》</div>
+      ${chips}
+      ${created}
+    </div>`;
+}
+
+function fromCSVSections(meta){
+  const order = CANON_ANCHORS;
+  const blocks = [];
+  let hasContent = false;
+  for (const key of order){
+    const txt = meta.sections?.[key];
+    if (!txt) continue;
+    hasContent = true;
+    const html = mdToHtml(txt);
+    const wrap = `<div class="section-card ${sectionClassByTitle(key)}">
+        <div class="section-card__title">${key}</div>
+        <div class="prose">${html}</div>
+      </div>`;
+    blocks.push(wrap);
+  }
+  return { hasContent, html: blocks.join("") };
+}
+
+function fromFileSections(meta, html){
   const temp = document.createElement("div");
   temp.innerHTML = html;
-
-  // 先清掉多餘內容
-  // 1) 單獨 '---' 與 <hr>
-  temp.querySelectorAll("hr").forEach(x=>x.remove());
+  // 清掉只有 '---' 和與標題相同的 heading、以及中繼資料行
+  const pageTitle = (meta.title||"").trim();
   temp.querySelectorAll("p").forEach(p=>{
     const t=(p.textContent||"").trim();
-    if (t==="---") p.remove();
+    if (t==="---" || /^(建立時間|科目)\s*[:：]/.test(t)) p.remove();
   });
-
-  // 2) 與頁面標題相同的 H1/H2/H3
-  const pageTitle = (meta.title||"").trim();
   if (pageTitle){
     temp.querySelectorAll("h1,h2,h3").forEach(h=>{
       if ((h.textContent||"").trim()===pageTitle) h.remove();
     });
   }
 
-  // 3) 清掉中英冒號開頭的中繼資料行
-  const metaLine = /^(建立時間|科目)\s*[:：]/;
-  temp.querySelectorAll("p").forEach(p=>{
-    const t=(p.textContent||"").trim();
-    if (metaLine.test(t)) p.remove();
-  });
-
   const blocks = Array.from(temp.childNodes).filter(n => !(n.nodeType===3 && !String(n.nodeValue).trim()));
-
   const isHeading = el => el && el.nodeType===1 && /H2|H3/.test(el.tagName);
 
-  // 依任何 H2/H3 切段（同時辨識常見錨點以套用不同樣式）
   const sections=[]; let i=0;
   while(i<blocks.length){
     if (isHeading(blocks[i])){
       const heading = blocks[i];
       const rawTitle = (heading.textContent||"").trim();
-      const norm = normalizeAnchor(rawTitle);
-      const dispTitle = norm || rawTitle;
-
+      const title = normalizeAnchor(rawTitle) || rawTitle;
       const nodes=[]; i++;
       while(i<blocks.length){
         if (isHeading(blocks[i])) break;
         nodes.push(blocks[i]); i++;
       }
-      sections.push({ title: dispTitle, className: sectionClassByTitle(norm||""), nodes });
+      const body = document.createElement("div"); body.className="prose";
+      nodes.forEach(n=>body.appendChild(n.cloneNode(true)));
+      body.querySelectorAll("p").forEach(p=>{
+        const t=(p.textContent||"").trim();
+        if (t && !t.includes("：")) p.classList.add("indent-1");
+      });
+      sections.push(`<div class="section-card ${sectionClassByTitle(normalizeAnchor(rawTitle)||"")}">
+        <div class="section-card__title">${escapeHTML(title)}</div>
+        ${body.outerHTML}
+      </div>`);
       continue;
     }
     i++;
   }
-
-  // 若沒有任何 H2/H3，將整份內容作為一張卡
-  if (!sections.length) sections.push({ title: "內容", className: "sec--generic", nodes: blocks, noWrap:true });
-
-  // Header（頁標題 + 科目 chips + 建立時間）
-  const chips = (meta.subject && meta.subject.length)
-    ? `<div class="page-chips">` + meta.subject.map(s=>(`<span class="chip" style="--chip-color:${subjectColor(s)}">${escapeHTML(s)}</span>`)).join("") + `</div>`
-    : `<div class="page-chips"></div>`;
-  const created = meta.createdAt ? `<div class="page-meta">${escapeHTML(meta.createdAt)}</div>` : "";
-  const headerCard = `
-    <div class="page-title-card">
-      <div class="page-title">《${escapeHTML(meta.title||"(未命名)")}》</div>
-      ${chips}
-      ${created}
-    </div>`;
-
-  // 章節卡片
-  const htmlCards = sections.map(sec=>{
-    const wrap = document.createElement("div");
-    wrap.className = `section-card ${sec.className}`;
-
-    const titleEl = document.createElement("div");
-    titleEl.className = "section-card__title";
-    titleEl.textContent = sec.title;
-
-    const body = document.createElement("div");
-    body.className = "prose";
-    sec.nodes.forEach(n=>body.appendChild(n.cloneNode(true)));
-
-    // 沒有「：」就自動縮排
-    body.querySelectorAll("p").forEach(p=>{
-      const t=(p.textContent||"").trim();
-      if (t && !t.includes("：")) p.classList.add("indent-1");
-    });
-
-    wrap.appendChild(titleEl);
-    wrap.appendChild(body);
-    return wrap.outerHTML;
-  });
-
-  cardHost.innerHTML = headerCard + htmlCards.join("");
-  renderMath(cardHost);
-  ensureScrollButtons();
+  if (!sections.length){
+    const body = document.createElement("div"); body.className="prose"; body.innerHTML = temp.innerHTML;
+    body.querySelectorAll("p").forEach(p=>{ const t=(p.textContent||"").trim(); if (t && !t.includes("：")) p.classList.add("indent-1"); });
+    sections.push(`<div class="section-card sec--generic">
+      <div class="section-card__title">內容</div>${body.outerHTML}</div>`);
+  }
+  return { hasContent: true, html: sections.join("") };
 }
 
 function showSkeleton(h=220){ cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`; }
@@ -397,54 +353,19 @@ function showError(msg){ cardHost.innerHTML = `<div class="section-card sec--gen
 
 // ===== IO =====
 async function readIndexFromCSV(){
-  const base = document.baseURI.replace(/[#?].*$/,"");
   const cfg  = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
-
-  // 常見部署情境的候選路徑（會逐一嘗試）
-  const candidates = [
-    cfg,
-    cfg.replace(/^\.\//, ""),                 // "assets/data/notes.csv"
-    new URL(cfg, base).href,                  // 轉成絕對 URL
-    "/assets/data/notes.csv",                 // 網站根目錄
-    (location.pathname.replace(/\/[^/]*$/, "") + "/assets/data/notes.csv") // 與頁面同層的 assets/
-  ].filter((v,i,arr)=> v && arr.indexOf(v)===i);
-
-  let text = null, lastErr = null;
-  for (const u of candidates){
-    try {
-      text = await fetchText(u);
-      if (text) break;
-    } catch(e){
-      lastErr = e;
-    }
-  }
-
-  // 內嵌備援：<script type="text/csv" id="notes-csv">...</script>
-  if (!text){
-    const inline = document.querySelector('script[type="text/csv"]#notes-csv');
-    if (inline?.textContent?.trim()){
-      text = inline.textContent.trim();
-      console.info("[KNOWHUB] 使用內嵌 CSV 備援 #notes-csv");
-    }
-  }
-
-  if (!text){
-    const where = candidates.join(" | ");
-    throw new Error(`Failed to fetch（已嘗試：${where}）${lastErr ? "｜原因："+lastErr : ""}`);
-  }
-
+  const text = await fetchText(cfg);
   const items = parseCSV(text).map(csvRowToItem).filter(Boolean);
   if (!items.length) throw new Error("CSV 內容為空或欄位未對上（需要至少 title/標題）");
   return items;
 }
-
 
 async function tryLoadFromGuesses(guesses){
   for (const g of guesses){
     try{
       const raw = await fetchText(g);
       if (g.endsWith(".md")) return mdToHtml(raw);
-      return raw; // html
+      return raw;
     }catch{ /* try next */ }
   }
   throw new Error("找不到對應的內容檔（請確認放在 assets/data/pages/，檔名規則是否正確）");
@@ -455,9 +376,23 @@ async function loadPage(id, meta){
   try{
     const m = meta || INDEX.find(x=>x.id===id);
     if (!m) throw new Error("找不到頁面索引");
-    const html = await tryLoadFromGuesses(m._fileGuess || []);
+
+    // 先用 CSV 欄位組群組；若沒有，再從檔案內容切段
+    let contentHTML = "";
+    const csvRes = fromCSVSections(m);
+    if (csvRes.hasContent){
+      contentHTML = csvRes.html;
+    } else {
+      const html = await tryLoadFromGuesses(m._fileGuess || []);
+      const fileRes = fromFileSections(m, html);
+      contentHTML = fileRes.html;
+    }
+
     CURRENT_PAGE_ID = id;
-    sectionizeAndRender(m, html);
+    const header = renderTitleHeader(m);
+    cardHost.innerHTML = header + contentHTML;
+    renderMath(cardHost);
+
     // 高亮側欄
     const hit = treeNav.querySelector(`.item[data-id="${id}"]`);
     if (hit){
@@ -465,6 +400,7 @@ async function loadPage(id, meta){
       hit.classList.add("active");
       hit.closest("details")?.setAttribute("open","");
     }
+    ensureScrollButtons();
   }catch(e){ showError(e.message); }
 }
 
@@ -487,25 +423,21 @@ sideSearch?.addEventListener("input", debounce(()=>{
   FILTER_Q = sideSearch.value || "";
   renderTree();
 }, 120));
-btnRandom?.addEventListener("click", loadRandom);
 
-function renderRandomChecks(){
-  // 目前省略（僅保留掛點，未來可加入科目篩選）
-  randomChecksHost && (randomChecksHost.innerHTML = "");
-}
+btnRandomInline?.addEventListener("click", loadRandom);
+btnRandomFixed?.addEventListener("click", loadRandom);
+
+function renderRandomChecks(){ randomChecksHost && (randomChecksHost.innerHTML = ""); }
 
 function installMobileDrawer() {
-  // 已安裝就跳過
   if (document.querySelector('.kh-drawer-overlay') &&
       document.querySelector('.kh-drawer-toggle')) return;
 
-  // 建立遮罩
   const overlay = document.createElement('div');
   overlay.className = 'kh-drawer-overlay';
   overlay.setAttribute('aria-hidden', 'true');
   document.body.appendChild(overlay);
 
-  // 建立固定左上角漢堡鈕（不在側欄內，避免被隱藏）
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'kh-drawer-toggle';
@@ -517,7 +449,6 @@ function installMobileDrawer() {
   const sidenav = document.querySelector('.kh-sidenav');
   if (!sidenav) return;
 
-  // 開關狀態
   const openDrawer = () => {
     document.documentElement.classList.add('kh-drawer-open');
     sidenav.setAttribute('data-open', 'true');
@@ -533,23 +464,17 @@ function installMobileDrawer() {
     isOpen ? closeDrawer() : openDrawer();
   };
 
-  // 事件
   btn.addEventListener('click', toggleDrawer);
   overlay.addEventListener('click', closeDrawer);
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeDrawer();
-  });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
-  // 螢幕尺寸變化時：大螢幕還原為常駐側欄、小螢幕保持抽屜
   const mq = matchMedia('(max-width: 820px)');
   const handleMQ = () => {
     if (mq.matches) {
-      // 手機：預設關閉抽屜
       closeDrawer();
       btn.style.display = 'inline-flex';
       overlay.style.display = '';
     } else {
-      // 桌機：確保側欄可見且不需要抽屫 UI
       document.documentElement.classList.remove('kh-drawer-open');
       sidenav.setAttribute('data-open', 'true');
       btn.setAttribute('aria-expanded', 'true');
@@ -558,7 +483,7 @@ function installMobileDrawer() {
     }
   };
   mq.addEventListener('change', handleMQ);
-  handleMQ(); // 初始判斷
+  handleMQ();
 }
 
 function rememberScrollPositions() {
@@ -619,7 +544,6 @@ function ensureScrollButtons(){
 }
 
 async function bootstrap(){
-  // 手機：預設關閉側欄
   if (sidenav && (matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 820px)").matches)) {
     sidenav.setAttribute("data-open","false");
     toggleBtn?.setAttribute("aria-expanded","false");
@@ -640,27 +564,21 @@ async function bootstrap(){
 
 function ensureMobileToggleFab() {
   if (document.querySelector('.kh-sidenav-fab')) return;
-
-  // 只在手機/小螢幕時加
   const isMobile = matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 820px)").matches;
   if (!isMobile) return;
-
   const fab = document.createElement('button');
   fab.className = 'kh-sidenav-fab btn btn-primary';
   fab.type = 'button';
   fab.setAttribute('aria-label', '切換類別');
   fab.textContent = '☰ 類別';
   document.body.appendChild(fab);
-
   const toggle = () => {
     const open = sidenav.getAttribute("data-open") !== "false";
     const next = open ? "false" : "true";
     sidenav.setAttribute("data-open", next);
     toggleBtn?.setAttribute("aria-expanded", (next === "true").toString());
   };
-
   fab.addEventListener('click', toggle);
-  // 舊按鈕仍保留，兩者行為一致
   toggleBtn?.addEventListener('click', toggle);
 }
 

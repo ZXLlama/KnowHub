@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="./assets/css/template.css" />
     <link rel="stylesheet" href="./assets/css/knowledge.css" />
 
-    <!-- 句子自動縮排：內文段落沒有「：」就縮排 -->
     <style>.prose p.indent-1{ text-indent: 2em; }</style>
 
     <!-- KaTeX -->
@@ -29,9 +28,12 @@
       </div>
     </header>
 
+    <!-- 全裝置固定在右上角的「隨機」按鈕 -->
+    <button id="btn-random-fixed" class="btn btn-primary" type="button" aria-label="隨機挑選">🎲 隨機</button>
+
     <div class="kh-shell">
-      <aside class="kh-sidenav" data-open="true" aria-label="類別側邊欄">
-        
+      <aside class="kh-sidenav" data-open="true" aria-label="類別側邊欄（可獨立滾動）">
+        <button id="sidenav-toggle" class="kh-sidenav__toggle btn btn-primary" aria-expanded="true">☰ 類別</button>
 
         <label class="kh-side-search" for="side-search">
           <span class="icon" aria-hidden="true">🔎</span>
@@ -44,15 +46,10 @@
           <p class="hint">✓ 勾選的科目會用於「🎲 隨機」；手動從清單點標題不受影響。</p>
         </section>
 
-        <nav id="nav-tree" class="kh-tree" aria-label="知識清單"></nav>
+        <nav id="nav-tree" class="kh-tree" aria-label="知識清單（單層只開一組）"></nav>
       </aside>
 
-      <main class="kh-content" id="kh-content" aria-live="polite" aria-label="內容">
-        <div class="kh-toolbar">
-          <button id="btn-random" class="btn btn-primary" type="button">🎲 隨機</button>
-          <span class="kh-toolbar__spacer"></span>
-        </div>
-
+      <main class="kh-content" id="kh-content" aria-live="polite" aria-label="內容（可獨立滾動）">
         <div id="knowledge-card" class="kh-card-host"></div>
 
         <div class="kh-bottom-home">
@@ -76,9 +73,8 @@
       });
     </script>
 
-    <!-- 純 CSV 版主程式，帶 cache-busting 參數 -->
-    <script src="./assets/js/knowledge.js?v=20251011-csv" defer></script>
-    <!-- 保險：1.2s 後若有殘留 loader（舊版遺留），移除掉 -->
+    <!-- 主程式 -->
+    <script src="./assets/js/knowledge.js?v=20251011-csvsec" defer></script>
     <script>setTimeout(()=>{ document.querySelector('.kh-loader')?.remove(); }, 1200);</script>
   </body>
 </html>

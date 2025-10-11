@@ -470,12 +470,11 @@
   --kh-radius-xl: 22px;
   --kh-gap: 16px;
   --kh-side-w: 300px;
-  /* 漸層基底 */
   --g-surface: linear-gradient(180deg, rgba(18,21,30,0.9), rgba(12,14,22,0.9));
   --g-card: linear-gradient(135deg, rgba(28,32,48,0.9), rgba(20,24,38,0.9));
   --g-card-2: linear-gradient(135deg, rgba(28,32,48,0.85), rgba(18,22,36,0.85));
-  --g-accent: linear-gradient(135deg, #7c3aed, #2563eb); /* 紫→藍 */
-  --g-accent-2: linear-gradient(135deg, #06b6d4, #10b981); /* 青→綠 */
+  --g-accent: linear-gradient(135deg, #7c3aed, #2563eb);
+  --g-accent-2: linear-gradient(135deg, #06b6d4, #10b981);
   --g-danger: linear-gradient(135deg, #ef4444, #f59e0b);
   --g-overlay: linear-gradient(0deg, rgba(0,0,0,0.45), rgba(0,0,0,0.45));
   --kh-border: 1px solid rgba(255,255,255,0.08);
@@ -548,9 +547,6 @@
   display: flex;
   flex-direction: column;
 }
-.kh-sidenav .kh-sidenav__toggle {
-  display: none;
-}
 
 .kh-content {
   background: var(--g-card);
@@ -562,6 +558,27 @@
   position: relative;
 }
 
+/* Fixed top-right Random button (all viewports) */
+#btn-random-fixed {
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top));
+  right: calc(8px + env(safe-area-inset-right));
+  z-index: 80;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: var(--kh-border);
+  background: var(--g-accent-2);
+  color: white;
+  box-shadow: var(--kh-shadow);
+}
+
+@media (min-width: 821px) {
+  #btn-random-fixed {
+    top: 12px;
+    right: 12px;
+  }
+}
+/* Mobile drawer */
 .kh-drawer-toggle {
   position: fixed;
   inset: 12px auto auto 12px;
@@ -611,6 +628,7 @@
     border-radius: 0 var(--kh-radius) var(--kh-radius) 0;
   }
 }
+/* Sidenav content */
 .kh-side-search {
   display: flex;
   align-items: center;
@@ -687,39 +705,15 @@
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(37, 99, 235, 0.18));
 }
 
-.kh-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px;
-}
-.kh-toolbar .kh-toolbar__spacer {
-  flex: 1;
-}
-.kh-toolbar #btn-random {
-  background-image: var(--g-accent-2);
-  border: 0;
-}
-
-.kh-bottom-home {
-  position: sticky;
-  bottom: -12px;
-  display: flex;
-  justify-content: center;
-  padding-top: 10px;
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.16));
-}
-.kh-bottom-home .kh-home-btn {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  border: var(--kh-border);
-}
-
+/* Title group: visually distinct */
 .page-title-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  border: var(--kh-border);
-  border-radius: var(--kh-radius-xl);
-  padding: 18px 16px;
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border-radius: 20px;
+  padding: 18px 16px 18px 18px;
   margin-bottom: 14px;
+  border: 1px solid rgba(147, 51, 234, 0.35);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.25);
 }
 .page-title-card .page-title {
   font-size: clamp(18px, 2.4vw, 28px);
@@ -748,6 +742,7 @@
   border: 1px solid color-mix(in srgb, var(--chip-color) 40%, transparent);
 }
 
+/* Section groups (內文卡片) */
 .section-card {
   border: var(--kh-border);
   border-radius: 18px;
@@ -767,7 +762,7 @@
   border: var(--kh-border);
 }
 
-/* 不同錨點的舒適漸層（僅色溫微調，不刺眼） */
+/* Pleasant gradients per canonical anchors */
 .sec--highlight {
   background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(234, 88, 12, 0.05));
 }
@@ -814,6 +809,7 @@
   text-indent: 2em;
 }
 
+/* Skeleton */
 .skeleton {
   border-radius: 16px;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.06));
@@ -829,6 +825,7 @@
     background-position: 100% 50%;
   }
 }
+/* Up/Down FAB */
 .kh-fab {
   position: fixed;
   right: 16px;
@@ -848,6 +845,7 @@
   cursor: pointer;
 }
 
+/* Mobile helper FAB */
 .kh-sidenav-fab {
   position: fixed;
   left: 16px;
@@ -855,6 +853,7 @@
   z-index: 70;
 }
 
+/* Misc */
 .kh-random-filter {
   display: none;
 }
