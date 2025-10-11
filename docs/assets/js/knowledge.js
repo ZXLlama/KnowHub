@@ -116,7 +116,15 @@ function csvRowToItem(r){
   g.push(`./assets/data/pages/${toSlug(title)}.html`);
 
   const sections = collectSectionsFromRow(r);
+  
+  // more guesses using raw title (handles Chinese & punctuation)
+  const rawTitle = (title || "").trim();
+  if (rawTitle) {
+    g.push(`./assets/data/pages/${rawTitle}.md`);
+    g.push(`./assets/data/pages/${rawTitle}.html`);
+  }
   return { id, title, subject: subjects, createdAt, sections, _fileGuess: g };
+
 }
 function prefixGuess(file){
   if (!file) return file;
@@ -162,7 +170,7 @@ function renderTree(){
       a.href = "javascript:void(0)";
       a.dataset.id = it.id;
       a.textContent = it.title || "(未命名)";
-      a.addEventListener("click", ()=>{
+      a.addEventListener("click", ()=>{ console.debug('[KNOWHUB] open item', it);
         loadPage(it.id, it);
         treeNav.querySelectorAll(".item.active").forEach(x=>x.classList.remove("active"));
         a.classList.add("active");
