@@ -32,7 +32,30 @@ let RANDOM_SUBJECTS = new Set(SUBJECT_ORDER);
 const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
 const debounce = (fn,ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 const toSlug = (s)=> (s||"").trim().replace(/[\\/:*?"<>|]+/g,"-").replace(/\s+/g,"-");
-async function fetchText(url){ const r=await fetch(url,{cache:"no-store",mode:"cors",credentials:"omit"}); if(!r.ok) throw new Error(`${r.status} ${r.statusText}`); return await r.text(); }
+async function fetchText(url){
+  try{
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    return await r.text();
+  }catch(e){
+    // 額外提示（混合內容 / CORS 常見）
+    const pageHTTPS = location.protocol === "https:";
+    const urlHTTPS  = /^https:/.test(url);
+    const urlHTTP   = /^http:/.test(url);
+    if (pageHTTPS && urlHTTP){
+      throw new Error(`Mixed content 被瀏覽器封鎖：頁面是 HTTPS 但你用 HTTP 抓取 ${url}`);
+    }
+    // 無同源時，可能是 CORS
+    try{
+      const sameOrigin = new URL(url, location.href).origin === location.origin;
+      if (!sameOrigin) {
+        throw new Error(`跨網域（CORS）可能被封鎖：${url} 請在伺服器回應加上 Access-Control-Allow-Origin`);
+      }
+    }catch(_){}
+    throw e;
+  }
+}
+
 
 /* ===== Subject Colors (stable) ===== */
 const SUBJECT_COLOR_MAP = {
@@ -133,7 +156,7 @@ function renderTree(){
   for (const [sub, arr] of groupBySubject(filtered)){
     const details = document.createElement("details");
     details.className = "group";
-    details.open = true;
+    details.open = false;
     details.innerHTML = `
       <summary>
         <span class="chip chip--sub" style="--chip-color:${subjectColor(sub)}">${escapeHTML(sub)}</span>
@@ -344,11 +367,47 @@ function showError(msg){ cardHost.innerHTML = `<div class="section-card sec--gen
 
 /* ===== IO ===== */
 async function readIndexFromCSV(){
-  const text = await fetchText(CSV_INDEX);
+  const base = document.baseURI.replace(/[#?].*$/,"");
+  const cfg  = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
+
+  // 常見部署情境的候選路徑（會逐一嘗試）
+  const candidates = [
+    cfg,
+    cfg.replace(/^\.\//, ""),                 // "assets/data/notes.csv"
+    new URL(cfg, base).href,                  // 轉成絕對 URL
+    "/assets/data/notes.csv",                 // 網站根目錄
+    (location.pathname.replace(/\/[^/]*$/, "") + "/assets/data/notes.csv") // 與頁面同層的 assets/
+  ].filter((v,i,arr)=> v && arr.indexOf(v)===i);
+
+  let text = null, lastErr = null;
+  for (const u of candidates){
+    try {
+      text = await fetchText(u);
+      if (text) break;
+    } catch(e){
+      lastErr = e;
+    }
+  }
+
+  // 內嵌備援：<script type="text/csv" id="notes-csv">...</script>
+  if (!text){
+    const inline = document.querySelector('script[type="text/csv"]#notes-csv');
+    if (inline?.textContent?.trim()){
+      text = inline.textContent.trim();
+      console.info("[KNOWHUB] 使用內嵌 CSV 備援 #notes-csv");
+    }
+  }
+
+  if (!text){
+    const where = candidates.join(" | ");
+    throw new Error(`Failed to fetch（已嘗試：${where}）${lastErr ? "｜原因："+lastErr : ""}`);
+  }
+
   const items = parseCSV(text).map(csvRowToItem).filter(Boolean);
   if (!items.length) throw new Error("CSV 內容為空或欄位未對上（需要至少 title/標題）");
   return items;
 }
+
 
 async function tryLoadFromGuesses(guesses){
   for (const g of guesses){
@@ -436,6 +495,33 @@ function ensureScrollButtons(){
   wrap.querySelector(".fab--up").addEventListener("click", ()=> window.scrollTo({top:0, behavior:"smooth"}));
   wrap.querySelector(".fab--down").addEventListener("click", ()=> window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"}));
 }
+
+function ensureMobileToggleFab() {
+  if (document.querySelector('.kh-sidenav-fab')) return;
+
+  // 只在手機/小螢幕時加
+  const isMobile = matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 820px)").matches;
+  if (!isMobile) return;
+
+  const fab = document.createElement('button');
+  fab.className = 'kh-sidenav-fab btn btn-primary';
+  fab.type = 'button';
+  fab.setAttribute('aria-label', '切換類別');
+  fab.textContent = '☰ 類別';
+  document.body.appendChild(fab);
+
+  const toggle = () => {
+    const open = sidenav.getAttribute("data-open") !== "false";
+    const next = open ? "false" : "true";
+    sidenav.setAttribute("data-open", next);
+    toggleBtn?.setAttribute("aria-expanded", (next === "true").toString());
+  };
+
+  fab.addEventListener('click', toggle);
+  // 舊按鈕仍保留，兩者行為一致
+  toggleBtn?.addEventListener('click', toggle);
+}
+
 
 // 首次載入
 bootstrap().then(()=> loadRandom().catch(()=>{})).catch(()=>{});
