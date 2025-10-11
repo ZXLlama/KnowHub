@@ -631,7 +631,9 @@ function ensureScrollButtons(){
       mainScroller.scrollTo({top:max, behavior:"smooth"});
     }
   });
-}
+};
+  wrap.querySelector(".fab--down").addEventListener("click", ()=> window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"}));
+
 
 function ensureMobileToggleFab() {
   if (document.querySelector('.kh-sidenav-fab')) return;

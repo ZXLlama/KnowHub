@@ -878,7 +878,6 @@
     left: 0;
     top: 0;
     bottom: 0;
-    z-index: 40;
     background: #fff;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
     transition: transform 0.25s ease;
@@ -1369,7 +1368,6 @@ html, body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
-    z-index: 10005;
   }
   .kh-drawer-open .kh-drawer-overlay {
     opacity: 1;
@@ -1388,7 +1386,6 @@ html, body {
     border-radius: 12px;
     font-size: 22px;
     line-height: 1;
-    z-index: 10010;
     background: linear-gradient(180deg, #2e2e3a, #1a1a23);
     color: #fff;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
@@ -1442,6 +1439,70 @@ html, body {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   backdrop-filter: blur(6px);
+}
+
+/* ==== Gradient palette & applications (2025-10-11 r2) ==== */
+:root {
+  --kh-grad-1: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
+  --kh-grad-2: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+  --kh-grad-3: linear-gradient(135deg, #00f5a0 0%, #00d9f5 100%);
+  --kh-grad-4: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+  --kh-grad-5: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+}
+
+/* Utility: gradient backgrounds */
+.grad-1 {
+  background-image: var(--kh-grad-1) !important;
+}
+
+.grad-2 {
+  background-image: var(--kh-grad-2) !important;
+}
+
+.grad-3 {
+  background-image: var(--kh-grad-3) !important;
+}
+
+.grad-4 {
+  background-image: var(--kh-grad-4) !important;
+}
+
+.grad-5 {
+  background-image: var(--kh-grad-5) !important;
+}
+
+/* Drawer toggle uses a bold gradient */
+.kh-drawer-toggle {
+  background-image: var(--kh-grad-5);
+  color: #fff;
+}
+
+/* FAB buttons use a subtle gradient */
+.kh-fab .fab {
+  background-image: var(--kh-grad-2);
+  color: #fff;
+}
+
+/* Sidenav with layered gradients for depth */
+.kh-sidenav {
+  background: linear-gradient(180deg, rgba(24, 24, 32, 0.96), rgba(14, 14, 20, 0.96)), radial-gradient(1200px 600px at -10% -10%, rgba(142, 45, 226, 0.12), transparent 40%), radial-gradient(1000px 400px at 120% 20%, rgba(241, 7, 163, 0.1), transparent 40%);
+  border-right: 1px solid rgba(142, 45, 226, 0.25);
+}
+
+/* Hover highlight for tree items */
+.kh-tree summary:hover {
+  background-image: var(--kh-grad-1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.kh-tree a:hover {
+  text-decoration: none;
+  background-image: var(--kh-grad-3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /*# sourceMappingURL=knowledge.css.map */
