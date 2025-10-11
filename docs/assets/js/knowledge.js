@@ -376,60 +376,51 @@ function showError(msg){
 
 
 // ===== Content Loader =====
+
 async function tryLoadFromGuesses(guesses){
+  const tried = [];
   for (const gRaw of (guesses || [])){
     let g = gRaw;
     try {
+      // 1) 轉絕對 URL 以便處理
       const u = new URL(gRaw, document.baseURI);
-      // encodeURI 以保留 / ? 等必要符號，同時正確處理中文與單引號
-      const enc = encodeURI(u.pathname).replace(/#/g, "%23");
+
+      // 2) 正規化路徑：把已經被編碼過一次或多次的路徑「解回原文」再統一編碼一次
+      let path = u.pathname;
+      try {
+        // 可能被多重編碼（例如 %25E6%...），嘗試解碼 2 次讓它回到原生字串
+        let once = decodeURIComponent(path);
+        let twice;
+        try { twice = decodeURIComponent(once); } catch { twice = once; }
+        // 如果第二次解碼成功且變更了字串，就採用第二次；否則用第一次
+        path = (twice && twice !== once) ? twice : once;
+      } catch {
+        // 不是編碼狀態，維持原樣
+      }
+
+      // 3) 統一重新編碼（避免雙重編碼）
+      let enc = encodeURI(path)
+        .replace(/#/g, "%23")   // 保護片段符號
+        .replace(/'/g, "%27");  // encodeURI 不會處理單引號，手動處理
+
       g = u.origin + enc + (u.search || "") + (u.hash || "");
     } catch {
       g = gRaw;
     }
+
     try{
       const raw = await fetchText(g);
       if (g.endsWith(".md")) return mdToHtml(raw);
       return raw; // html
-    }catch{ /* try next guess */ }
+    }catch(e){
+      tried.push(g);
+      // 繼續嘗試下一個猜測
+    }
   }
+  console.warn("[KNOWHUB] 無法載入任何猜測的路徑：", tried);
   throw new Error("找不到對應的內容檔（請確認放在 assets/data/pages/，檔名規則是否正確）");
 }
 
-async function loadPage(id, meta){
-  showSkeleton(260);
-  try{
-    const m = meta || INDEX.find(x=>x.id===id);
-    if (!m) throw new Error("找不到頁面索引");
-
-    // 先用 CSV 欄位分組；沒有再讀檔案切段
-    let contentHTML = "";
-    const csvRes = fromCSVSections(m);
-    if (csvRes.hasContent){
-      contentHTML = csvRes.html;
-    } else {
-      const html = await tryLoadFromGuesses(m._fileGuess || []);
-      const fileRes = fromFileSections(m, html);
-      contentHTML = fileRes.html;
-    }
-
-    CURRENT_PAGE_ID = id;
-    const header = renderTitleHeader(m);
-    cardHost.innerHTML = header + contentHTML;
-    renderMath(cardHost);
-
-    // 側欄高亮定位
-    const hit = treeNav.querySelector(`.item[data-id="${id}"]`);
-    if (hit){
-      treeNav.querySelectorAll(".item.active").forEach(x=>x.classList.remove("active"));
-      hit.classList.add("active");
-      hit.closest("details")?.setAttribute("open","");
-    }
-    ensureScrollButtons();
-  }catch(e){
-    showError(e.message);
-  }
-}
 async function loadRandom(){
   if (!INDEX.length) { await bootstrap(); }
   const pool = INDEX;
