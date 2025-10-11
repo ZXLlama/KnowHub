@@ -1,19 +1,20 @@
-/* KnowHub — Knowledge (CSV-only, enhanced UI) 2025-10-10
+/* KnowHub — Knowledge (CSV-only, enhanced UI) 2025-10-11
  * - CSV only
  * - Subject color chips + createdAt
- * - Remove '---' blocks
- * - Section containers with gradients
- * - Better mobile sidebar
+ * - Remove '---' blocks & meta lines
+ * - Section containers with gradients (wrap ALL H2/H3 into cards)
+ * - Better mobile sidebar (drawer with overlay, independent scrolling)
  * - Bottom-right scroll to top/bottom buttons
  * - Auto-indent paragraphs without '：'
+ * - On load: auto random once
  */
 
-/* ===== Config ===== */
+// ===== Config =====
 const CSV_INDEX = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
 const SUBJECT_ORDER = (window.KNOWHUB && window.KNOWHUB.SUBJECTS) || ["國文","英文","數學","物理","化學","生物","地球科學"];
 const ANCHORS  = ["快速重點","解釋/定義","詳細說明","常見考點/易錯點","舉例說明"]; // 以你指定為主（同義詞自動合併見 normalizeAnchor）
 
-/* ===== DOM ===== */
+// ===== DOM =====
 const sidenav    = document.querySelector(".kh-sidenav");
 const toggleBtn  = document.getElementById("sidenav-toggle");
 const sideSearch = document.getElementById("side-search");
@@ -22,13 +23,13 @@ const cardHost   = document.getElementById("knowledge-card");
 const btnRandom  = document.getElementById("btn-random");
 const randomChecksHost = document.getElementById("random-subjects");
 
-/* ===== State ===== */
+// ===== State =====
 let INDEX = [];                 // [{id,title,subject:[],createdAt?,_fileGuess:string[]}]
 let FILTER_Q = "";
 let CURRENT_PAGE_ID = null;
 let RANDOM_SUBJECTS = new Set(SUBJECT_ORDER);
 
-/* ===== Utils ===== */
+// ===== Utils =====
 const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
 const debounce = (fn,ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 const toSlug = (s)=> (s||"").trim().replace(/[\\/:*?"<>|]+/g,"-").replace(/\s+/g,"-");
@@ -57,7 +58,7 @@ async function fetchText(url){
 }
 
 
-/* ===== Subject Colors (stable) ===== */
+// ===== Subject Colors (stable) =====
 const SUBJECT_COLOR_MAP = {
   "國文":"#E3556B","英文":"#4D9DE0","數學":"#6C5CE7","物理":"#00BCD4","化學":"#00B894","生物":"#55D6BE","地球科學":"#FFA62B","未分類":"#9E9E9E"
 };
@@ -68,7 +69,7 @@ function subjectColor(s){
   const hue = h%360; return `hsl(${hue},70%,55%)`;
 }
 
-/* ===== CSV ===== */
+// ===== CSV =====
 function parseCSV(text){
   const rows=[]; let i=0, field="", row=[], inQ=false;
   const push = ()=>{ row.push(field); field=""; };
@@ -133,7 +134,7 @@ function prefixGuess(file){
   return `./assets/data/pages/${file}`;
 }
 
-/* ===== Sidebar & Search ===== */
+// ===== Sidebar & Search =====
 function groupBySubject(items){
   const map = new Map();
   items.forEach(x=>{
@@ -162,7 +163,7 @@ function renderTree(){
         <span class="chip chip--sub" style="--chip-color:${subjectColor(sub)}">${escapeHTML(sub)}</span>
         <span class="count">${arr.length}</span>
       </summary>
-      <div class="items"></div>`;
+      <div class="items" role="list"></div>`;
     const box = details.querySelector(".items");
 
     arr.forEach(it=>{
@@ -213,7 +214,7 @@ function enableSingleOpenInTree(root = document) {
   }, true);
 }
 
-/* ===== Render ===== */
+// ===== Render =====
 function waitForKatexReady(timeout=8000){
   return new Promise((res,rej)=>{ const t0=Date.now(); (function loop(){ if (window.katex) return res(); if (Date.now()-t0>timeout) return rej(); setTimeout(loop,50); })(); });
 }
@@ -259,7 +260,7 @@ function mdToHtml(md){
   const out=[];
   for (const ln of lines){
     if (!ln.trim()) { out.push(""); continue; }
-    if (ln.trim()==="---") { out.push(""); continue; }                 // 規則 4：移除 '---'
+    if (ln.trim()==="---") { out.push(""); continue; }                 // 移除 '---'
     if (ln.startsWith("### ")) out.push("<h3>"+esc(ln.slice(4))+"</h3>");
     else if (ln.startsWith("## ")) out.push("<h2>"+esc(ln.slice(3))+"</h2>");
     else if (ln.startsWith("# ")) out.push("<h1>"+esc(ln.slice(2))+"</h1>");
@@ -268,6 +269,7 @@ function mdToHtml(md){
   return out.join("\n");
 }
 
+// 將常見錨點正規化（但不再限制只包裝這些段落；所有 H2/H3 都會包卡片）
 function normalizeAnchor(raw){
   const t = (raw || "")
     .trim()
@@ -294,6 +296,7 @@ function sectionClassByTitle(name){
   }
 }
 
+// 將內文分段並包裝為卡片（所有 H2/H3 都會被包）
 function sectionizeAndRender(meta, html){
   const temp = document.createElement("div");
   temp.innerHTML = html;
@@ -321,33 +324,36 @@ function sectionizeAndRender(meta, html){
     if (metaLine.test(t)) p.remove();
   });
 
-  const blocks = Array.from(temp.childNodes);
+  const blocks = Array.from(temp.childNodes).filter(n => !(n.nodeType===3 && !String(n.nodeValue).trim()));
+
   const isHeading = el => el && el.nodeType===1 && /H2|H3/.test(el.tagName);
 
-  // 依標題錨點切段
+  // 依任何 H2/H3 切段（同時辨識常見錨點以套用不同樣式）
   const sections=[]; let i=0;
   while(i<blocks.length){
     if (isHeading(blocks[i])){
-      const norm = normalizeAnchor((blocks[i].textContent||"").trim());
-      if (norm){
-        const nodes=[]; i++;
-        while(i<blocks.length){
-          if (isHeading(blocks[i]) && normalizeAnchor((blocks[i].textContent||"").trim())) break;
-          nodes.push(blocks[i]); i++;
-        }
-        sections.push({ title:norm, nodes });
-        continue;
+      const heading = blocks[i];
+      const rawTitle = (heading.textContent||"").trim();
+      const norm = normalizeAnchor(rawTitle);
+      const dispTitle = norm || rawTitle;
+
+      const nodes=[]; i++;
+      while(i<blocks.length){
+        if (isHeading(blocks[i])) break;
+        nodes.push(blocks[i]); i++;
       }
+      sections.push({ title: dispTitle, className: sectionClassByTitle(norm||""), nodes });
+      continue;
     }
     i++;
   }
-  if (!sections.length) sections.push({ title:"內容", nodes: blocks, noWrap:true });
+
+  // 若沒有任何 H2/H3，將整份內容作為一張卡
+  if (!sections.length) sections.push({ title: "內容", className: "sec--generic", nodes: blocks, noWrap:true });
 
   // Header（頁標題 + 科目 chips + 建立時間）
   const chips = (meta.subject && meta.subject.length)
-    ? `<div class="page-chips">` + meta.subject.map(s=>(
-        `<span class="chip" style="--chip-color:${subjectColor(s)}">${escapeHTML(s)}</span>`
-      )).join("") + `</div>`
+    ? `<div class="page-chips">` + meta.subject.map(s=>(`<span class="chip" style="--chip-color:${subjectColor(s)}">${escapeHTML(s)}</span>`)).join("") + `</div>`
     : `<div class="page-chips"></div>`;
   const created = meta.createdAt ? `<div class="page-meta">${escapeHTML(meta.createdAt)}</div>` : "";
   const headerCard = `
@@ -360,7 +366,7 @@ function sectionizeAndRender(meta, html){
   // 章節卡片
   const htmlCards = sections.map(sec=>{
     const wrap = document.createElement("div");
-    wrap.className = `section-card ${sectionClassByTitle(sec.title)}`;
+    wrap.className = `section-card ${sec.className}`;
 
     const titleEl = document.createElement("div");
     titleEl.className = "section-card__title";
@@ -389,7 +395,7 @@ function sectionizeAndRender(meta, html){
 function showSkeleton(h=220){ cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`; }
 function showError(msg){ cardHost.innerHTML = `<div class="section-card sec--generic"><div class="section-card__title">讀取失敗</div><div class="prose"><p>${escapeHTML(msg||"")}</p></div></div>`; }
 
-/* ===== IO ===== */
+// ===== IO =====
 async function readIndexFromCSV(){
   const base = document.baseURI.replace(/[#?].*$/,"");
   const cfg  = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
@@ -470,7 +476,7 @@ async function loadRandom(){
   await loadPage(pick.id, pick);
 }
 
-/* ===== Events & Bootstrap ===== */
+// ===== Events & Bootstrap =====
 toggleBtn?.addEventListener("click", ()=>{
   const open = sidenav.getAttribute("data-open")!=="false";
   const next = open ? "false" : "true";
@@ -484,7 +490,7 @@ sideSearch?.addEventListener("input", debounce(()=>{
 btnRandom?.addEventListener("click", loadRandom);
 
 function renderRandomChecks(){
-  // 可保留；此處省略顯示，若需要也能加回
+  // 目前省略（僅保留掛點，未來可加入科目篩選）
   randomChecksHost && (randomChecksHost.innerHTML = "");
 }
 
@@ -543,7 +549,7 @@ function installMobileDrawer() {
       btn.style.display = 'inline-flex';
       overlay.style.display = '';
     } else {
-      // 桌機：確保側欄可見且不需要抽屜 UI
+      // 桌機：確保側欄可見且不需要抽屫 UI
       document.documentElement.classList.remove('kh-drawer-open');
       sidenav.setAttribute('data-open', 'true');
       btn.setAttribute('aria-expanded', 'true');
@@ -581,28 +587,7 @@ function rememberScrollPositions() {
   save(side, K.side); save(main, K.main);
 }
 
-
-
-async function bootstrap(){
-  // 手機：預設關閉側欄
-  if (sidenav && (matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 820px)").matches)) {
-    sidenav.setAttribute("data-open","false");
-    toggleBtn?.setAttribute("aria-expanded","false");
-  }
-  renderRandomChecks();
-
-  try{
-    INDEX = await readIndexFromCSV();
-    renderTree();
-  }catch(e){
-    showError(`CSV 載入失敗：${e.message}\n請確認 window.KNOWHUB.CSV_INDEX 指向正確檔名。`);
-    throw e;
-  }
-  ensureScrollButtons();
-}
-
 // 右下角上下捲動按鈕
-
 function ensureScrollButtons(){
   if (document.querySelector(".kh-fab")) return;
   const wrap = document.createElement("div");
@@ -632,9 +617,26 @@ function ensureScrollButtons(){
     }
   });
 }
-;
-  wrap.querySelector(".fab--down").addEventListener("click", ()=> window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"}));
 
+async function bootstrap(){
+  // 手機：預設關閉側欄
+  if (sidenav && (matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 820px)").matches)) {
+    sidenav.setAttribute("data-open","false");
+    toggleBtn?.setAttribute("aria-expanded","false");
+  }
+  renderRandomChecks();
+
+  try{
+    INDEX = await readIndexFromCSV();
+    renderTree();
+  }catch(e){
+    showError(`CSV 載入失敗：${e.message}\n請確認 window.KNOWHUB.CSV_INDEX 指向正確檔名。`);
+    throw e;
+  }
+  rememberScrollPositions();
+  ensureScrollButtons();
+  ensureMobileToggleFab();
+}
 
 function ensureMobileToggleFab() {
   if (document.querySelector('.kh-sidenav-fab')) return;
@@ -662,6 +664,7 @@ function ensureMobileToggleFab() {
   toggleBtn?.addEventListener('click', toggle);
 }
 
-
-// 首次載入
-bootstrap().then(()=> loadRandom().catch(()=>{})).catch(()=>{});
+// 首次載入：先啟動，再自動隨機一次
+bootstrap()
+  .then(()=> loadRandom().catch(()=>{}))
+  .catch(()=>{});
