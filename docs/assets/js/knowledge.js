@@ -28,7 +28,7 @@ let CURRENT_PAGE_ID = null;
 let RANDOM_SUBJECTS = new Set(SUBJECT_ORDER);
 
 // ===== Utils =====
-const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;","&gt;":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
+const escapeHTML = (s)=> (s||"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]||m));
 const debounce = (fn,ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 const toSlug = (s)=> (s||"").trim().replace(/[\\/:*?"<>|]+/g,"-").replace(/\s+/g,"-");
 async function fetchText(url){
@@ -296,6 +296,7 @@ function fromCSVSections(meta){
   return { hasContent, html: blocks.join("") };
 }
 
+
 function fromFileSections(meta, html){
   const temp = document.createElement("div");
   temp.innerHTML = html;
@@ -312,7 +313,7 @@ function fromFileSections(meta, html){
   }
 
   const blocks = Array.from(temp.childNodes).filter(n => !(n.nodeType===3 && !String(n.nodeValue).trim()));
-  const isHeading = el => el && el.nodeType===1 && /H2|H3/.test(el.tagName);
+  const isHeading = el => el && el.nodeType===1 && /H1|H2|H3/.test(el.tagName);
 
   const sections=[]; let i=0;
   while(i<blocks.length){
@@ -331,78 +332,26 @@ function fromFileSections(meta, html){
         const t=(p.textContent||"").trim();
         if (t && !t.includes("：")) p.classList.add("indent-1");
       });
+      // 內文群組卡片
+      const secTitleHTML = `<div class="section-card__title">${escapeHTML(title)}</div>`;
       sections.push(`<div class="section-card ${sectionClassByTitle(normalizeAnchor(rawTitle)||"")}">
-        <div class="section-card__title">${escapeHTML(title)}</div>
+        ${secTitleHTML}
         ${body.outerHTML}
       </div>`);
       continue;
     }
     i++;
   }
+
   if (!sections.length){
+    // Fallback：若無任何分段，包一張卡，但不顯示「內容」標題
     const body = document.createElement("div"); body.className="prose"; body.innerHTML = temp.innerHTML;
     body.querySelectorAll("p").forEach(p=>{ const t=(p.textContent||"").trim(); if (t && !t.includes("：")) p.classList.add("indent-1"); });
-    sections.push(`<div class="section-card sec--generic">
-      <div class="section-card__title">內容</div>${body.outerHTML}</div>`);
+    sections.push(`<div class="section-card sec--generic">${body.outerHTML}</div>`);
   }
   return { hasContent: true, html: sections.join("") };
 }
 
-function showSkeleton(h=220){ cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`; }
-function showError(msg){ cardHost.innerHTML = `<div class="section-card sec--generic"><div class="section-card__title">讀取失敗</div><div class="prose"><p>${escapeHTML(msg||"")}</p></div></div>`; }
-
-// ===== IO =====
-async function readIndexFromCSV(){
-  const cfg  = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
-  const text = await fetchText(cfg);
-  const items = parseCSV(text).map(csvRowToItem).filter(Boolean);
-  if (!items.length) throw new Error("CSV 內容為空或欄位未對上（需要至少 title/標題）");
-  return items;
-}
-
-async function tryLoadFromGuesses(guesses){
-  for (const g of guesses){
-    try{
-      const raw = await fetchText(g);
-      if (g.endsWith(".md")) return mdToHtml(raw);
-      return raw;
-    }catch{ /* try next */ }
-  }
-  throw new Error("找不到對應的內容檔（請確認放在 assets/data/pages/，檔名規則是否正確）");
-}
-
-async function loadPage(id, meta){
-  showSkeleton(260);
-  try{
-    const m = meta || INDEX.find(x=>x.id===id);
-    if (!m) throw new Error("找不到頁面索引");
-
-    // 先用 CSV 欄位組群組；若沒有，再從檔案內容切段
-    let contentHTML = "";
-    const csvRes = fromCSVSections(m);
-    if (csvRes.hasContent){
-      contentHTML = csvRes.html;
-    } else {
-      const html = await tryLoadFromGuesses(m._fileGuess || []);
-      const fileRes = fromFileSections(m, html);
-      contentHTML = fileRes.html;
-    }
-
-    CURRENT_PAGE_ID = id;
-    const header = renderTitleHeader(m);
-    cardHost.innerHTML = header + contentHTML;
-    renderMath(cardHost);
-
-    // 高亮側欄
-    const hit = treeNav.querySelector(`.item[data-id="${id}"]`);
-    if (hit){
-      treeNav.querySelectorAll(".item.active").forEach(x=>x.classList.remove("active"));
-      hit.classList.add("active");
-      hit.closest("details")?.setAttribute("open","");
-    }
-    ensureScrollButtons();
-  }catch(e){ showError(e.message); }
-}
 
 async function loadRandom(){
   if (!INDEX.length) { await bootstrap(); }
