@@ -187,6 +187,30 @@ function renderTree(){
     if (hit){ treeNav.querySelectorAll(".item.active").forEach(x=>x.classList.remove("active"));
       hit.classList.add("active"); hit.closest("details")?.setAttribute("open",""); }
   }
+  enableSingleOpenInTree(document);
+  installMobileDrawer();
+}
+
+function enableSingleOpenInTree(root = document) {
+  const tree = root.querySelector('.kh-tree');
+  if (!tree) return;
+
+  // 先確保全部預設關閉
+  tree.querySelectorAll('details').forEach(d => { d.open = false; });
+
+  // 監聽所有 details 的 toggle 事件
+  tree.addEventListener('toggle', (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLDetailsElement)) return;
+    if (!target.open) return; // 關閉不處理
+
+    // 關閉兄弟節點（同一層）其他已開啟的 details
+    const parent = target.parentElement;
+    if (!parent) return;
+    parent.querySelectorAll(':scope > details[open]').forEach(d => {
+      if (d !== target) d.open = false;
+    });
+  }, true);
 }
 
 /* ===== Render ===== */
@@ -463,6 +487,74 @@ function renderRandomChecks(){
   // 可保留；此處省略顯示，若需要也能加回
   randomChecksHost && (randomChecksHost.innerHTML = "");
 }
+
+function installMobileDrawer() {
+  // 已安裝就跳過
+  if (document.querySelector('.kh-drawer-overlay') &&
+      document.querySelector('.kh-drawer-toggle')) return;
+
+  // 建立遮罩
+  const overlay = document.createElement('div');
+  overlay.className = 'kh-drawer-overlay';
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(overlay);
+
+  // 建立固定左上角漢堡鈕（不在側欄內，避免被隱藏）
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'kh-drawer-toggle';
+  btn.setAttribute('aria-label', '開啟類別');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.innerHTML = '☰';
+  document.body.appendChild(btn);
+
+  const sidenav = document.querySelector('.kh-sidenav');
+  if (!sidenav) return;
+
+  // 開關狀態
+  const openDrawer = () => {
+    document.documentElement.classList.add('kh-drawer-open');
+    sidenav.setAttribute('data-open', 'true');
+    btn.setAttribute('aria-expanded', 'true');
+  };
+  const closeDrawer = () => {
+    document.documentElement.classList.remove('kh-drawer-open');
+    sidenav.setAttribute('data-open', 'false');
+    btn.setAttribute('aria-expanded', 'false');
+  };
+  const toggleDrawer = () => {
+    const isOpen = document.documentElement.classList.contains('kh-drawer-open');
+    isOpen ? closeDrawer() : openDrawer();
+  };
+
+  // 事件
+  btn.addEventListener('click', toggleDrawer);
+  overlay.addEventListener('click', closeDrawer);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDrawer();
+  });
+
+  // 螢幕尺寸變化時：大螢幕還原為常駐側欄、小螢幕保持抽屜
+  const mq = matchMedia('(max-width: 820px)');
+  const handleMQ = () => {
+    if (mq.matches) {
+      // 手機：預設關閉抽屜
+      closeDrawer();
+      btn.style.display = 'inline-flex';
+      overlay.style.display = '';
+    } else {
+      // 桌機：確保側欄可見且不需要抽屜 UI
+      document.documentElement.classList.remove('kh-drawer-open');
+      sidenav.setAttribute('data-open', 'true');
+      btn.setAttribute('aria-expanded', 'true');
+      btn.style.display = 'none';
+      overlay.style.display = 'none';
+    }
+  };
+  mq.addEventListener('change', handleMQ);
+  handleMQ(); // 初始判斷
+}
+
 
 async function bootstrap(){
   // 手機：預設關閉側欄
