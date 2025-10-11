@@ -366,6 +366,62 @@ function showError(msg){
 }
 
 
+
+// ===== Content Loader =====
+async function tryLoadFromGuesses(guesses){
+  for (const gRaw of (guesses || [])){
+    let g = gRaw;
+    try {
+      const u = new URL(gRaw, document.baseURI);
+      // encodeURI 以保留 / ? 等必要符號，同時正確處理中文與單引號
+      const enc = encodeURI(u.pathname).replace(/#/g, "%23");
+      g = u.origin + enc + (u.search || "") + (u.hash || "");
+    } catch {
+      g = gRaw;
+    }
+    try{
+      const raw = await fetchText(g);
+      if (g.endsWith(".md")) return mdToHtml(raw);
+      return raw; // html
+    }catch{ /* try next guess */ }
+  }
+  throw new Error("找不到對應的內容檔（請確認放在 assets/data/pages/，檔名規則是否正確）");
+}
+
+async function loadPage(id, meta){
+  showSkeleton(260);
+  try{
+    const m = meta || INDEX.find(x=>x.id===id);
+    if (!m) throw new Error("找不到頁面索引");
+
+    // 先用 CSV 欄位分組；沒有再讀檔案切段
+    let contentHTML = "";
+    const csvRes = fromCSVSections(m);
+    if (csvRes.hasContent){
+      contentHTML = csvRes.html;
+    } else {
+      const html = await tryLoadFromGuesses(m._fileGuess || []);
+      const fileRes = fromFileSections(m, html);
+      contentHTML = fileRes.html;
+    }
+
+    CURRENT_PAGE_ID = id;
+    const header = renderTitleHeader(m);
+    cardHost.innerHTML = header + contentHTML;
+    renderMath(cardHost);
+
+    // 側欄高亮定位
+    const hit = treeNav.querySelector(`.item[data-id="${id}"]`);
+    if (hit){
+      treeNav.querySelectorAll(".item.active").forEach(x=>x.classList.remove("active"));
+      hit.classList.add("active");
+      hit.closest("details")?.setAttribute("open","");
+    }
+    ensureScrollButtons();
+  }catch(e){
+    showError(e.message);
+  }
+}
 async function loadRandom(){
   if (!INDEX.length) { await bootstrap(); }
   const pool = INDEX;
@@ -503,6 +559,48 @@ function ensureScrollButtons(){
       mainScroller.scrollTo({top:max, behavior:"smooth"});
     }
   });
+}
+
+// ===== IO (CSV Index Loader) =====
+async function readIndexFromCSV(){
+  const base = document.baseURI.replace(/[#?].*$/,"");
+  const cfg  = (window.KNOWHUB && window.KNOWHUB.CSV_INDEX) || "./assets/data/notes.csv";
+
+  const candidates = [
+    cfg,
+    cfg.replace(/^\.\//, ""),
+    (()=>{ try { return new URL(cfg, base).href; } catch { return cfg; } })(),
+    "/assets/data/notes.csv",
+    (location.pathname.replace(/\/[^/]*$/, "") + "/assets/data/notes.csv")
+  ].filter((v,i,arr)=> v && arr.indexOf(v)===i);
+
+  let text = null, lastErr = null;
+  for (const u of candidates){
+    try {
+      text = await fetchText(u);
+      if (text) break;
+    } catch(e){
+      lastErr = e;
+    }
+  }
+
+  // Inline fallback: <script type="text/csv" id="notes-csv">...</script>
+  if (!text){
+    const inline = document.querySelector('script[type="text/csv"]#notes-csv');
+    if (inline?.textContent?.trim()){
+      text = inline.textContent.trim();
+      console.info("[KNOWHUB] 使用內嵌 CSV 備援 #notes-csv");
+    }
+  }
+
+  if (!text){
+    const where = candidates.join(" | ");
+    throw new Error(`Failed to fetch（已嘗試：${where}）${lastErr ? "｜原因："+lastErr : ""}`);
+  }
+
+  const items = parseCSV(text).map(csvRowToItem).filter(Boolean);
+  if (!items.length) throw new Error("CSV 內容為空或欄位未對上（需要至少 title/標題）");
+  return items;
 }
 
 async function bootstrap(){
