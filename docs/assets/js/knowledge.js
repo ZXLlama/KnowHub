@@ -647,7 +647,7 @@ async function bootstrap(){
   }
   rememberScrollPositions();
   ensureScrollButtons();
-  ensureMobileToggleFab();
+
 }
 
 function ensureMobileToggleFab() {
