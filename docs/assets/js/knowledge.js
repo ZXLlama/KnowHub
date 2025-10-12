@@ -382,27 +382,19 @@ async function tryLoadFromGuesses(guesses){
   for (const gRaw of (guesses || [])){
     let g = gRaw;
     try {
-      // 1) 轉絕對 URL 以便處理
+      // 轉絕對 URL
       const u = new URL(gRaw, document.baseURI);
 
-      // 2) 正規化路徑：把已經被編碼過一次或多次的路徑「解回原文」再統一編碼一次
+      // 將可能被多重編碼的路徑還原，再統一編碼一次（避免 %25E6... 的雙重編碼）
       let path = u.pathname;
       try {
-        // 可能被多重編碼（例如 %25E6%...），嘗試解碼 2 次讓它回到原生字串
         let once = decodeURIComponent(path);
-        let twice;
-        try { twice = decodeURIComponent(once); } catch { twice = once; }
-        // 如果第二次解碼成功且變更了字串，就採用第二次；否則用第一次
+        let twice; try { twice = decodeURIComponent(once); } catch { twice = once; }
         path = (twice && twice !== once) ? twice : once;
-      } catch {
-        // 不是編碼狀態，維持原樣
-      }
+      } catch {}
 
-      // 3) 統一重新編碼（避免雙重編碼）
-      let enc = encodeURI(path)
-        .replace(/#/g, "%23")   // 保護片段符號
-        .replace(/'/g, "%27");  // encodeURI 不會處理單引號，手動處理
-
+      // 單次編碼；手動處理 '#' 與單引號
+      const enc = encodeURI(path).replace(/#/g, "%23").replace(/'/g, "%27");
       g = u.origin + enc + (u.search || "") + (u.hash || "");
     } catch {
       g = gRaw;
@@ -414,11 +406,48 @@ async function tryLoadFromGuesses(guesses){
       return raw; // html
     }catch(e){
       tried.push(g);
-      // 繼續嘗試下一個猜測
     }
   }
   console.warn("[KNOWHUB] 無法載入任何猜測的路徑：", tried);
   throw new Error("找不到對應的內容檔（請確認放在 assets/data/pages/，檔名規則是否正確）");
+}
+
+async function loadPage(id, meta){
+  // 這兩個工具函式若沒定義，請一併補上：
+  // function showSkeleton(h=220){ cardHost.innerHTML = `<div class="skeleton" style="height:${h}px"></div>`; }
+  // function showError(msg){ cardHost.innerHTML = `<div class="section-card sec--generic"><div class="section-card__title">讀取失敗</div><div class="prose"><p>${escapeHTML(String(msg||""))}</p></div></div>`; }
+
+  showSkeleton(260);
+  try{
+    const m = meta || INDEX.find(x=>x.id===id);
+    if (!m) throw new Error("找不到頁面索引");
+
+    // 先用 CSV 欄位分組；沒有就從檔案切段（支援 H1/H2/H3）
+    let contentHTML = "";
+    const csvRes = fromCSVSections(m);            // 你已有的函式
+    if (csvRes.hasContent){
+      contentHTML = csvRes.html;
+    } else {
+      const html = await tryLoadFromGuesses(m._fileGuess || []);
+      const fileRes = fromFileSections(m, html);  // 你已有的函式（會移除「內容」標題）
+      contentHTML = fileRes.html;
+    }
+
+    CURRENT_PAGE_ID = id;
+    const header = renderTitleHeader(m);          // 你已有的函式
+    cardHost.innerHTML = header + contentHTML;
+    renderMath(cardHost);
+
+    // 側欄高亮
+    const hit = treeNav.querySelector(`.item[data-id="${id}"]`);
+    if (hit){
+      treeNav.querySelectorAll(".item.active").forEach(x=>x.classList.remove("active"));
+      hit.classList.add("active");
+      hit.closest("details")?.setAttribute("open","");
+    }
+  }catch(e){
+    showError(e.message);
+  }
 }
 
 async function loadRandom(){
