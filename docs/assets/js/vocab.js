@@ -68,7 +68,7 @@ const modeToggle = $("#mode-toggle");
 /* ---------- 狀態 ---------- */
 let items      = [];   // {word, pos, definition}
 let idx        = 0;
-let isDualMode = true; // true=雙面（可翻面）；false=單面（兩面同顯）
+let isDualMode = false; // true=雙面（可翻面）；false=單面（兩面同顯）
 let flipped    = false;
 
 /* ---------- 語音 ---------- */
