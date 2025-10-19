@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>句型與語態｜速攻對照＋互動練習</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#121823; --panel-2:#0f141d; --text:#e8f0ff; --muted:#a9b3c7;
+      --accent: linear-gradient(135deg,#7c4dff, #22d3ee 60%, #10b981);
+      --bad:#ff6b6b; --good:#22c55e; --warn:#f59e0b;
+      --radius:16px; --shadow:0 6px 30px rgba(0,0,0,.35);
+    }
+    html,body{height:100%;}
+    body{margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans TC", Arial; background: radial-gradient(1200px 800px at 10% -20%, #0e1630 5%, transparent 50%), var(--bg); color:var(--text);}
+
+    /* Layout */
+    header{
+      position:sticky; top:0; z-index:10; backdrop-filter: blur(10px);
+      background:linear-gradient(180deg, rgba(18,24,35,.9), rgba(18,24,35,.6));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .wrap{max-width:1000px; margin:0 auto; padding:20px;}
+    .title{display:flex; gap:12px; align-items:center;}
+    .logo{width:36px; height:36px; border-radius:12px; background:var(--accent); box-shadow: var(--shadow);} 
+    h1{font-size: clamp(22px, 3.5vw, 34px); margin:0; letter-spacing: .5px;}
+    p.lead{margin:.3rem 0 0; color:var(--muted)}
+
+    /* Cards */
+    .card{background: linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:18px;}
+    .grid{display:grid; grid-template-columns: 1fr; gap:16px;}
+    @media(min-width:900px){ .grid{ grid-template-columns: 1.2fr .8fr; } }
+
+    /* Buttons */
+    .btn{ --padx:14px; --pady:10px; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:var(--pady) var(--padx); border:none; border-radius: 14px; color:white; cursor:pointer; background: var(--accent); box-shadow: 0 8px 24px rgba(93,169,255,.25); transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px);} .btn:active{ transform: translateY(1px) scale(.98);} 
+    .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--text);} 
+    .btn.small{ --pady:6px; --padx:10px; font-size:.9rem; }
+    .btn.bad{ background:linear-gradient(135deg, #ff4d6d, #ff8fa3);} 
+    .btn.good{ background:linear-gradient(135deg, #10b981, #22d3ee);} 
+
+    /* Pills */
+    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-size:.85rem; color:#0b1220; background:linear-gradient(135deg,#c7d2fe,#a5f3fc);} 
+
+    /* Accordion */
+    details{ border-radius:14px; border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); padding:12px 14px;}
+    details+details{ margin-top:10px;}
+    summary{ cursor:pointer; list-style:none;}
+    summary::-webkit-details-marker{ display:none;}
+    summary{ display:flex; align-items:center; justify-content:space-between; font-weight:700; }
+    .chev{opacity:.7;}
+
+    table{ width:100%; border-collapse: collapse; margin-top:10px;}
+    th,td{ border-bottom:1px dashed rgba(255,255,255,.08); padding:10px 6px; text-align:left;}
+    th{ color:#bcd; font-weight:600;}
+
+    /* Quiz */
+    .quiz-card{ padding:18px; border-radius:16px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)); border:1px solid rgba(255,255,255,.07);
+      display:grid; gap:12px;
+    }
+    .q-meta{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted);}
+    .q-text{ font-size: clamp(18px, 2.4vw, 20px); line-height:1.6;}
+    .choices{ display:grid; gap:10px;}
+    .choice{ padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); cursor:pointer; transition: transform .05s ease, background .2s ease, border-color .2s ease;}
+    .choice:hover{ transform: translateY(-1px); }
+    .choice.correct{ border-color: rgba(16,185,129,.7); background: rgba(16,185,129,.15);} 
+    .choice.wrong{ border-color: rgba(239,68,68,.7); background: rgba(239,68,68,.15);} 
+    .explain{ color:#c7d2fe; background: rgba(124,77,255,.08); border:1px solid rgba(124,77,255,.25); padding:12px; border-radius:12px;}
+
+    .toolbar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; margin:10px 0 0;}
+    .left, .right{ display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+
+    .stats{ display:flex; gap:10px; align-items:center; color:var(--muted);}
+    .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .dot.good{ background:var(--good);} .dot.bad{ background:var(--bad);} 
+
+    .footer{ text-align:center; color:var(--muted); padding:30px 0 60px;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="title">
+        <div class="logo"></div>
+        <div>
+          <h1>句型與語態｜速攻對照＋互動練習</h1>
+          <p class="lead">JSON 題庫 × SVO 骨架 × 被動語態全制霸。看到空格直接反射出公式 🧠⚡</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <!-- LEFT: Reference -->
+      <section class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <h2 style="margin:0; font-size:20px;">⚡ 導讀｜對照表</h2>
+          <span class="pill">SVO / 連綴 / 授與 / 受補 / 被動</span>
+        </div>
+
+        <details open>
+          <summary>① 英文 5 大句型骨架 <span class="chev">▾</span></summary>
+          <table>
+            <thead><tr><th>句型</th><th>結構</th><th>說明</th><th>例句</th></tr></thead>
+            <tbody>
+              <tr><td>S + V</td><td>主詞 + 動詞</td><td>不及物</td><td>She <b>arrived</b>.</td></tr>
+              <tr><td>S + V + O</td><td>主詞 + 動詞 + 受詞</td><td>及物</td><td>They <b>launched</b> a product.</td></tr>
+              <tr><td>S + V + IO + DO</td><td>主詞 + 動詞 + 間受 + 直受</td><td>授與動詞</td><td>We <b>gave</b> clients a refund.</td></tr>
+              <tr><td>S + V + C</td><td>主詞 + 連綴動詞 + 補語</td><td>描述主詞</td><td>The plan <b>looks</b> viable.</td></tr>
+              <tr><td>S + V + O + C</td><td>主詞 + 動詞 + 受詞 + 補語</td><td>描述受詞</td><td>They <b>found</b> it useful.</td></tr>
+            </tbody>
+          </table>
+        </details>
+
+        <details>
+          <summary>② 語態（被動公式） <span class="chev">▾</span></summary>
+          <table>
+            <thead><tr><th>時態</th><th>被動形</th><th>例句</th></tr></thead>
+            <tbody>
+              <tr><td>一般現在</td><td>am/is/are + p.p.</td><td>Reports <b>are sent</b> daily.</td></tr>
+              <tr><td>一般過去</td><td>was/were + p.p.</td><td>The file <b>was uploaded</b>.</td></tr>
+              <tr><td>現在完成</td><td>has/have been + p.p.</td><td>Data <b>has been updated</b>.</td></tr>
+              <tr><td>未來</td><td>will be + p.p.</td><td>Tickets <b>will be issued</b>.</td></tr>
+              <tr><td>現在進行（被動）</td><td>am/is/are <u>being</u> + p.p.</td><td>The room <b>is being cleaned</b>.</td></tr>
+            </tbody>
+          </table>
+        </details>
+
+        <details>
+          <summary>③ 常見陷阱 快速對照 <span class="chev">▾</span></summary>
+          <table>
+            <thead><tr><th>陷阱</th><th>錯誤</th><th>正確</th></tr></thead>
+            <tbody>
+              <tr><td>被動少 be</td><td>The data <i>updated</i> yesterday.</td><td>The data <b>was updated</b> yesterday.</td></tr>
+              <tr><td>進行被動</td><td>The room <i>is cleaning</i>.</td><td>The room <b>is being cleaned</b>.</td></tr>
+              <tr><td>完成被動</td><td>The project <i>has finished</i>.</td><td>The project <b>has been finished</b>.</td></tr>
+              <tr><td>連綴後補語</td><td>look <i>successfully</i></td><td>look <b>successful</b></td></tr>
+              <tr><td>授與 vs 受補</td><td>gave Tom <i>a manager</i></td><td>appointed Tom <b>manager</b></td></tr>
+            </tbody>
+          </table>
+        </details>
+      </section>
+
+      <!-- RIGHT: Controls -->
+      <aside class="card">
+        <h2 style="margin:0 0 10px; font-size:20px;">🎮 練習控制台</h2>
+        <div style="display:grid; gap:10px;">
+          <label>題目來源（可多選）</label>
+          <div class="left" id="cat-box"></div>
+
+          <label>題數</label>
+          <div class="left">
+            <button class="btn small ghost" data-n="5">5</button>
+            <button class="btn small ghost" data-n="10">10</button>
+            <button class="btn small ghost" data-n="20">20</button>
+            <button class="btn small ghost" data-n="all">全部</button>
+          </div>
+
+          <div class="left">
+            <button id="startBtn" class="btn">🚀 開始作答</button>
+            <button id="wrongBtn" class="btn ghost">只練錯題</button>
+          </div>
+
+          <div class="stats">
+            <span class="dot good"></span> 正確 <b id="ok">0</b>
+            <span class="dot bad" style="margin-left:8px;"></span> 錯誤 <b id="bad">0</b>
+            <span style="margin-left:auto;">命中率 <b id="acc">0%</b></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section style="margin-top:16px;" class="card">
+      <div class="toolbar">
+        <div class="left">
+          <span class="pill" id="nowCat">—</span>
+          <span class="pill" id="progress">0 / 0</span>
+        </div>
+        <div class="right">
+          <button id="reveal" class="btn ghost">揭曉答案</button>
+          <button id="next" class="btn">下一題 ▶</button>
+        </div>
+      </div>
+
+      <div id="quiz" class="quiz-card" style="margin-top:10px;">
+        <div class="q-meta">請點擊「開始作答」或「只練錯題」。</div>
+      </div>
+    </section>
+
+    <div class="footer">Made for ZXSNOW • 暗色主題、行動端友好、<b>JSON 題庫</b> • 離線亦可（內建備援資料）</div>
+  </main>
+
+  <!-- 內建備援 JSON（若 questions.json 抓不到就用這份） -->
+  <script type="application/json" id="bank-json">[
+    {"id":"v001","cat":"voice","catName":"被動語態","text":"The documents ___ sent to the clients yesterday.","choices":["is","are","were","have"],"ans":2,"exp":"過去 + 被動 → were + p.p."},
+    {"id":"v002","cat":"voice","catName":"被動語態","text":"The report ___ by the supervisor right now.","choices":["reviews","is reviewing","is being reviewed","has reviewed"],"ans":2,"exp":"現在進行被動：is being reviewed"},
+    {"id":"v003","cat":"voice","catName":"被動語態","text":"Tickets ___ to all participants next week.","choices":["will issue","will be issued","are issued","have been issued"],"ans":1,"exp":"未來被動：will be issued"},
+    {"id":"v004","cat":"voice","catName":"被動語態","text":"The system has already ___.","choices":["repair","repairing","been repaired","being repaired"],"ans":2,"exp":"現在完成被動：has been repaired"},
+    {"id":"v005","cat":"voice","catName":"被動語態","text":"The project ___ last Friday due to budget cuts.","choices":["canceled","was canceled","has canceled","is canceling"],"ans":1,"exp":"過去被動：was canceled"},
+    {"id":"v006","cat":"voice","catName":"被動語態","text":"All orders ___ by 5 p.m. every day.","choices":["pack","are packed","were packed","have packed"],"ans":1,"exp":"一般現在被動：are packed（習慣/常態）"},
+    {"id":"v007","cat":"voice","catName":"被動語態","text":"A temporary password ___ to you after registration.","choices":["sends","is sent","was sending","has sending"],"ans":1,"exp":"一般現在被動：is sent（規則描述）"},
+    {"id":"v008","cat":"voice","catName":"被動語態","text":"The room ___ when we arrived.","choices":["is being cleaned","was being cleaned","has been cleaning","was cleaned"],"ans":1,"exp":"過去進行被動：was being cleaned"},
+    {"id":"v009","cat":"voice","catName":"被動語態","text":"The damaged parts ___ replaced tomorrow morning.","choices":["are being","are","will be","have been"],"ans":2,"exp":"未來被動：will be replaced（p.p. 省略於題幹）"},
+    {"id":"v010","cat":"voice","catName":"被動語態","text":"The finalists ___ announced; please check the website.","choices":["have been","have being","are being","has been"],"ans":0,"exp":"現在完成被動：have been announced（p.p. 省略於題幹）"},
+
+    {"id":"l001","cat":"linking","catName":"連綴＋補語","text":"The new strategy looks ___.","choices":["effectively","effective","effect","efficiency"],"ans":1,"exp":"連綴動詞後接形容詞作補語"},
+    {"id":"l002","cat":"linking","catName":"連綴＋補語","text":"Our clients seem ___ with the results.","choices":["satisfying","satisfaction","satisfied","to satisfy"],"ans":2,"exp":"seem + 形容詞；be satisfied with"},
+    {"id":"l003","cat":"linking","catName":"連綴＋補語","text":"The market remained ___.","choices":["stable","stably","stability","stabilize"],"ans":0,"exp":"remain + 形容詞"},
+    {"id":"l004","cat":"linking","catName":"連綴＋補語","text":"Her explanation sounds ___.","choices":["convincing","convincingly","convince","convincedly"],"ans":0,"exp":"sound + 形容詞"},
+    {"id":"l005","cat":"linking","catName":"連綴＋補語","text":"The soup tastes ___.","choices":["delicious","deliciously","deliciousness","delight"],"ans":0,"exp":"taste + 形容詞"},
+    {"id":"l006","cat":"linking","catName":"連綴＋補語","text":"The manager became ___ after the reorganization.","choices":["stress","stressed","stressfully","stressful"],"ans":1,"exp":"become + 形容詞；人 + stressed"},
+    {"id":"l007","cat":"linking","catName":"連綴＋補語","text":"The solution proved ___.","choices":["effectiveness","effective","effectively","effect"],"ans":1,"exp":"prove + 形容詞"},
+    {"id":"l008","cat":"linking","catName":"連綴＋補語","text":"Her proposal appears ___ to investors.","choices":["appeal","appealing","appealably","appealed"],"ans":1,"exp":"appear + 形容詞"},
+
+    {"id":"d001","cat":"ditran","catName":"授與動詞","text":"They offered ___ a 10% discount.","choices":["to customers","customers","for customers","at customers"],"ans":1,"exp":"offer + IO + DO"},
+    {"id":"d002","cat":"ditran","catName":"授與動詞","text":"Please send ___ the updated files.","choices":["us","to us","for us","at us"],"ans":0,"exp":"send + IO + DO；= send the files to us"},
+    {"id":"d003","cat":"ditran","catName":"授與動詞","text":"The manager showed ___ the new dashboard.","choices":["to them","them","for them","with them"],"ans":1,"exp":"show + IO + DO"},
+    {"id":"d004","cat":"ditran","catName":"授與動詞","text":"We will grant ___ access to the beta features.","choices":["for users","users","to users","of users"],"ans":1,"exp":"grant + IO + DO"},
+    {"id":"d005","cat":"ditran","catName":"授與動詞","text":"Could you lend ___ your charger?","choices":["me","to me","for me","with me"],"ans":0,"exp":"lend + IO + DO；= lend your charger to me"},
+    {"id":"d006","cat":"ditran","catName":"授與動詞","text":"She bought ___ a souvenir from Hokkaido.","choices":["me","for me","to me","with me"],"ans":1,"exp":"buy + DO + for + IO 的常見型"},
+    {"id":"d007","cat":"ditran","catName":"授與動詞","text":"The tutor taught ___ a useful technique.","choices":["to us","us","for us","with us"],"ans":1,"exp":"teach + IO + DO"},
+    {"id":"d008","cat":"ditran","catName":"授與動詞","text":"Please show ___ your ID at the entrance.","choices":["me","to me","for me","with me"],"ans":0,"exp":"show + IO + DO（口語常見）"},
+
+    {"id":"o001","cat":"objcomp","catName":"受詞補語","text":"The committee appointed Ms. Lin ___ of marketing.","choices":["a manager","as a manager","manager","to be a manager"],"ans":2,"exp":"appoint + O + 職稱（as 可省）"},
+    {"id":"o002","cat":"objcomp","catName":"受詞補語","text":"We found the presentation ___.","choices":["helpful","helpfully","help","helped"],"ans":0,"exp":"find + O + adj."},
+    {"id":"o003","cat":"objcomp","catName":"受詞補語","text":"The training kept employees ___.","choices":["motivating","motivation","motivated","to motivate"],"ans":2,"exp":"keep + O + adj./p.p."},
+    {"id":"o004","cat":"objcomp","catName":"受詞補語","text":"They elected her ___ of the club.","choices":["as president","president","a president","to be president"],"ans":1,"exp":"elect + O + 職稱（通常不加 as）"},
+    {"id":"o005","cat":"objcomp","catName":"受詞補語","text":"The news made everyone ___.","choices":["to smile","smile","smiling","smiled"],"ans":1,"exp":"make + O + 原V"},
+    {"id":"o006","cat":"objcomp","catName":"受詞補語","text":"We consider this approach ___.","choices":["effectively","effect","effective","effectiveness"],"ans":2,"exp":"consider + O + adj."},
+    {"id":"o007","cat":"objcomp","catName":"受詞補語","text":"The film left me ___.","choices":["to inspire","inspired","inspiringly","inspiring"],"ans":1,"exp":"leave + O + p.p./adj."},
+    {"id":"o008","cat":"objcomp","catName":"受詞補語","text":"The teacher kept the classroom ___.","choices":["clean","cleanly","cleaned","to clean"],"ans":0,"exp":"keep + O + adj."},
+
+    {"id":"c001","cat":"causative","catName":"使役句","text":"The manager made the team ___ overtime.","choices":["works","to work","work","working"],"ans":2,"exp":"make + O + 原V"},
+    {"id":"c002","cat":"causative","catName":"使役句","text":"We had the air conditioner ___ yesterday.","choices":["to repair","repaired","repairing","be repaired"],"ans":1,"exp":"have + O + p.p."},
+    {"id":"c003","cat":"causative","catName":"使役句","text":"They let customers ___ orders online.","choices":["place","to place","placed","placing"],"ans":0,"exp":"let + O + 原V"},
+    {"id":"c004","cat":"causative","catName":"使役句","text":"I got my phone ___ at the store.","choices":["fix","to fix","fixed","fixing"],"ans":2,"exp":"get + O + p.p.（請人把東西弄好）"},
+    {"id":"c005","cat":"causative","catName":"使役句","text":"We had the designer ___ a new logo.","choices":["create","created","to create","creating"],"ans":0,"exp":"have + O + 原V（請某人做）"},
+    {"id":"c006","cat":"causative","catName":"使役句","text":"The joke made everyone ___.","choices":["laugh","to laugh","laughed","laughing"],"ans":0,"exp":"make + O + 原V"},
+    {"id":"c007","cat":"causative","catName":"使役句","text":"I had the package ___ to my office.","choices":["deliver","delivered","to deliver","delivering"],"ans":1,"exp":"have + O + p.p.（使役被動語義）"},
+    {"id":"c008","cat":"causative","catName":"使役句","text":"She let her kids ___ video games for an hour.","choices":["to play","play","played","playing"],"ans":1,"exp":"let + O + 原V"},
+
+    {"id":"m001","cat":"mix","catName":"綜合","text":"The shipment ___ delayed because of the storm.","choices":["was","was being","has","is"],"ans":0,"exp":"be + p.p.（p.p. 省略於題幹）"},
+    {"id":"m002","cat":"mix","catName":"綜合","text":"The files sent by John ___ on the server.","choices":["stores","are stored","are storing","were storing"],"ans":1,"exp":"分詞片語修飾 + 主句被動 are stored"},
+    {"id":"m003","cat":"mix","catName":"綜合","text":"The device ___ during the test but works fine now.","choices":["was failed","failed","was failing","has failed"],"ans":1,"exp":"fail 不及物，不可被動"},
+    {"id":"m004","cat":"mix","catName":"綜合","text":"All tickets ___ before noon, so the event was full.","choices":["were sold out","sold out","are selling out","has been sold out"],"ans":0,"exp":"過去完成於過去 → were sold out"},
+    {"id":"m005","cat":"mix","catName":"綜合","text":"The proposal, ___ was revised twice, finally passed.","choices":["that","which","who","whom"],"ans":1,"exp":"非限定用法不用 that"},
+    {"id":"m006","cat":"mix","catName":"綜合","text":"The room ___ now; please wait a moment.","choices":["is cleaning","is being cleaned","has cleaned","was cleaned"],"ans":1,"exp":"現在進行被動"},
+    {"id":"m007","cat":"mix","catName":"綜合","text":"The plan looks ___ on paper but may be risky.","choices":["good","well","betterly","bestly"],"ans":0,"exp":"連綴動詞 look + 形容詞"},
+    {"id":"m008","cat":"mix","catName":"綜合","text":"They showed ___ a demo of the product.","choices":["to us","us","for us","with us"],"ans":1,"exp":"授與動詞：IO 置於 DO 前"},
+    {"id":"m009","cat":"mix","catName":"綜合","text":"The board found the report ___.","choices":["usefully","useful","use","used"],"ans":1,"exp":"find + O + adj."},
+    {"id":"m010","cat":"mix","catName":"綜合","text":"We will have the software ___ next week.","choices":["to update","updated","updating","update"],"ans":1,"exp":"have + O + p.p.（使役被動語義）"},
+    {"id":"v1","cat":"voice","catName":"被動語態","text":"The documents ___ sent to the clients yesterday.","choices":["is","are","were","have"],"ans":2,"exp":"過去時間 yesterday + 被動 p.p. → were sent."},
+    {"id":"v2","cat":"voice","catName":"被動語態","text":"The report ___ by the supervisor right now.","choices":["reviews","is reviewing","is being reviewed","has reviewed"],"ans":2,"exp":"現在進行被動：be + being + p.p."},
+    {"id":"v3","cat":"voice","catName":"被動語態","text":"Tickets ___ to all participants next week.","choices":["will issue","will be issued","are issued","have been issued"],"ans":1,"exp":"未來被動：will be + p.p."},
+    {"id":"v4","cat":"voice","catName":"被動語態","text":"The system ___ already ___.","choices":["is / repaired","has / repaired","has been / repaired","was / repairing"],"ans":2,"exp":"現在完成被動：has been repaired."},
+    {"id":"v5","cat":"voice","catName":"被動語態","text":"The project ___ last Friday due to budget cuts.","choices":["canceled","was canceled","has canceled","is canceling"],"ans":1,"exp":"過去被動：was canceled."},
+
+    {"id":"l1","cat":"linking","catName":"連綴＋補語","text":"The new strategy looks ___.","choices":["effectively","effective","effect","efficiency"],"ans":1,"exp":"連綴動詞 look 後接形容詞作主詞補語。"},
+    {"id":"l2","cat":"linking","catName":"連綴＋補語","text":"Our clients seem ___ with the results.","choices":["satisfying","satisfaction","satisfied","to satisfy"],"ans":2,"exp":"seem + 形容詞；be satisfied with 固定搭配。"},
+    {"id":"l3","cat":"linking","catName":"連綴＋補語","text":"The market remained ___.","choices":["stable","stably","stability","stabilize"],"ans":0,"exp":"remain 為連綴動詞，後接形容詞。"},
+
+    {"id":"d1","cat":"ditran","catName":"授與動詞","text":"They offered ___ a 10% discount.","choices":["to customers","customers","for customers","at customers"],"ans":1,"exp":"offer + 人(間受) + 物(直受)。"},
+    {"id":"d2","cat":"ditran","catName":"授與動詞","text":"Please send ___ the updated files.","choices":["us","to us","for us","at us"],"ans":0,"exp":"send + IO + DO；或 send the files to us。"},
+    {"id":"d3","cat":"ditran","catName":"授與動詞","text":"The manager showed ___ the new dashboard.","choices":["to them","them","for them","with them"],"ans":1,"exp":"show + 人 + 物。"},
+
+    {"id":"o1","cat":"objcomp","catName":"受詞補語","text":"The committee appointed Ms. Lin ___ of marketing.","choices":["a manager","as a manager","manager","to be a manager"],"ans":2,"exp":"appoint + O + 補語（職稱）常直接名詞；as 可省略。"},
+    {"id":"o2","cat":"objcomp","catName":"受詞補語","text":"We found the presentation ___.","choices":["helpful","helpfully","help","helped"],"ans":0,"exp":"find + O + C（形容詞）。"},
+    {"id":"o3","cat":"objcomp","catName":"受詞補語","text":"The training kept employees ___.","choices":["motivating","motivation","motivated","to motivate"],"ans":2,"exp":"keep + O + C（形容詞/過分詞）。"},
+
+    {"id":"c1","cat":"causative","catName":"使役句","text":"The manager made the team ___ overtime.","choices":["works","to work","work","working"],"ans":2,"exp":"make + O + 原V。"},
+    {"id":"c2","cat":"causative","catName":"使役句","text":"We had the air conditioner ___ yesterday.","choices":["to repair","repaired","repairing","be repaired"],"ans":1,"exp":"have + O + p.p.（請人把東西弄好/被動語義）。"},
+    {"id":"c3","cat":"causative","catName":"使役句","text":"They let customers ___ orders online.","choices":["place","to place","placed","placing"],"ans":0,"exp":"let + O + 原V。"},
+
+    {"id":"m1","cat":"mix","catName":"綜合","text":"The shipment ___ delayed because of the storm.","choices":["was","was being","has","is"],"ans":0,"exp":"需 be + p.p.；空格只給 be，後面省略 p.p. 的題型→ was delayed（省略在題幹）。"},
+    {"id":"m2","cat":"mix","catName":"綜合","text":"The files sent by John ___ on the server.","choices":["stores","are stored","are storing","were storing"],"ans":1,"exp":"sent 為分詞片語；主句需 be 動詞 + p.p. → are stored."},
+    {"id":"m3","cat":"mix","catName":"綜合","text":"The device ___ during the test but works fine now.","choices":["was failed","failed","was failing","has failed"],"ans":1,"exp":"fail 為不及物；不可用被動。"},
+    {"id":"m4","cat":"mix","catName":"綜合","text":"All tickets ___ before noon, so the event was full.","choices":["were sold out","sold out","are selling out","has been sold out"],"ans":0,"exp":"完成於過去→過去被動 were sold out。"}
+  ]</script>
+
+  <script>
+    // ====== JSON 題庫載入 ======
+    async function loadBank(){
+      // 1) 先嘗試外部 questions.json（可放同資料夾）
+      try{
+        const res = await fetch('questions.json', {cache:'no-store'});
+        if(res.ok){
+          const data = await res.json();
+          if(Array.isArray(data) && data.length){ return data; }
+        }
+      }catch(e){ /* ignore & fallback */ }
+      // 2) 退回到內建備援 JSON
+      try{
+        const raw = document.getElementById('bank-json').textContent.trim();
+        const data = JSON.parse(raw);
+        return data;
+      }catch(e){
+        console.error('JSON parse failed:', e);
+        return [];
+      }
+    }
+
+    // ====== 工具 ======
+    const el = (q)=>document.querySelector(q);
+    const shuffle = (arr)=>arr.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
+    const uniq = (arr)=>[...new Set(arr)];
+    const WRONG_KEY = 'sv_voice_wrong_ids_v2';
+
+    function getWrongIds(){ return JSON.parse(localStorage.getItem(WRONG_KEY)||'[]'); }
+    function setWrongIds(ids){ localStorage.setItem(WRONG_KEY, JSON.stringify(uniq(ids).slice(-400))); }
+
+    // ====== 狀態 ======
+    let BANK = [];
+    let CATS = [];
+    let selectedCats = new Set();
+    let queue = []; let idx = 0; let correct=0, wrong=0; let reveal=false;
+
+    function catNameOf(id){
+      // 由題庫帶出的 catName，若缺則提供預設映射
+      const lookup = {
+        voice:'被動語態', linking:'連綴＋補語', ditran:'授與動詞', objcomp:'受詞補語', causative:'使役句', mix:'綜合'
+      };
+      const one = BANK.find(q=>q.cat===id && q.catName);
+      return one?.catName || lookup[id] || id;
+    }
+
+    function buildCats(){
+      const ids = uniq(BANK.map(q=>q.cat));
+      CATS = ids.map(id=>({id, name:catNameOf(id)}));
+      selectedCats = new Set(ids);
+      const box = el('#cat-box'); box.innerHTML='';
+      CATS.forEach(c=>{
+        const b = document.createElement('button');
+        b.className = 'btn small ghost';
+        b.textContent = c.name; b.dataset.id=c.id; b.dataset.active='1';
+        b.addEventListener('click', ()=>{
+          const on = b.dataset.active === '1';
+          b.dataset.active = on ? '0':'1';
+          b.style.opacity = on ? .45 : 1;
+          if(on) selectedCats.delete(c.id); else selectedCats.add(c.id);
+        });
+        box.appendChild(b);
+      });
+    }
+
+    function sampleByCats(cset){ return BANK.filter(q=>cset.has(q.cat)); }
+
+    function updateStats(){
+      el('#ok').textContent = correct; el('#bad').textContent = wrong;
+      const tot = correct+wrong; el('#acc').textContent = tot? Math.round(correct*100/tot)+'%':'0%';
+      el('#progress').textContent = `${Math.min(idx+1, queue.length)} / ${queue.length}`;
+    }
+
+    function persistWrong(q){
+      const ids = getWrongIds(); ids.push(q.id); setWrongIds(ids);
+    }
+
+    function renderQuestion(){
+      const $quiz = el('#quiz');
+      if(idx>=queue.length){
+        $quiz.innerHTML = `<div class="q-meta">🎉 完成了！本輪成績：<b>${correct}</b> / ${queue.length}，命中率 <b>${queue.length?Math.round(correct*100/queue.length):0}%</b>。<br>可點「只練錯題」針對弱點補刀。</div>`;
+        el('#nowCat').textContent = '—';
+        return;
+      }
+      const q = queue[idx];
+      el('#nowCat').textContent = catNameOf(q.cat);
+      updateStats(); reveal=false;
+
+      $quiz.innerHTML = `
+        <div class="q-meta">第 ${idx+1} 題・${catNameOf(q.cat)}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="choices"></div>
+        <div class="explain" style="display:none"></div>
+      `;
+      const box = $quiz.querySelector('.choices');
+      q.choices.forEach((txt,i)=>{
+        const c = document.createElement('div'); c.className='choice'; c.innerHTML = `<b>(${String.fromCharCode(65+i)})</b> ${txt}`;
+        c.addEventListener('click', ()=>select(i)); box.appendChild(c);
+      });
+      const ex = $quiz.querySelector('.explain'); ex.textContent = '👉 解釋：' + (q.exp || '—');
+
+      el('#reveal').onclick = ()=>{
+        reveal = true; [...box.children].forEach((node,i)=>{ node.classList.toggle('correct', i===q.ans); });
+        ex.style.display='block';
+      };
+      el('#next').onclick = ()=>{ idx++; renderQuestion(); };
+
+      function select(i){
+        if(reveal) return;
+        const ok = i===q.ans; if(ok) correct++; else { wrong++; persistWrong(q); }
+        [...box.children].forEach((node,ii)=>{
+          node.classList.toggle('correct', ii===q.ans);
+          node.classList.toggle('wrong', ii===i && ii!==q.ans);
+        });
+        ex.style.display='block'; reveal=true; updateStats();
+      }
+    }
+
+    function chosenN(){
+      const active = document.querySelector('[data-n].good');
+      return active? active.dataset.n : '10';
+    }
+
+    function attachToolbar(){
+      document.querySelectorAll('[data-n]').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          document.querySelectorAll('[data-n]').forEach(b=>b.classList.remove('good'));
+          btn.classList.add('good');
+        });
+      });
+
+      el('#startBtn').addEventListener('click', ()=>{
+        const pool = sampleByCats(selectedCats);
+        let n = chosenN(); const arr = shuffle(pool);
+        queue = (n==='all') ? arr : arr.slice(0, Math.min(parseInt(n,10), arr.length));
+        idx=0; correct=0; wrong=0; renderQuestion();
+      });
+
+      el('#wrongBtn').addEventListener('click', ()=>{
+        const ids = getWrongIds();
+        if(!ids.length){ el('#quiz').innerHTML = '<div class="q-meta">目前沒有錯題紀錄，先做幾題吧！</div>'; return; }
+        // 依 id 建立題列（若外部 JSON 有更新，找不到的 id 會被自動忽略）
+        const lookup = new Map(BANK.map(q=>[q.id,q]));
+        const qs = ids.map(id=>lookup.get(id)).filter(Boolean);
+        queue = shuffle(qs).slice(0, 40);
+        idx=0; correct=0; wrong=0; renderQuestion();
+      });
+    }
+
+    // ====== 啟動 ======
+    (async function init(){
+      BANK = await loadBank();
+      if(!Array.isArray(BANK) || !BANK.length){
+        el('#quiz').innerHTML = '<div class="q-meta">🚫 題庫載入失敗：請確認 questions.json 是否存在，或保留內建備援。</div>'; return;
+      }
+      // 確保每題有 id
+      BANK.forEach((q,i)=>{ if(!q.id){ q.id = `${q.cat||'x'}_${i}`; } });
+      buildCats();
+      attachToolbar();
+      // 初始化統計
+      (function update(){ el('#ok').textContent='0'; el('#bad').textContent='0'; el('#acc').textContent='0%'; })();
+    })();
+  </script>
+</body>
+</html>

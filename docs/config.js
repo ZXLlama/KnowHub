@@ -21,6 +21,12 @@ const config = {
       subtitle: "整理過的筆記清單，不只有作者我的，還有偷我同學的",
       image: "./images/DEV.png",
       link: "./notes.html"
+    },
+    {
+      title: "💀英文句型與語態",
+      subtitle: "速攻對照＋互動練習",
+      image: "./images/DEV.png",
+      link: "./SP.html"
     }
   ]
 };
