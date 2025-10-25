@@ -1,79 +1,76 @@
-// 這份請編譯成 ./assets/css/toeic_part5.css 再給 HTML 載入
 :root { --pane-w: min(980px, 96vw); }
 
-.toeic-container {
-  width: var(--pane-w);
-  margin: 16px auto;
-  padding: 12px;
-}
-
+.toeic-container { width: var(--pane-w); margin: 16px auto; padding: 12px; }
 .page-title-card { margin-bottom: 14px; }
 
-.score-deck {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(160px,1fr));
-  gap: 12px;
-  margin-top: 12px;
+/* 正確/錯誤 比例 Bar */
+.scorebar { margin-top: 8px; }
+.scorebar .bar {
+  position: relative; width: 100%; height: 18px; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(180deg, #0d1320, #0b1120);
+  border: 1px solid #1f2a44; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.bar-correct { height:100%; background: linear-gradient(90deg,#22c55e,#4ade80); }
+.bar-wrong   { height:100%; background: linear-gradient(90deg,#ef4444,#f97316); }
+.scorebar .bar-meta {
+  display:flex; justify-content:space-between; gap:12px; margin-top:6px;
+  color:#cbd5e1; font-weight:700;
 }
 
-.stat-box {
-  position: relative;
-  padding: 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-  box-shadow: 0 8px 22px rgba(0,0,0,.25);
-
-  &.big .stat-value { font-size: clamp(34px, 6vw, 56px); }
-  &[data-tone="good"] { background: linear-gradient(135deg, rgba(16,185,129,.16), rgba(16,185,129,.06)); border-color: rgba(16,185,129,.35); }
-  &[data-tone="ok"]   { background: linear-gradient(135deg, rgba(245,158,11,.16), rgba(245,158,11,.06)); border-color: rgba(245,158,11,.35); }
-  &[data-tone="bad"]  { background: linear-gradient(135deg, rgba(239,68,68,.18), rgba(239,68,68,.06)); border-color: rgba(239,68,68,.35); }
-}
-
-.stat-label { font-size: 12px; color: #a1a1aa; margin-bottom: 6px; }
-.stat-value { font-weight: 900; font-size: clamp(20px, 5vw, 44px); letter-spacing: .02em; }
-
+/* 題目區塊 */
 .qa-card { padding: 18px; }
-.qno { font-size: 12px; color: #9ca3af; letter-spacing: .12em; }
+.qno { font-size:12px; color:#9ca3af; letter-spacing:.12em; }
 .question { font-size: clamp(18px, 3.6vw, 22px); line-height: 1.6; margin: 8px 0 12px; }
-.options { display: grid; gap: 10px; }
+.options { display:grid; gap:10px; }
 
 .opt {
-  position: relative;
-  border: 1px solid #1f2a44;
-  background: #0b1220;
-  border-radius: 12px;
-  padding: 12px 14px;
-  cursor: pointer;
-  transition: .2s ease;
-
-  &:hover {
-    border-color: #334155;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(60, 60, 100, 0.12);
-  }
-  input { position: absolute; inset: 0; opacity: 0; }
+  position:relative; border:1px solid #1f2a44; background:#0b1220; border-radius:12px;
+  padding:12px 14px; cursor:pointer; transition:.2s ease;
+  &:hover { border-color:#334155; transform: translateY(-1px); }
+  input { position:absolute; inset:0; opacity:0; }
   .mark {
-    width: 22px; height: 22px; display: inline-grid; place-items: center;
-    border-radius: 6px; background: #0b1220; border: 1px solid #1f2a44;
-    margin-right: 10px; font-size: 12px; color: #94a3b8;
+    width:22px; height:22px; display:inline-grid; place-items:center; border-radius:6px;
+    background:#0b1220; border:1px solid #1f2a44; margin-right:10px; font-size:12px; color:#94a3b8;
   }
-  &.selected { border-color: #7c3aed; background: linear-gradient(180deg, #0f1020, #0b1220); }
-  &.correct { border-color: #22c55e; }
-  &.wrong   { border-color: #ef4444; }
+  &.selected { border-color:#7c3aed; background: linear-gradient(180deg, #0f1020, #0b1220); }
+  &.correct  { border-color:#22c55e; }
+  &.wrong    { border-color:#ef4444; }
 }
-.opt-content { display: flex; align-items: flex-start; gap: 10px; }
+.opt-content { display:flex; align-items:flex-start; gap:10px; }
 
-.controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+/* 置底 sticky 行動列 + 霓虹玻璃風按鈕 */
+.action-bar {
+  position: sticky; bottom: 0; margin-top: 16px; padding: 10px; border-radius: 16px;
+  display:flex; flex-wrap: wrap; gap:10px; justify-content:center;
+  background: rgba(6,10,20,.65); backdrop-filter: blur(10px);
+  border: 1px solid rgba(148,163,184,.18); box-shadow: 0 8px 22px rgba(0,0,0,.35);
+}
+.btn-neo {
+  --pad-x: 14px; --pad-y: 10px; --radius: 999px;
+  padding: var(--pad-y) var(--pad-x); border-radius: var(--radius); border: 1px solid #263142;
+  color:#e5e7eb; background: linear-gradient(180deg,#0f1525,#0b1220);
+  box-shadow: 0 10px 20px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06);
+  cursor:pointer; font-weight:700; letter-spacing:.02em; transition:.15s ease;
+  &:hover { transform: translateY(-1px); border-color:#3b82f6; }
+  &.primary { background: linear-gradient(120deg,#3b82f6,#8b5cf6,#06b6d4); color:white; border:none; }
+  &.success { background: linear-gradient(120deg,#22c55e,#4ade80); color:#052e16; border:none; }
+  &.ghost   { background: transparent; border:1px dashed #334155; }
+}
 
+/* 詳解 */
 .explain {
-  margin-top: 14px; padding: 12px 14px;
-  border: 1px solid #22314a; border-radius: 12px;
-  background: #0b1220; color: #dbeafe; display: none;
+  margin-top:14px; padding:12px 14px; border:1px solid #22314a; border-radius:12px;
+  background:#0b1220; color:#dbeafe; display:none;
+  &.show { display:block; }
+}
 
-  &.show { display: block; }
+/* 回首頁按鈕 */
+.btn-back {
+  margin-left:auto; padding:8px 12px; border-radius:999px;
+  border:1px solid #1f2a44; color:#e5e7eb; text-decoration:none;
+  &:hover { border-color:#3b82f6; }
 }
 
 @media (max-width: 720px) {
-  .score-deck { grid-template-columns: repeat(2, minmax(160px,1fr)); }
+  .action-bar { justify-content:space-between; }
 }

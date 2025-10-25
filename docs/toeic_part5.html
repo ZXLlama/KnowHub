@@ -5,20 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>KnowHub｜TOEIC 閱讀 Part 5（前30題）</title>
 
-  <!-- 照搬 KnowHub header/footer 的共用樣式 -->
+  <!-- 共用樣式（與站上其他頁一致） -->
   <link rel="stylesheet" href="./assets/css/template.css" />
   <link rel="stylesheet" href="./assets/css/knowledge.css" />
 
-  <!-- 本頁樣式（由 toeic_part5.scss 編譯而來） -->
+  <!-- 本頁樣式（由 toeic_part5.scss 編譯） -->
   <link rel="stylesheet" href="./assets/css/toeic_part5.css" />
 </head>
 <body class="kh-body">
-  <!-- Header -->
+  <!-- Header：沿用 KnowHub，右側有回首頁 -->
   <header class="kh-header">
     <div class="kh-header__inner">
       <a class="kh-logo" href="./index.html" aria-label="回到首頁">
         <img src="./images/Know-hub.png" alt="KnowHub Logo" />
       </a>
+      <div class="kh-title">TOEIC Part 5｜前30題刷題器</div>
+      <a class="btn-back" href="./index.html" aria-label="回首頁">← 回首頁</a>
     </div>
   </header>
 
@@ -26,30 +28,16 @@
     <div class="toeic-container">
       <section class="page-title-card">
         <h1 class="page-title">閱讀 Part 5（前 30 題）</h1>
-        <div class="page-chips">
-          <span class="chip">題目 / 選項 / 詳解</span>
-          <span class="chip">錯誤率計算</span>
-          <span class="chip">錯題重作</span>
-          <span class="chip">來源：/assets/data/TOEIC_PART5.json</span>
-        </div>
 
-        <!-- 更顯眼：正確率 / 錯誤率 -->
-        <div class="score-deck" role="status" aria-live="polite">
-          <div class="stat-box big" data-tone="ok">
-            <div class="stat-label">正確率</div>
-            <div id="accRate" class="stat-value">–</div>
+        <!-- 正確/錯誤率：合併比例 Bar -->
+        <div class="scorebar" role="img" aria-label="作答表現">
+          <div class="bar">
+            <div id="bar-correct" class="bar-correct" style="width:0%"></div>
+            <div id="bar-wrong" class="bar-wrong" style="width:0%"></div>
           </div>
-          <div class="stat-box big" data-tone="ok">
-            <div class="stat-label">錯誤率</div>
-            <div id="errRate" class="stat-value">–</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">已作</div>
-            <div id="answered" class="stat-value">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">答對</div>
-            <div id="correct" class="stat-value">0</div>
+          <div class="bar-meta">
+            <span id="accText">正確 0%</span>
+            <span id="errText">錯誤 0%</span>
           </div>
         </div>
       </section>
@@ -59,14 +47,15 @@
         <div class="question" id="question">載入中…</div>
         <div class="options" id="options" role="list"></div>
 
-        <div class="controls">
-          <button id="submit" class="btn btn-primary">提交答案</button>
-          <button id="reveal" class="btn">顯示詳解</button>
-          <button id="prev" class="btn">上一題</button>
-          <button id="next" class="btn btn-primary">下一題</button>
-          <button id="shuffle" class="btn">洗牌</button>
-          <button id="wrongMode" class="btn">重作錯題：關</button>
-          <button id="reset" class="btn btn-plain">重置紀錄</button>
+        <!-- 特色按鈕：置底 sticky 的動作列 -->
+        <div class="action-bar">
+          <button id="submit" class="btn-neo primary">提交答案</button>
+          <button id="reveal" class="btn-neo">顯示詳解</button>
+          <button id="prev" class="btn-neo">上一題</button>
+          <button id="next" class="btn-neo success">下一題</button>
+          <button id="shuffle" class="btn-neo">洗牌</button>
+          <button id="wrongMode" class="btn-neo">重作錯題：關</button>
+          <button id="reset" class="btn-neo ghost">重置紀錄</button>
         </div>
 
         <div id="explain" class="explain" aria-live="polite"></div>
@@ -74,7 +63,6 @@
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="kh-footer">
     <div class="kh-footer__inner">
       <small>© <span id="year"></span> KnowHub — Keep learning, keep earning 💸</small>
