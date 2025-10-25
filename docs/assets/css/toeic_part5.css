@@ -1,0 +1,153 @@
+:root {
+  --pane-w: min(980px, 96vw);
+}
+
+.toeic-container {
+  width: var(--pane-w);
+  margin: 16px auto;
+  padding: 12px;
+}
+
+.page-title-card {
+  margin-bottom: 14px;
+}
+
+.score-deck {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.stat-box {
+  position: relative;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+}
+.stat-box.big .stat-value {
+  font-size: clamp(34px, 6vw, 56px);
+}
+.stat-box[data-tone=good] {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(16, 185, 129, 0.06));
+  border-color: rgba(16, 185, 129, 0.35);
+}
+.stat-box[data-tone=ok] {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(245, 158, 11, 0.06));
+  border-color: rgba(245, 158, 11, 0.35);
+}
+.stat-box[data-tone=bad] {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(239, 68, 68, 0.06));
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #a1a1aa;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-weight: 900;
+  font-size: clamp(20px, 5vw, 44px);
+  letter-spacing: 0.02em;
+}
+
+.qa-card {
+  padding: 18px;
+}
+
+.qno {
+  font-size: 12px;
+  color: #9ca3af;
+  letter-spacing: 0.12em;
+}
+
+.question {
+  font-size: clamp(18px, 3.6vw, 22px);
+  line-height: 1.6;
+  margin: 8px 0 12px;
+}
+
+.options {
+  display: grid;
+  gap: 10px;
+}
+
+.opt {
+  position: relative;
+  border: 1px solid #1f2a44;
+  background: #0b1220;
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.opt:hover {
+  border-color: #334155;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(60, 60, 100, 0.12);
+}
+.opt input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.opt .mark {
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #0b1220;
+  border: 1px solid #1f2a44;
+  margin-right: 10px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.opt.selected {
+  border-color: #7c3aed;
+  background: linear-gradient(180deg, #0f1020, #0b1220);
+}
+.opt.correct {
+  border-color: #22c55e;
+}
+.opt.wrong {
+  border-color: #ef4444;
+}
+
+.opt-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.explain {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #22314a;
+  border-radius: 12px;
+  background: #0b1220;
+  color: #dbeafe;
+  display: none;
+}
+.explain.show {
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .score-deck {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+}
+
+/*# sourceMappingURL=toeic_part5.css.map */

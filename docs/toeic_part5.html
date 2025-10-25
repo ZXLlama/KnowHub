@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>KnowHub｜TOEIC 閱讀 Part 5（前30題）</title>
+
+  <!-- 照搬 KnowHub header/footer 的共用樣式 -->
+  <link rel="stylesheet" href="./assets/css/template.css" />
+  <link rel="stylesheet" href="./assets/css/knowledge.css" />
+
+  <!-- 本頁樣式（由 toeic_part5.scss 編譯而來） -->
+  <link rel="stylesheet" href="./assets/css/toeic_part5.css" />
+</head>
+<body class="kh-body">
+  <!-- Header -->
+  <header class="kh-header">
+    <div class="kh-header__inner">
+      <a class="kh-logo" href="./index.html" aria-label="回到首頁">
+        <img src="./images/Know-hub.png" alt="KnowHub Logo" />
+      </a>
+    </div>
+  </header>
+
+  <main class="kh-main">
+    <div class="toeic-container">
+      <section class="page-title-card">
+        <h1 class="page-title">閱讀 Part 5（前 30 題）</h1>
+        <div class="page-chips">
+          <span class="chip">題目 / 選項 / 詳解</span>
+          <span class="chip">錯誤率計算</span>
+          <span class="chip">錯題重作</span>
+          <span class="chip">來源：/assets/data/TOEIC_PART5.json</span>
+        </div>
+
+        <!-- 更顯眼：正確率 / 錯誤率 -->
+        <div class="score-deck" role="status" aria-live="polite">
+          <div class="stat-box big" data-tone="ok">
+            <div class="stat-label">正確率</div>
+            <div id="accRate" class="stat-value">–</div>
+          </div>
+          <div class="stat-box big" data-tone="ok">
+            <div class="stat-label">錯誤率</div>
+            <div id="errRate" class="stat-value">–</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">已作</div>
+            <div id="answered" class="stat-value">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">答對</div>
+            <div id="correct" class="stat-value">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="qa-card section-card" id="qaCard">
+        <div class="qno" id="qno">第 1 題</div>
+        <div class="question" id="question">載入中…</div>
+        <div class="options" id="options" role="list"></div>
+
+        <div class="controls">
+          <button id="submit" class="btn btn-primary">提交答案</button>
+          <button id="reveal" class="btn">顯示詳解</button>
+          <button id="prev" class="btn">上一題</button>
+          <button id="next" class="btn btn-primary">下一題</button>
+          <button id="shuffle" class="btn">洗牌</button>
+          <button id="wrongMode" class="btn">重作錯題：關</button>
+          <button id="reset" class="btn btn-plain">重置紀錄</button>
+        </div>
+
+        <div id="explain" class="explain" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="kh-footer">
+    <div class="kh-footer__inner">
+      <small>© <span id="year"></span> KnowHub — Keep learning, keep earning 💸</small>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="./assets/js/toeic_part5.js" type="module" defer></script>
+</body>
+</html>

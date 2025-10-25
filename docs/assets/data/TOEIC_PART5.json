@@ -1,0 +1,8 @@
+[
+  {
+    "q": "The manager ____ the proposal to reduce costs.",
+    "options": ["approved", "discovered", "explained", "prevented"],
+    "answer": 0,
+    "explain": "manager 對 proposal 最合理動作為 approve（批准）。"
+  }
+]

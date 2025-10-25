@@ -23,10 +23,10 @@ const config = {
       link: "./notes.html"
     },
     {
-      title: "💀英文句型與語態",
+      title: "💀TOEIX_PART5",
       subtitle: "速攻對照＋互動練習",
       image: "./images/DEV.png",
-      link: "./SP.html"
+      link: "./toeic_part5.html"
     }
   ]
 };
