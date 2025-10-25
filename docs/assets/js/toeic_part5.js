@@ -158,4 +158,11 @@ btnReveal.addEventListener('click', ()=>{
 
 // 初始化
 updateBar();
-tryFetch(JSON_PATHS).then(ok => { if(!ok) render(); });
+tryFetch(JSON_PATHS).then(ok => { 
+  if(!ok) render(); 
+  // 每次載入頁面時自動洗牌一次
+  shuffle(order);
+  idx = 0;
+  render();
+});
+
