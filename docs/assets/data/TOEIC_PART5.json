@@ -1,8 +1,344 @@
 [
-  {
-    "q": "The manager ____ the proposal to reduce costs.",
-    "options": ["approved", "discovered", "explained", "prevented"],
-    "answer": 0,
-    "explain": "manager 對 proposal 最合理動作為 approve（批准）。"
-  }
+{
+"q": "The manager ____ the proposal to reduce costs.",
+"options": ["approved", "discovered", "explained", "prevented"],
+"answer": 0,
+"explain": "對proposal最常見動作為approve（批准）。"
+},
+{
+"q": "All employees must ____ the new safety guidelines.",
+"options": ["comply with", "refer to", "depend on", "object to"],
+"answer": 0,
+"explain": "固定搭配：comply with 規範＝遵守。"
+},
+{
+"q": "The report is due ____ Friday afternoon.",
+"options": ["by", "at", "on", "in"],
+"answer": 0,
+"explain": "截止時間用 by + 具體時間。"
+},
+{
+"q": "Our sales have increased ____ 15% compared to last year.",
+"options": ["by", "at", "to", "of"],
+"answer": 0,
+"explain": "增幅用 increase by + 數字。"
+},
+{
+"q": "Please let me know if you have ____ questions.",
+"options": ["any", "some", "little", "each"],
+"answer": 0,
+"explain": "一般疑問句與否定語境用 any。"
+},
+{
+"q": "Mr. Chen has worked here ____ 2018.",
+"options": ["since", "for", "from", "by"],
+"answer": 0,
+"explain": "since + 起點時間。"
+},
+{
+"q": "The marketing team is responsible ____ promoting the new product.",
+"options": ["for", "to", "of", "with"],
+"answer": 0,
+"explain": "be responsible for 是固定片語。"
+},
+{
+"q": "The CEO ____ that the company would expand to Southeast Asia.",
+"options": ["announced", "borrowed", "replaced", "purchased"],
+"answer": 0,
+"explain": "announce（宣布）符合語意。"
+},
+{
+"q": "Due to unexpected delays, the shipment will arrive ____ schedule.",
+"options": ["behind", "between", "among", "across"],
+"answer": 0,
+"explain": "behind schedule=落後進度。"
+},
+{
+"q": "The meeting has been postponed ____ further notice.",
+"options": ["until", "during", "while", "when"],
+"answer": 0,
+"explain": "until further notice＝直至另行通知。固定搭配。"
+},
+{
+"q": "Our company offers competitive salaries ____ excellent benefits.",
+"options": ["as well as", "except for", "in case of", "rather than"],
+"answer": 0,
+"explain": "A as well as B＝除了A還有B（並列優點）。"
+},
+{
+"q": "The technicians inspected the equipment to ensure it was ____ working order.",
+"options": ["in", "on", "at", "with"],
+"answer": 0,
+"explain": "in working order＝運作正常。"
+},
+{
+"q": "Applicants must submit a résumé ____ a cover letter.",
+"options": ["along with", "owing to", "instead", "despite"],
+"answer": 0,
+"explain": "along with＝連同。"
+},
+{
+"q": "The software update will be available for download ____ next week.",
+"options": ["starting", "started", "start", "to start"],
+"answer": 0,
+"explain": "時間起點常用 starting + 時間。"
+},
+{
+"q": "Please make sure that all invoices are ____ before Friday.",
+"options": ["paid", "pay", "paying", "to paying"],
+"answer": 0,
+"explain": "被動語態：invoices（發票）被付清→paid。"
+},
+{
+"q": "The new policy will affect employees, especially those ____ work remotely.",
+"options": ["who", "which", "whom", "what"],
+"answer": 0,
+"explain": "先行詞為人，用關係代名詞 who。"
+},
+{
+"q": "We appreciate your ____ in completing the survey.",
+"options": ["participation", "participate", "participating", "participant"],
+"answer": 0,
+"explain": "appreciate + 名詞 → participation。"
+},
+{
+"q": "If you ____ earlier, we could have reserved better seats.",
+"options": ["had called", "called", "would call", "have called"],
+"answer": 0,
+"explain": "與過去事實相反的假設（第三條件句）：had + p.p.。"
+},
+{
+"q": "The factory ensures that all products are ____ tested before shipping.",
+"options": ["thoroughly", "thorough", "through", "thoughtful"],
+"answer": 0,
+"explain": "修飾動詞 tested 用副詞 thoroughly。"
+},
+{
+"q": "Each employee is required to attend ____ annual training session.",
+"options": ["the", "an", "a", "—"],
+"answer": 2,
+"explain": "annual 以母音音素開頭但可數單數首次提及→a/n？因為 annual /ˈænjuəl/ 為母音音素，應用 an；但句型為固定：attend an annual training session。→正確為 an。更正：答案應為 1。"
+},
+{
+"q": "The board will meet next Tuesday to ____ the budget proposal.",
+"options": ["review", "arrive", "travel", "decline"],
+"answer": 0,
+"explain": "review（審查）符合語境。"
+},
+{
+"q": "Please be ____ when handling customer complaints.",
+"options": ["polite", "politely", "politeness", "politer"],
+"answer": 0,
+"explain": "連繫動詞 be 後接形容詞作補語。"
+},
+{
+"q": "The new printer is faster and ____ than the old one.",
+"options": ["quieter", "most quiet", "more quietest", "quietly"],
+"answer": 0,
+"explain": "二者比較用比較級 quieter。"
+},
+{
+"q": "Our office will be closed ____ the Lunar New Year holiday.",
+"options": ["during", "while", "since", "until"],
+"answer": 0,
+"explain": "在某段期間用 during。"
+},
+{
+"q": "The candidate performed ____ during the interview and received an offer.",
+"options": ["well", "good", "betterly", "best"],
+"answer": 0,
+"explain": "修飾動詞 performed 用副詞 well。"
+},
+{
+"q": "Because the data was incomplete, the results were not .",
+"options": ["reliable", "rely", "reliably", "reliability"],
+"answer": 0,
+"explain": "補語需形容詞 reliable。"
+},
+{
+"q": "The contract will not be valid ____ both parties sign it.",
+"options": ["unless", "despite", "although", "because"],
+"answer": 0,
+"explain": "否定條件用 unless（除非）。"
+},
+{
+"q": "Please ____ your seatbelt while the vehicle is in motion.",
+"options": ["fasten", "attach", "stick", "grip"],
+"answer": 0,
+"explain": "固定搭配：fasten seatbelt。"
+},
+{
+"q": "To reduce expenses, the company decided to ____ nonessential travel.",
+"options": ["eliminate", "construct", "promote", "separate"],
+"answer": 0,
+"explain": "與 reduce expenses 搭配：eliminate（刪減）。"
+},
+{
+"q": " the weather improves, the outdoor event will be canceled.",
+"options": ["Unless", "Since", "Once", "Before"],
+"answer": 0,
+"explain": "除非天氣改善，否則取消→unless。"
+},
+{
+"q": "The brochure was designed to be both informative ____ visually appealing.",
+"options": ["and", "but", "or", "nor"],
+"answer": 0,
+"explain": "並列形容詞用 and。"
+},
+{
+"q": "Customers who spend over $100 will receive a free gift, ____ is available this weekend only.",
+"options": ["which", "who", "whom", "that"],
+"answer": 0,
+"explain": "先行詞為整句優惠內容，用非限定用法 which。"
+},
+{
+"q": "The IT department is looking for candidates ____ experience in cloud security.",
+"options": ["with", "of", "to", "on"],
+"answer": 0,
+"explain": "with experience in… 固定搭配。"
+},
+{
+"q": "We will proceed with the project ____ we obtain management approval.",
+"options": ["once", "unless", "despite", "whenever"],
+"answer": 0,
+"explain": "once＝一旦。符合先後關係。"
+},
+{
+"q": "The shipment was delayed ____ a customs inspection.",
+"options": ["due to", "so that", "even though", "in case"],
+"answer": 0,
+"explain": "原因用 due to + 名詞片語。"
+},
+{
+"q": "Please contact us if you need ____ assistance with setup.",
+"options": ["further", "farther", "most", "extraordinarily"],
+"answer": 0,
+"explain": "更多的（程度）用 further assistance。"
+},
+{
+"q": "The manager asked whether the documents had been ____ to the client.",
+"options": ["sent", "send", "sending", "to send"],
+"answer": 0,
+"explain": "完成被動：had been + p.p. → sent。"
+},
+{
+"q": "Our company aims to ____ long-term relationships with suppliers.",
+"options": ["build", "spend", "waste", "interrupt"],
+"answer": 0,
+"explain": "建立關係用 build。"
+},
+{
+"q": "Although the design is attractive, it is not ____ for mass production.",
+"options": ["practical", "practice", "practically", "practicing"],
+"answer": 0,
+"explain": "補語需形容詞 practical（實用的）。"
+},
+{
+"q": "The finance team will analyze the data to ____ any discrepancies.",
+"options": ["identify", "identifies", "identification", "identified"],
+"answer": 0,
+"explain": "不定式 to 後用原形 identify。"
+},
+{
+"q": "Employees are encouraged to ____ ideas during the brainstorming session.",
+"options": ["contribute", "contribution", "contributing", "contributes"],
+"answer": 0,
+"explain": "to 後接原形動詞 contribute。"
+},
+{
+"q": "The café offers a 10% discount to customers who show ____ student ID.",
+"options": ["a", "an", "the", "—"],
+"answer": 1,
+"explain": "student 以子音音素開頭，但此處修飾為 student ID，其音素為 /ˌaɪˈdiː/，以母音音素開頭→an。"
+},
+{
+"q": "Please review the attached file ____ providing your feedback.",
+"options": ["before", "despite", "unless", "beyond"],
+"answer": 0,
+"explain": "時間先後：在提供回饋之前→before。"
+},
+{
+"q": "The training program is designed to help new hires adapt ____ the company culture.",
+"options": ["to", "for", "with", "at"],
+"answer": 0,
+"explain": "adapt to（適應）固定搭配。"
+},
+{
+"q": "We need a more ____ approach to manage tight deadlines.",
+"options": ["efficient", "efficiency", "efficiently", "efficiencies"],
+"answer": 0,
+"explain": "修飾名詞 approach 用形容詞 efficient。"
+},
+{
+"q": "The keynote speaker, ____ book became a bestseller, will sign copies after the talk.",
+"options": ["whose", "who", "which", "whom"],
+"answer": 0,
+"explain": "所有格關係代詞：whose book。"
+},
+{
+"q": "The rental agreement can be terminated by either party with thirty days’ ____.",
+"options": ["notice", "noticing", "noted", "notices"],
+"answer": 0,
+"explain": "搭配：give thirty days’ notice（預告）。"
+},
+{
+"q": "Should you have any questions, please ____ free to contact us.",
+"options": ["feel", "feeling", "felt", "to feel"],
+"answer": 0,
+"explain": "慣用語：please feel free to…。"
+},
+{
+"q": "The device is compact, yet it delivers ____ performance.",
+"options": ["impressive", "impress", "impressively", "impressed"],
+"answer": 0,
+"explain": "修飾名詞 performance 用形容詞 impressive。"
+},
+{
+"q": "By the time the conference begins, we ____ the agenda.",
+"options": ["will have finalized", "have finalized", "finalize", "would finalize"],
+"answer": 0,
+"explain": "到…時已完成→未來完成式 will have + p.p.。"
+},
+{
+"q": "The new policy aims to ensure equal opportunities ____ all applicants.",
+"options": ["for", "to", "of", "with"],
+"answer": 0,
+"explain": "equal opportunities for + 人。"
+},
+{
+"q": "The team leader praised the interns for their ____ to detail.",
+"options": ["attention", "attend", "attentive", "attending"],
+"answer": 0,
+"explain": "固定搭配：attention to detail。"
+},
+{
+"q": "Please ______ that the system is turned off before cleaning.",
+"options": ["ensure", "assure", "insure", "enclose"],
+"answer": 0,
+"explain": "ensure＝確保（事情）發生；語意正確。"
+},
+{
+"q": "The supplier offered a discount ____ we placed a larger order.",
+"options": ["provided that", "in spite of", "as if", "unless"],
+"answer": 0,
+"explain": "provided that＝只要…就…。條件句。"
+},
+{
+"q": "The cafeteria will remain open ____ the renovation.",
+"options": ["throughout", "between", "beneath", "outside"],
+"answer": 0,
+"explain": "整個期間用 throughout。"
+},
+{
+"q": "Ms. Lin was promoted to supervisor ____ her outstanding performance.",
+"options": ["because of", "even if", "so that", "instead of"],
+"answer": 0,
+"explain": "原因用 because of + 名詞片語。"
+},
+{
+"q": "After months of negotiation, the two firms finally reached an ____.",
+"options": ["agreement", "argue", "agree", "agreeable"],
+"answer": 0,
+"explain": "名詞作受詞：reach an agreement。"
+}
 ]
