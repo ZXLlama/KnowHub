@@ -340,5 +340,329 @@
 "options": ["agreement", "argue", "agree", "agreeable"],
 "answer": 0,
 "explain": "名詞作受詞：reach an agreement。"
+},
+{
+"q": "The manager reminded everyone to arrive ____ time for the meeting.",
+"options": ["on", "at", "in", "by"],
+"answer": 0,
+"explain": "固定用法：on time = 準時。"
+},
+{
+"q": "The factory was shut down ____ safety violations.",
+"options": ["because of", "although", "instead of", "in spite of"],
+"answer": 0,
+"explain": "原因用 because of + 名詞片語。"
+},
+{
+"q": "Please make sure all personal items are removed ____ leaving the office.",
+"options": ["before", "since", "after", "until"],
+"answer": 0,
+"explain": "動作先後：離開前→before leaving。"
+},
+{
+"q": "The sales department has exceeded its quarterly .",
+"options": ["target", "object", "goal", "mark"],
+"answer": 0,
+"explain": "業績目標常用 target。"
+},
+{
+"q": "All employees are expected to dress ____ for client meetings.",
+"options": ["professionally", "professional", "profession", "professions"],
+"answer": 0,
+"explain": "修飾動詞 dress → 副詞 professionally。"
+},
+{
+"q": "The company will launch its new campaign ____ the end of this month.",
+"options": ["at", "in", "by", "on"],
+"answer": 0,
+"explain": "at the end of… 是固定用法。"
+},
+{
+"q": " his experience, Mr. Wang was chosen to lead the project.",
+"options": ["Because of", "Although", "Despite", "Due"],
+"answer": 0,
+"explain": "原因用 because of + 名詞。"
+},
+{
+"q": "The CEO’s speech was both inspiring ____ informative.",
+"options": ["and", "but", "nor", "so"],
+"answer": 0,
+"explain": "並列兩個形容詞用 and。"
+},
+{
+"q": "The technician checked the machine to make sure it was ____ working properly.",
+"options": ["still", "yet", "even", "already"],
+"answer": 0,
+"explain": "still 表示“仍然”工作正常。"
+},
+{
+"q": "Please be sure to ____ your password regularly for security reasons.",
+"options": ["change", "switch", "move", "exchange"],
+"answer": 0,
+"explain": "更改密碼用 change。"
+},
+{
+"q": "The seminar was postponed ____ the speaker’s flight delay.",
+"options": ["due to", "even though", "in case of", "for"],
+"answer": 0,
+"explain": "due to + 名詞表示原因。"
+},
+{
+"q": "The director asked the team to submit the final report ____ Friday.",
+"options": ["by", "until", "on", "at"],
+"answer": 0,
+"explain": "截止期限用 by + 時間。"
+},
+{
+"q": "Our office is located ____ the 10th floor of the main building.",
+"options": ["on", "at", "in", "by"],
+"answer": 0,
+"explain": "樓層用 on。"
+},
+{
+"q": "The project was completed ____ schedule and within budget.",
+"options": ["ahead of", "according to", "by", "after"],
+"answer": 0,
+"explain": "ahead of schedule＝提早進度。"
+},
+{
+"q": "____ the heavy rain, the outdoor concert continued as planned.",
+"options": ["Despite", "Because", "Although", "Due to"],
+"answer": 0,
+"explain": "儘管用 despite + 名詞。"
+},
+{
+"q": "The manager promised to look ____ the complaint immediately.",
+"options": ["into", "over", "up", "for"],
+"answer": 0,
+"explain": "look into＝調查。"
+},
+{
+"q": "Please refrain ____ using your phone during the performance.",
+"options": ["from", "to", "of", "at"],
+"answer": 0,
+"explain": "refrain from + V-ing 固定搭配。"
+},
+{
+"q": "The company decided to hire more staff to meet the increasing ____.",
+"options": ["demand", "supply", "require", "needs"],
+"answer": 0,
+"explain": "商業語境中常用 demand（需求）。"
+},
+{
+"q": "The new marketing strategy has proven to be very ____.",
+"options": ["effective", "effect", "affect", "affective"],
+"answer": 0,
+"explain": "形容詞 effective 表示有效的。"
+},
+{
+"q": "We must submit the proposal ____ the end of the day.",
+"options": ["by", "in", "on", "at"],
+"answer": 0,
+"explain": "期限用 by。"
+},
+{
+"q": "The factory’s output has doubled ____ the new machines were installed.",
+"options": ["since", "while", "until", "as"],
+"answer": 0,
+"explain": "自從…以來用 since。"
+},
+{
+"q": "Mr. Lee was praised for his outstanding ____ to the project.",
+"options": ["contribution", "contribute", "contributing", "contributor"],
+"answer": 0,
+"explain": "名詞用 contribution。"
+},
+{
+"q": "The new employee quickly adapted ____ the company’s culture.",
+"options": ["to", "with", "for", "on"],
+"answer": 0,
+"explain": "adapt to 固定搭配。"
+},
+{
+"q": "Please submit the signed form ____ the front desk.",
+"options": ["to", "for", "in", "by"],
+"answer": 0,
+"explain": "submit to sb/sth＝提交給。"
+},
+{
+"q": "The manager emphasized the importance of teamwork ____ success.",
+"options": ["for", "to", "in", "at"],
+"answer": 0,
+"explain": "importance of teamwork for success 固定搭配。"
+},
+{
+"q": "The factory must comply ____ government safety regulations.",
+"options": ["with", "to", "on", "in"],
+"answer": 0,
+"explain": "固定搭配：comply with。"
+},
+{
+"q": "The company provides training programs ____ improve employees’ skills.",
+"options": ["to", "for", "at", "of"],
+"answer": 0,
+"explain": "目的用 to + V。"
+},
+{
+"q": "The restaurant offers a wide ____ of vegetarian dishes.",
+"options": ["variety", "vary", "varied", "various"],
+"answer": 0,
+"explain": "a wide variety of… 固定片語。"
+},
+{
+"q": "The conference room can accommodate up to fifty ____.",
+"options": ["participants", "participate", "participation", "participating"],
+"answer": 0,
+"explain": "名詞 participants＝參與者。"
+},
+{
+"q": "All new employees must attend the orientation ____ the first week.",
+"options": ["during", "while", "until", "by"],
+"answer": 0,
+"explain": "在期間內用 during。"
+},
+{
+"q": "The project was delayed because some materials were not ____ on time.",
+"options": ["delivered", "deliver", "delivering", "delivery"],
+"answer": 0,
+"explain": "被動語態：materials 被遞送。"
+},
+{
+"q": "The new app is designed to make online payments more ____.",
+"options": ["convenient", "convenience", "conveniently", "conveniences"],
+"answer": 0,
+"explain": "修飾 payments 用形容詞 convenient。"
+},
+{
+"q": "The supervisor encouraged the staff to share their ideas ____.",
+"options": ["freely", "free", "freedom", "freeness"],
+"answer": 0,
+"explain": "修飾動詞 share 用副詞 freely。"
+},
+{
+"q": "We are looking forward to ____ you at the annual conference.",
+"options": ["seeing", "see", "to see", "seen"],
+"answer": 0,
+"explain": "look forward to + V-ing。"
+},
+{
+"q": "The travel agency offers a wide range of packages at ____ prices.",
+"options": ["affordable", "afford", "affordably", "affording"],
+"answer": 0,
+"explain": "修飾名詞 prices 用形容詞 affordable。"
+},
+{
+"q": "The manager insisted that all employees ____ the meeting.",
+"options": ["attend", "attends", "attending", "to attend"],
+"answer": 0,
+"explain": "insist that + 主詞 + 原形動詞。"
+},
+{
+"q": "The presentation was postponed ____ technical difficulties.",
+"options": ["due to", "in spite of", "as if", "even though"],
+"answer": 0,
+"explain": "原因用 due to + 名詞。"
+},
+{
+"q": "All company vehicles must be parked ____ the designated area.",
+"options": ["in", "on", "by", "at"],
+"answer": 0,
+"explain": "在區域裡用 in。"
+},
+{
+"q": "The job requires excellent communication ____.",
+"options": ["skills", "skilled", "skillful", "skillfully"],
+"answer": 0,
+"explain": "名詞作受詞→skills。"
+},
+{
+"q": "The contract will take effect ____ January 1st.",
+"options": ["on", "at", "in", "by"],
+"answer": 0,
+"explain": "日期前用 on。"
+},
+{
+"q": "The marketing team is responsible for promoting the brand ____ social media.",
+"options": ["through", "by", "at", "across"],
+"answer": 0,
+"explain": "透過某媒介用 through。"
+},
+{
+"q": "Customers are encouraged to provide feedback ____ improve our service.",
+"options": ["to", "for", "by", "in"],
+"answer": 0,
+"explain": "目的用 to + 原形動詞。"
+},
+{
+"q": "The company will offer bonuses to employees who perform ____ expectations.",
+"options": ["above", "over", "beyond", "under"],
+"answer": 2,
+"explain": "beyond expectations＝超出預期。"
+},
+{
+"q": "The manager decided to postpone the meeting ____ further notice.",
+"options": ["until", "by", "to", "for"],
+"answer": 0,
+"explain": "until further notice＝直至另行通知。"
+},
+{
+"q": "All staff members are required to log in ____ their company accounts.",
+"options": ["to", "in", "on", "for"],
+"answer": 0,
+"explain": "log in to 是固定用法。"
+},
+{
+"q": "The HR department will handle any issues related ____ employee benefits.",
+"options": ["to", "with", "for", "of"],
+"answer": 0,
+"explain": "related to 固定搭配。"
+},
+{
+"q": "The new product line will be released ____ next quarter.",
+"options": ["sometime", "sometime in", "at", "during"],
+"answer": 3,
+"explain": "在期間內用 during next quarter。"
+},
+{
+"q": "The project was completed successfully, ____ all the challenges.",
+"options": ["despite", "because", "since", "due to"],
+"answer": 0,
+"explain": "儘管有困難→despite。"
+},
+{
+"q": "The CEO requested that the report ____ finished by tomorrow.",
+"options": ["be", "is", "was", "being"],
+"answer": 0,
+"explain": "要求類動詞後用原形動詞（虛擬語氣）。"
+},
+{
+"q": "The hotel offers free breakfast for guests staying ____ two nights or more.",
+"options": ["for", "at", "over", "by"],
+"answer": 0,
+"explain": "停留時間用 for + 期間。"
+},
+{
+"q": "Our customer service is available 24 hours a day, seven days ____ week.",
+"options": ["a", "the", "each", "per"],
+"answer": 0,
+"explain": "固定片語：seven days a week。"
+},
+{
+"q": "Please contact the IT department if your account cannot be ____.",
+"options": ["accessed", "access", "accessing", "to access"],
+"answer": 0,
+"explain": "被動語態：cannot be accessed。"
+},
+{
+"q": "The store offers a refund ____ customers are not satisfied with their purchase.",
+"options": ["if", "unless", "although", "because"],
+"answer": 0,
+"explain": "條件句用 if。"
+},
+{
+"q": "The budget proposal was rejected because it was too ____.",
+"options": ["expensive", "expense", "expensively", "expenditure"],
+"answer": 0,
+"explain": "形容詞 expensive＝昂貴的。"
 }
 ]
