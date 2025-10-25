@@ -1,11 +1,11 @@
-// ＊題庫位置（相對 docs/ 根目錄）
+// 題庫位置（相對 docs/ 根目錄）
 const JSON_PATHS = [
   './assets/data/TOEIC_PART5.json',
   'assets/data/TOEIC_PART5.json',
   '/assets/data/TOEIC_PART5.json',
 ];
 
-// 抓不到外部 JSON 才會 fallback（避免頁面壞）
+// 抓不到外部 JSON 才 fallback
 const SAMPLE = [
   { q: 'The manager ____ the proposal to reduce costs.', options: ['approved','discovered','explained','prevented'], answer: 0, explain: 'manager 對 proposal 最合理動作為 approve（批准）。' },
   { q: 'Applicants must submit their forms ____ Friday.', options: ['on','by','in','at'], answer: 1, explain: '截止時間用 by（不晚於）。' },
@@ -22,7 +22,7 @@ let correct  = Number(localStorage.getItem('kh_toeic_ok')  || 0);
 let wrongSet = new Set(JSON.parse(localStorage.getItem('kh_toeic_wrong') || '[]'));
 let wrongMode = false;
 
-// DOM
+// DOM（只抓本頁一定存在的節點）
 const $ = (id) => document.getElementById(id);
 const elQno=$('qno'), elQ=$('question'), elOpts=$('options'), elExplain=$('explain');
 const barCorrect=$('bar-correct'), barWrong=$('bar-wrong');
@@ -104,6 +104,7 @@ function judge(){
 function next(){ if (idx < order.length-1){ idx++; render(); } else alert('已到最後一題'); }
 function prev(){ if (idx>0){ idx--; render(); } }
 function doShuffle(){ shuffle(order); idx=0; render(); }
+
 function toggleWrongMode(){
   wrongMode = !wrongMode;
   btnWrongMode.textContent = `重作錯題：${wrongMode ? '開' : '關'}`;
@@ -119,6 +120,7 @@ function toggleWrongMode(){
     order = data.map((_,i)=>i); idx=0; render();
   }
 }
+
 function resetAll(){
   if (!confirm('確定重置？這會清除已作題數、正確數與錯題清單。')) return;
   answered=0; correct=0; wrongSet=new Set();

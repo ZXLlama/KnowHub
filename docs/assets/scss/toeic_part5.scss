@@ -74,3 +74,144 @@
 @media (max-width: 720px) {
   .action-bar { justify-content:space-between; }
 }
+:root { --pane-w: min(980px, 96vw); }
+
+.toeic-container { width: var(--pane-w); margin: 16px auto; padding: 12px; }
+.page-title-card { margin-bottom: 14px; }
+
+/* 正確/錯誤 比例 Bar（單條內分區） */
+.scorebar { margin-top: 8px; }
+.scorebar .bar {
+  position: relative; width: 100%; height: 18px; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(180deg, #0d1320, #0b1120);
+  border: 1px solid #1f2a44; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.bar-correct { height:100%; background: linear-gradient(90deg,#22c55e,#4ade80); float:left; }
+.bar-wrong   { height:100%; background: linear-gradient(90deg,#ef4444,#f97316); float:left; }
+.scorebar .bar-meta {
+  display:flex; justify-content:space-between; gap:12px; margin-top:6px;
+  color:#cbd5e1; font-weight:700;
+}
+
+/* 題目區塊 */
+.qa-card { padding: 18px; }
+.qno { font-size:12px; color:#9ca3af; letter-spacing:.12em; }
+.question { font-size: clamp(18px, 3.6vw, 22px); line-height: 1.6; margin: 8px 0 12px; }
+.options { display:grid; gap:10px; }
+
+.opt {
+  position:relative; border:1px solid #1f2a44; background:#0b1220; border-radius:12px;
+  padding:12px 14px; cursor:pointer; transition:.2s ease;
+  &:hover { border-color:#334155; transform: translateY(-1px); }
+  input { position:absolute; inset:0; opacity:0; }
+  .mark {
+    width:22px; height:22px; display:inline-grid; place-items:center; border-radius:6px;
+    background:#0b1220; border:1px solid #1f2a44; margin-right:10px; font-size:12px; color:#94a3b8;
+  }
+  &.selected { border-color:#7c3aed; background: linear-gradient(180deg, #0f1020, #0b1220); }
+  &.correct  { border-color:#22c55e; }
+  &.wrong    { border-color:#ef4444; }
+}
+.opt-content { display:flex; align-items:flex-start; gap:10px; }
+
+/* 置底 sticky 行動列 + 霓虹玻璃風按鈕（與 vocab 視覺相容） */
+.action-bar {
+  position: sticky; bottom: 0; margin-top: 16px; padding: 10px; border-radius: 16px;
+  display:flex; flex-wrap: wrap; gap:10px; justify-content:center;
+  background: rgba(6,10,20,.65); backdrop-filter: blur(10px);
+  border: 1px solid rgba(148,163,184,.18); box-shadow: 0 8px 22px rgba(0,0,0,.35);
+}
+.btn-neo {
+  --pad-x: 14px; --pad-y: 10px; --radius: 999px;
+  padding: var(--pad-y) var(--pad-x); border-radius: var(--radius); border: 1px solid #263142;
+  color:#e5e7eb; background: linear-gradient(180deg,#0f1525,#0b1220);
+  box-shadow: 0 10px 20px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06);
+  cursor:pointer; font-weight:700; letter-spacing:.02em; transition:.15s ease;
+  &:hover { transform: translateY(-1px); border-color:#3b82f6; }
+  &.primary { background: linear-gradient(120deg,#3b82f6,#8b5cf6,#06b6d4); color:white; border:none; }
+  &.success { background: linear-gradient(120deg,#22c55e,#4ade80); color:#052e16; border:none; }
+  &.ghost   { background: transparent; border:1px dashed #334155; }
+}
+
+/* 詳解 */
+.explain {
+  margin-top:14px; padding:12px 14px; border:1px solid #22314a; border-radius:12px;
+  background:#0b1220; color:#dbeafe; display:none;
+  &.show { display:block; }
+}
+
+/* （選擇性）RWD 微調 */
+@media (max-width: 720px) {
+  .action-bar { justify-content:space-between; }
+}
+
+:root { --pane-w: min(980px, 96vw); }
+
+.toeic-container { width: var(--pane-w); margin: 16px auto; padding: 12px; }
+.page-title-card { margin-bottom: 14px; }
+
+/* 正確/錯誤 比例 Bar（單條內分區） */
+.scorebar { margin-top: 8px; }
+.scorebar .bar {
+  position: relative; width: 100%; height: 18px; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(180deg, #0d1320, #0b1120);
+  border: 1px solid #1f2a44; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.bar-correct { height:100%; background: linear-gradient(90deg,#22c55e,#4ade80); float:left; }
+.bar-wrong   { height:100%; background: linear-gradient(90deg,#ef4444,#f97316); float:left; }
+.scorebar .bar-meta {
+  display:flex; justify-content:space-between; gap:12px; margin-top:6px;
+  color:#cbd5e1; font-weight:700;
+}
+
+/* 題目區塊 */
+.qa-card { padding: 18px; }
+.qno { font-size:12px; color:#9ca3af; letter-spacing:.12em; }
+.question { font-size: clamp(18px, 3.6vw, 22px); line-height: 1.6; margin: 8px 0 12px; }
+.options { display:grid; gap:10px; }
+
+.opt {
+  position:relative; border:1px solid #1f2a44; background:#0b1220; border-radius:12px;
+  padding:12px 14px; cursor:pointer; transition:.2s ease;
+  &:hover { border-color:#334155; transform: translateY(-1px); }
+  input { position:absolute; inset:0; opacity:0; }
+  .mark {
+    width:22px; height:22px; display:inline-grid; place-items:center; border-radius:6px;
+    background:#0b1220; border:1px solid #1f2a44; margin-right:10px; font-size:12px; color:#94a3b8;
+  }
+  &.selected { border-color:#7c3aed; background: linear-gradient(180deg, #0f1020, #0b1220); }
+  &.correct  { border-color:#22c55e; }
+  &.wrong    { border-color:#ef4444; }
+}
+.opt-content { display:flex; align-items:flex-start; gap:10px; }
+
+/* 置底 sticky 行動列 + 霓虹玻璃風按鈕（與 vocab 視覺相容） */
+.action-bar {
+  position: sticky; bottom: 0; margin-top: 16px; padding: 10px; border-radius: 16px;
+  display:flex; flex-wrap: wrap; gap:10px; justify-content:center;
+  background: rgba(6,10,20,.65); backdrop-filter: blur(10px);
+  border: 1px solid rgba(148,163,184,.18); box-shadow: 0 8px 22px rgba(0,0,0,.35);
+}
+.btn-neo {
+  --pad-x: 14px; --pad-y: 10px; --radius: 999px;
+  padding: var(--pad-y) var(--pad-x); border-radius: var(--radius); border: 1px solid #263142;
+  color:#e5e7eb; background: linear-gradient(180deg,#0f1525,#0b1220);
+  box-shadow: 0 10px 20px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06);
+  cursor:pointer; font-weight:700; letter-spacing:.02em; transition:.15s ease;
+  &:hover { transform: translateY(-1px); border-color:#3b82f6; }
+  &.primary { background: linear-gradient(120deg,#3b82f6,#8b5cf6,#06b6d4); color:white; border:none; }
+  &.success { background: linear-gradient(120deg,#22c55e,#4ade80); color:#052e16; border:none; }
+  &.ghost   { background: transparent; border:1px dashed #334155; }
+}
+
+/* 詳解 */
+.explain {
+  margin-top:14px; padding:12px 14px; border:1px solid #22314a; border-radius:12px;
+  background:#0b1220; color:#dbeafe; display:none;
+  &.show { display:block; }
+}
+
+/* （選擇性）RWD 微調 */
+@media (max-width: 720px) {
+  .action-bar { justify-content:space-between; }
+}

@@ -3,24 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>KnowHub｜TOEIC 閱讀 Part 5（前30題）</title>
+  <title>KnowHub · TOEIC Part 5</title>
 
-  <!-- 共用樣式（與站上其他頁一致） -->
-  <link rel="stylesheet" href="./assets/css/template.css" />
-  <link rel="stylesheet" href="./assets/css/knowledge.css" />
-
+  <!-- 共用樣式（與 vocab 同套路） -->
+  <link rel="stylesheet" href="assets/css/template.css" />
+  <link rel="stylesheet" href="assets/css/knowledge.css" />
   <!-- 本頁樣式（由 toeic_part5.scss 編譯） -->
-  <link rel="stylesheet" href="./assets/css/toeic_part5.css" />
+  <link rel="stylesheet" href="assets/css/toeic_part5.css" />
 </head>
 <body class="kh-body">
-  <!-- Header：沿用 KnowHub，右側有回首頁 -->
+  <!-- Header：與 vocab 一樣，Logo 可回首頁 -->
   <header class="kh-header">
     <div class="kh-header__inner">
       <a class="kh-logo" href="./index.html" aria-label="回到首頁">
-        <img src="./images/Know-hub.png" alt="KnowHub Logo" />
+        <img src="./images/Know-hub.png" alt="KnowHub Logo">
       </a>
-      <div class="kh-title">TOEIC Part 5｜前30題刷題器</div>
-      <a class="btn-back" href="./index.html" aria-label="回首頁">← 回首頁</a>
     </div>
   </header>
 
@@ -47,29 +44,33 @@
         <div class="question" id="question">載入中…</div>
         <div class="options" id="options" role="list"></div>
 
-        <!-- 特色按鈕：置底 sticky 的動作列 -->
-        <div class="action-bar">
+        <!-- 置底 sticky 的操作列（含回首頁） -->
+        <nav class="action-bar" aria-label="操作按鈕">
           <button id="submit" class="btn-neo primary">提交答案</button>
           <button id="reveal" class="btn-neo">顯示詳解</button>
-          <button id="prev" class="btn-neo">上一題</button>
-          <button id="next" class="btn-neo success">下一題</button>
+          <button id="prev" class="btn-neo" title="上一題">上一題</button>
+          <button id="next" class="btn-neo success" title="下一題">下一題</button>
           <button id="shuffle" class="btn-neo">洗牌</button>
           <button id="wrongMode" class="btn-neo">重作錯題：關</button>
           <button id="reset" class="btn-neo ghost">重置紀錄</button>
-        </div>
+          <a href="index.html" class="btn-neo primary" aria-label="回首頁">🏠 回首頁</a>
+        </nav>
 
         <div id="explain" class="explain" aria-live="polite"></div>
       </section>
     </div>
   </main>
 
+  <!-- Footer（與 vocab 一致） -->
   <footer class="kh-footer">
     <div class="kh-footer__inner">
       <small>© <span id="year"></span> KnowHub — Keep learning, keep earning 💸</small>
     </div>
   </footer>
 
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-  <script src="./assets/js/toeic_part5.js" type="module" defer></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+  <script src="assets/js/toeic_part5.js" type="module" defer></script>
 </body>
 </html>
