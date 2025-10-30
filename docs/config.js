@@ -1,7 +1,7 @@
 const config = {
   grid: {
-    rows: 1,
-    columns: 1
+    rows: 3,
+    columns: 2
   },
   tiles: [
     {
@@ -27,6 +27,12 @@ const config = {
       subtitle: "速攻對照＋互動練習",
       image: "./images/DEV.png",
       link: "./toeic_part5.html"
+    },
+    {
+      title: "🌍3D科氏力模擬",
+      subtitle: "我是傻逼我看了很久還是看沒明白",
+      image: "./images/DEV.png",
+      link: "./coriolis_force.html"
     }
   ]
 };

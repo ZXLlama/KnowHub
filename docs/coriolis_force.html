@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>KnowHub · 科氏力 3D 模擬器</title>
+
+  <!-- KnowHub 共用樣式 -->
+  <link rel="stylesheet" href="assets/css/template.css" />
+  <link rel="stylesheet" href="assets/css/knowledge.css" />
+
+  <!-- Page-local tweaks: 不改動核心 JS，只處理版面與容器尺寸 -->
+  <style>
+    :root{
+      --sim-controls-w: 320px;
+    }
+    /* 讓整頁用彈性排版，Header / Main / Footer */
+    body.kh-body{
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: #0b1220;
+      color: #e7ecf3;
+      overflow: hidden; /* 與原本滿版 3D 一致 */
+    }
+
+    /* 主區域容器 */
+    .kh-main{
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+    }
+
+    /* 承接原本 #container 全視窗畫布，但避開 header / footer */
+    .sim-stage{
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    /* 把原本 k.html 的 #container 塞在這裡跑滿 */
+    #container{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 原檔的 loader / info / controls 依舊絕對定位，但微調以配合 KnowHub */
+    #loader{
+      z-index: 50;
+      text-shadow: 0 0 10px #00aaff;
+    }
+    #info{
+      position: absolute;
+      bottom: 16px;
+      width: 100%;
+      text-align: center;
+      color: #9db4c9;
+      font-size: 12px;
+      z-index: 40;
+      pointer-events: none;
+    }
+    /* 控制面板維持原寬，右上角不跟 header 打架 */
+    #controls{
+      position: absolute;
+      top: 88px;          /* header 高度保留空間 */
+      left: 20px;
+      z-index: 60;
+      width: var(--sim-controls-w);
+      background: rgba(10, 20, 35, 0.85);
+      padding: 20px 16px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 170, 255, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-family: 'Orbitron', sans-serif;
+      box-shadow: 0 0 25px rgba(0, 170, 255, 0.2);
+      display: none; /* init 階段先隱藏，載入後顯示（與原本一致） */
+      transform: translateX(0);
+      transition: transform 200ms ease, opacity 200ms ease;
+    }
+    #controls.collapsed{
+      transform: translateX(calc(-100% - 24px));
+      opacity: .9;
+    }
+
+    /* 控制面板標題列 + 摺疊按鈕 */
+    .controls-header{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: -6px -4px 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(0, 170, 255, 0.35);
+    }
+    .controls-title{
+      font-size: 14px;
+      letter-spacing: .5px;
+      color: #a9e6ff;
+    }
+    .controls-toggle{
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 12px;
+      line-height: 1;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 170, 255, 0.6);
+      background: rgba(0, 170, 255, 0.15);
+      color: #e7faff;
+      cursor: pointer;
+    }
+
+    /* 收合時在畫面邊緣顯示一個「展開」小鈕 */
+    #controls-peek{
+      position: absolute;
+      top: 88px;
+      left: 12px;
+      z-index: 61;
+      display: none; /* 預設關閉，當 #controls 被收合時顯示 */
+    }
+    #controls-peek.show{
+      display: block;
+    }
+    #controls-peek .btn{
+      padding: 8px 10px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      font-size: 13px;
+    }
+
+    .control-row { display: flex; align-items: center; margin-bottom: 14px; }
+    .control-row label { margin-right: 15px; font-size: 14px; min-width: 100px; color: #00aaff; }
+    input[type="range"] { width: 100%; -webkit-appearance: none; background: transparent; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: rgba(0, 170, 255, 0.3); border-radius: 2px; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; background: #00aaff; border-radius: 50%; border: 2px solid #111; margin-top: -6px; box-shadow: 0 0 10px #00aaff; }
+    .value-display { font-weight: bold; color: #00e0ff; min-width: 50px; text-align: left; }
+    .divider { height: 1px; background-image: linear-gradient(to right, rgba(0,170,255,0), rgba(0,170,255,0.5), rgba(0,170,255,0)); border: 0; margin: 18px 0; }
+    .radio-group label { display: flex; align-items: center; font-size: 13px; margin-right: 15px; cursor: pointer; color: #eee; }
+    .wind-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wind-controls button { font-family: 'Noto Sans TC', sans-serif; background-color: rgba(0, 170, 255, 0.2); border: 1px solid rgba(0, 170, 255, 0.5); color: #fff; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+    .wind-controls button.active { background-color: #007bff; border-color: #00aaff; box-shadow: 0 0 8px #007bff; }
+    #tooltip { position: absolute; background: rgba(0,0,0,0.8); border: 1px solid #00aaff; padding: 10px; border-radius: 5px; color: #fff; font-family: 'Noto Sans TC', sans-serif; font-size: 13px; max-width: 250px; z-index: 200; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+
+    /* 浮動回首頁按鈕（與 knowledge 的 kh-bottom-home 呼應，但做成 FAB） */
+    .kh-home-fab{
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      z-index: 70;
+    }
+    .kh-home-fab .btn{
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    /* 手機優化：控制面板往下讓出更多視窗高度 */
+    @media (max-width: 768px){
+      #controls{
+        top: 100px;
+        left: 12px;
+        width: min(88vw, var(--sim-controls-w));
+      }
+      #controls-peek{
+        top: 100px;
+        left: 8px;
+      }
+    }
+  </style>
+
+  <!-- Google Fonts 與原樣式（保留原字型設定以避免視覺突兀） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="kh-body">
+  <!-- Header（與 knowledge/vocab/toeic 同風格，Logo 可回首頁） -->
+  <header class="kh-header">
+    <div class="kh-header__inner">
+      <a class="kh-logo" href="./index.html" aria-label="回到首頁">
+        <img src="./images/Know-hub.png" alt="KnowHub Logo" />
+      </a>
+    </div>
+  </header>
+
+  <!-- Main：全螢幕 3D 場景 -->
+  <main class="kh-main">
+    <section class="sim-stage" aria-label="科氏力 3D 模擬器">
+      <div id="loader">ULTIMATE EARTH SIMULATOR /// LOADING...</div>
+      <div id="container" aria-label="WebGL 場景容器"></div>
+      <div id="tooltip" role="tooltip"></div>
+
+      <!-- 原檔控制面板（保留 ID / 結構 / 事件），加上可摺疊功能 -->
+      <div id="controls" aria-label="控制面板" aria-expanded="true">
+        <div class="controls-header">
+          <div class="controls-title">⚙️ 控制面板</div>
+          <button id="controlsToggle" class="controls-toggle" type="button" aria-controls="controls" aria-expanded="true">⮜ 收起</button>
+        </div>
+
+        <div class="control-row" data-tooltip="調整地球自轉的角速度。正值為順時針（西向東），負值為逆時針。速度大小直接影響科氏力強度。">
+          <label>自轉速度:</label>
+          <input type="range" id="rotationSpeed" min="-100" max="100" value="15">
+        </div>
+        <div class="control-row" data-tooltip="科氏力的相對強度，由自轉速度自動計算得出。">
+          <label>科氏力:</label>
+          <span id="coriolisValue" class="value-display"></span>
+        </div>
+        <hr class="divider">
+        <div class="control-row" data-tooltip="切換觀察者的參考系。太空視角：您靜止，地球系統轉動。地球視角：您隨地球轉動，風在靜止的地球上流動。">
+          <label>觀察視角:</label>
+          <div class="radio-group">
+            <label><input type="radio" name="viewMode" value="space" checked> 太空</label>
+            <label><input type="radio" name="viewMode" value="earth"> 地球</label>
+          </div>
+        </div>
+        <div class="control-row" data-tooltip="選擇顯示的向量。風向（綠色）是空氣實際運動路徑。科氏力（紅色）是導致風向偏轉的虛擬力。">
+          <label>顯示向量:</label>
+          <div class="radio-group">
+            <label><input type="radio" name="vectorMode" value="wind" checked> 風向</label>
+            <label><input type="radio" name="vectorMode" value="coriolis"> 科氏力</label>
+            <label><input type="radio" name="vectorMode" value="both"> 兩者</label>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="wind-controls">
+          <button id="btn-n2e" class="active" data-tooltip="顯示從北半球高壓區（極地）吹向赤道的風。">北極 > 赤道</button>
+          <button id="btn-e2n" class="active" data-tooltip="顯示從赤道低壓區吹向北半球的風。">赤道 > 北極</button>
+          <button id="btn-s2e" class="active" data-tooltip="顯示從南半球高壓區（極地）吹向赤道的風。">南極 > 赤道</button>
+          <button id="btn-e2s" class="active" data-tooltip="顯示從赤道低壓區吹向南半球的風。">赤道 > 南極</button>
+        </div>
+      </div>
+
+      <!-- 收合後的「展開控制面板」小鈕 -->
+      <div id="controls-peek" class="kh-home-fab">
+        <button id="controlsShow" class="btn btn-primary" type="button" aria-controls="controls" aria-expanded="false">🛠️ 展開控制面板</button>
+      </div>
+
+      <div id="info">滑鼠左鍵拖曳旋轉，滾輪縮放，右鍵平移。</div>
+
+      <!-- 回首頁 FAB -->
+      <div class="kh-home-fab" style="right: 20px; bottom: 20px;">
+        <a class="btn btn-primary" href="./index.html" aria-label="回到首頁">🏠 回首頁</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="kh-footer">
+    <div class="kh-footer__inner">
+      <small>© <span id="year"></span> KnowHub — Keep learning, keep earning 💸</small>
+    </div>
+  </footer>
+
+  <script>
+    // Footer 年份
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+  <!-- three.js 與原本依賴（保持版本與順序） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- 原 k.html 腳本（未改動演算法與結構） -->
+  <script>
+    // --- Shaders ---
+    const earthVS = `varying vec2 vUv; varying vec3 vNormal; varying vec3 vPosition; void main() { vUv = uv; vPosition = position; vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+    const earthFS = `uniform sampler2D tD; uniform sampler2D tN; uniform sampler2D tS; varying vec2 vUv; varying vec3 vNormal; varying vec3 vPosition; uniform vec3 sunDir; void main() { vec3 day = texture2D(tD, vUv).rgb; vec3 night = texture2D(tN, vUv).rgb; float intensity = max(dot(vNormal, normalize(sunDir)), 0.0); float specStr = texture2D(tS, vUv).r; vec3 viewDir = normalize(-vPosition); vec3 reflectDir = reflect(-sunDir, vNormal); float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0) * specStr; float mixVal = smoothstep(-0.1, 0.2, intensity); vec3 final = mix(night*1.5, day, mixVal); final += vec3(1.0, 0.9, 0.7) * spec * 1.5 * mixVal; gl_FragColor = vec4(final, 1.0); }`;
+    const atmosphereVS = `varying vec3 vN; void main() { vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+    const atmosphereFS = `varying vec3 vN; void main() { float i = pow(0.5 - dot(vN, vec3(0,0,1.0)), 2.0); gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * i; }`;
+
+    // --- Core Variables ---
+    let scene, camera, renderer, controls, clock, sunLight, starField;
+    let earth, clouds, atmosphere, windSystem;
+    const windData = []; const arrowCount = 250; const earthRadius = 5;
+    let viewMode = 'space', vectorMode = 'wind';
+    const windToggles = { n2e: true, e2n: true, s2e: true, e2s: true };
+
+    init();
+
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(-5, 5, 15);
+      clock = new THREE.Clock();
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      document.getElementById('container').appendChild(renderer.domElement);
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; controls.minDistance = 6.5; controls.maxDistance = 50;
+      scene.add(new THREE.AmbientLight(0x101010));
+      sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      sunLight.position.set(100, 10, 50);
+      scene.add(sunLight);
+
+      const manager = new THREE.LoadingManager();
+      manager.onLoad = () => {
+        document.getElementById('loader').style.display = 'none';
+        const panel = document.getElementById('controls');
+        const peek = document.getElementById('controls-peek');
+        panel.style.display = 'block'; // 與舊行為一致：載入完成才顯示
+        setupControls();
+        bindCollapse(panel, peek);
+        introAnimation();
+        animate();
+      };
+      const texLoader = new THREE.TextureLoader(manager);
+
+      starField = new THREE.Mesh(new THREE.SphereGeometry(200, 64, 64), new THREE.MeshBasicMaterial({ map: texLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/starry-night.jpg'), side: THREE.BackSide }));
+      scene.add(starField);
+
+      const earthGeo = new THREE.SphereGeometry(earthRadius, 64, 64);
+      earth = new THREE.Mesh(earthGeo, new THREE.ShaderMaterial({ vertexShader: earthVS, fragmentShader: earthFS, uniforms: { tD: { value: texLoader.load('https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg') }, tN: { value: texLoader.load('https://threejs.org/examples/textures/earth_lights_2048.png') }, tS: { value: texLoader.load('https://threejs.org/examples/textures/water_2048.png') }, sunDir: { value: sunLight.position } } }));
+      scene.add(earth);
+      atmosphere = new THREE.Mesh(earthGeo, new THREE.ShaderMaterial({ vertexShader: atmosphereVS, fragmentShader: atmosphereFS, blending: THREE.AdditiveBlending, side: THREE.BackSide }));
+      atmosphere.scale.set(1.1, 1.1, 1.1);
+      scene.add(atmosphere);
+      clouds = new THREE.Mesh(new THREE.SphereGeometry(earthRadius + 0.05, 64, 64), new THREE.MeshPhongMaterial({ map: texLoader.load('https://threejs.org/examples/textures/earth_clouds_2048.png'), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending }));
+      scene.add(clouds);
+
+      windSystem = new THREE.Group();
+      scene.add(windSystem);
+      for (let i = 0; i < arrowCount; i++) {
+        const lat = Math.random() * 180 - 90; const lon = Math.random() * 360 - 180;
+        let dir; if (lat > 0) dir = (Math.random() > 0.5) ? 'e2n' : 'n2e'; else dir = (Math.random() > 0.5) ? 'e2s' : 's2e';
+        const windArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.5, 0x00ff00, 0.25, 0.2);
+        const coriolisArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.4, 0xff0000, 0.2, 0.15);
+        windSystem.add(windArrow); windSystem.add(coriolisArrow);
+        windData.push({ lat, lon, dir, speed: (Math.random() * 0.1 + 0.05) * 0.5, windArrow, coriolisArrow });
+      }
+      window.addEventListener('resize', onWindowResize, false);
+    }
+
+    function setupControls() {
+      const rotSlider = document.getElementById('rotationSpeed');
+      const coriolisDisplay = document.getElementById('coriolisValue');
+      rotSlider.addEventListener('input', () => { coriolisDisplay.textContent = (Math.abs(rotSlider.value) * 50).toFixed(0); });
+      coriolisDisplay.textContent = (Math.abs(rotSlider.value) * 50).toFixed(0);
+      document.querySelectorAll('input[name="viewMode"]').forEach(r => r.addEventListener('change', e => viewMode = e.target.value));
+      document.querySelectorAll('input[name="vectorMode"]').forEach(r => r.addEventListener('change', e => vectorMode = e.target.value));
+      Object.keys(windToggles).forEach(key => {
+        const btn = document.getElementById(`btn-${key}`);
+        btn.addEventListener('click', () => { windToggles[key] = !windToggles[key]; btn.classList.toggle('active'); });
+      });
+      const tooltip = document.getElementById('tooltip');
+      document.querySelectorAll('[data-tooltip]').forEach(el => {
+        el.addEventListener('mouseenter', () => { tooltip.textContent = el.dataset.tooltip; tooltip.style.opacity = 1; });
+        el.addEventListener('mouseleave', () => { tooltip.style.opacity = 0; });
+        el.addEventListener('mousemove', e => { tooltip.style.left = `${e.clientX + 15}px`; tooltip.style.top = `${e.clientY + 15}px`; });
+      });
+    }
+
+    // 綁定摺疊/展開邏輯（不碰既有控制器與動畫邏輯）
+    function bindCollapse(panel, peek){
+      const toggleBtn = document.getElementById('controlsToggle');
+      const showBtn = document.getElementById('controlsShow');
+
+      const setExpanded = (expanded) => {
+        panel.classList.toggle('collapsed', !expanded);
+        panel.setAttribute('aria-expanded', String(expanded));
+        toggleBtn.setAttribute('aria-expanded', String(expanded));
+        toggleBtn.textContent = expanded ? '⮜ 收起' : '⮞ 展開';
+        peek.classList.toggle('show', !expanded);
+        showBtn.setAttribute('aria-expanded', String(!expanded));
+      };
+
+      // 預設展開
+      setExpanded(true);
+
+      toggleBtn.addEventListener('click', () => {
+        const expanded = panel.getAttribute('aria-expanded') === 'true';
+        setExpanded(!expanded);
+      });
+      showBtn.addEventListener('click', () => setExpanded(true));
+    }
+
+    function introAnimation() {
+      const startPos = camera.position.clone();
+      const endPos = new THREE.Vector3(0, 0, 12);
+      let t = 0;
+      function animateIntro() {
+        if (t > 1) return;
+        requestAnimationFrame(animateIntro);
+        t += 0.005;
+        camera.position.lerpVectors(startPos, endPos, t);
+        controls.update();
+      }
+      animateIntro();
+    }
+
+    function latLonToVector3(lat, lon, r) { const p = (90 - lat) * Math.PI / 180; const t = (lon + 180) * Math.PI / 180; return new THREE.Vector3(-r * Math.sin(p) * Math.cos(t), r * Math.cos(p), r * Math.sin(p) * Math.sin(t)); }
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+      const rotSpeed = document.getElementById('rotationSpeed').value / 1000;
+
+      // View Mode
+      if (viewMode === 'space') {
+        earth.rotation.y += rotSpeed * dt;
+        clouds.rotation.y += rotSpeed * 1.2 * dt;
+        windSystem.rotation.y = earth.rotation.y;
+        starField.rotation.y = 0;
+      } else {
+        earth.rotation.y = 0; clouds.rotation.y = 0; windSystem.rotation.y = 0;
+        starField.rotation.y -= rotSpeed * dt;
+      }
+
+      // Wind + Coriolis
+      for (const data of windData) {
+        const isVisible = windToggles[data.dir];
+        data.windArrow.visible = isVisible && (vectorMode === 'wind' || vectorMode === 'both');
+        data.coriolisArrow.visible = isVisible && (vectorMode === 'coriolis' || vectorMode === 'both');
+        if (!isVisible) continue;
+
+        const currentPos = latLonToVector3(data.lat, data.lon, 5.2);
+        if (data.dir === 'e2n') { data.lat += data.speed; if (data.lat > 89) data.lat = 1; }
+        else if (data.dir === 'e2s') { data.lat -= data.speed; if (data.lat < -89) data.lat = -1; }
+        else if (data.dir === 'n2e') { data.lat -= data.speed; if (data.lat < 1) data.lat = 89; }
+        else if (data.dir === 's2e') { data.lat += data.speed; if (data.lat > -1) data.lat = -89; }
+
+        const coriolisEffect = rotSpeed * 2500 * Math.sin(data.lat * Math.PI / 180) * dt;
+        if (data.dir === 'e2n' || data.dir === 's2e') { data.lon -= coriolisEffect; } else { data.lon += coriolisEffect; }
+
+        const nextPos = latLonToVector3(data.lat, data.lon, 5.2);
+        const windVec = nextPos.clone().sub(currentPos).normalize();
+
+        data.windArrow.position.copy(nextPos);
+        if (windVec.lengthSq() > 0.0001) data.windArrow.setDirection(windVec);
+
+        if (data.coriolisArrow.visible) {
+          const omega = new THREE.Vector3(0, rotSpeed * 50, 0);
+          const coriolisVec = new THREE.Vector3().crossVectors(windVec, omega);
+          data.coriolisArrow.position.copy(nextPos);
+          if (coriolisVec.lengthSq() > 0.0001) data.coriolisArrow.setDirection(coriolisVec.normalize());
+        }
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+</html>
