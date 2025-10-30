@@ -4,8 +4,6 @@
   "scripts": {
     "dev": "sass docs/assets/scss:docs/assets/css && sass --watch docs/assets/scss:docs/assets/css",
     "build": "node ./node_modules/sass/sass.js --style=compressed docs/assets/scss:docs/assets/css"
-
-    // "build": "sass --style=compressed docs/assets/scss:docs/assets/css"
   },
   "devDependencies": {
     "sass": "^1.77.0",
